@@ -1,0 +1,52 @@
+{
+  "site": {
+    "title": "ichiyo",
+    "root-title": "ichiyo (@1Yie)",
+    "home-title": "ichiyo",
+    "about-title": "关于",
+    "blog-title": "博客",
+    "link-title": "友链",
+    "error-404": "404"
+  },
+  "ui-header": {
+    "title": "ichiyo",
+    "home": "首页",
+    "about": "关于",
+    "blog": "博客",
+    "link": "友链",
+    "follow-system": "跟随系统",
+    "light": "浅色模式",
+    "dark": "深色模式"
+  },
+  "ui-footer": {
+    "title": "ichiyo",
+    "social-icon": "svg here",
+    "copyright": "Copyright © 2025 ichiyo"
+  },
+  "home-title": {
+    "home-title": "存活于二十一世纪互联网",
+    "home-subtitle": "这是一个副标题",
+    "hr": "の",
+    "text-1": "这是第一行",
+    "text-2": "这是第二行",
+    "text-3": "这是第三行",
+    "text-4": "这是第四行"
+  },
+  "home-project": {
+    "title": "项目",
+    "subtitle": "这是项目副标题"
+  },
+  "about-title": {
+    "about-title": "关于标题",
+    "about-sub-title": "关于副标题"
+  },
+  "link-title": {
+    "link-title": "友链标题",
+    "link-sub-title": "友链副标题"
+  },
+  "error-404": {
+    "title": "页面未找到",
+    "sub-title": "您访问的页面不存在",
+    "back-link": "返回首页"
+  }
+}

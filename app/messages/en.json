@@ -1,0 +1,52 @@
+{
+  "site": {
+    "title": "ichiyo",
+    "root-title": "ichiyo (@1Yie)",
+    "home-title": "ichiyo",
+    "about-title": "About",
+    "blog-title": "Blog",
+    "link-title": "Links",
+    "error-404": "404"
+  },
+  "ui-header": {
+    "title": "ichiyo",
+    "home": "Home",
+    "about": "About",
+    "blog": "Blog",
+    "link": "Links",
+    "follow-system": "Follow System",
+    "light": "Light Mode",
+    "dark": "Dark Mode"
+  },
+  "ui-footer": {
+    "title": "ichiyo",
+    "social-icon": "svg here",
+    "copyright": "Copyright © 2025 ichiyo"
+  },
+  "home-title": {
+    "home-title": "This is test title",
+    "home-subtitle": "This is test sub title",
+    "hr": "&",
+    "text-1": "This is the first line",
+    "text-2": "This is the second line",
+    "text-3": "This is the third line",
+    "text-4": "This is the fourth line"
+  },
+  "home-project": {
+    "title": "Project title",
+    "subtitle": "Project sub title"
+  },
+  "about-title": {
+    "about-title": "ABOUT TITLE",
+    "about-sub-title": "ABOUT SUB TITLE"
+  },
+  "link-title": {
+    "link-title": "LINK TITLE",
+    "link-sub-title": "LINK SUB TITLE"
+  },
+  "error-404": {
+    "title": "404 Not Found",
+    "sub-title": "The page you are looking for does not exist.",
+    "back-link": "Go back to home"
+  }
+}

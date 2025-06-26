@@ -1,0 +1,22 @@
+import type { Metadata } from "next";
+import { createTranslator } from "next-intl";
+import { getMessages } from "next-intl/server";
+
+import LinkTitle from "@/app/ui/link-title"
+
+export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
+  const messages = await getMessages();
+  const i18n = createTranslator({ locale: params.locale, messages, namespace: "site" });
+
+  return {
+    title: `${i18n("title")} | ${i18n("link-title")}`,
+  };
+}
+
+export default function Link() {
+    return (
+        <>
+        <LinkTitle />   
+        </>
+    )
+}

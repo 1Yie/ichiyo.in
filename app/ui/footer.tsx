@@ -1,0 +1,71 @@
+import Link from "next/link";
+import {
+  NavigationMenu,
+  NavigationMenuItem,
+  // NavigationMenuLink,
+  NavigationMenuList,
+} from "@/components/ui/navigation-menu";
+import { IoLogoGithub } from "react-icons/io5";
+import { useTranslations } from "next-intl";
+
+type SocialIconLinkProps = {
+  href: string;
+  children: React.ReactNode;
+};
+
+export default function Footer() {
+  const i18n = useTranslations("ui-footer");
+
+  const SocialIconLink = ({ href, children }: SocialIconLinkProps) => (
+    <Link
+      href={href}
+      className="transition-colors hover:text-gray-600 dark:hover:text-gray-300"
+    >
+      {children}
+    </Link>
+  );
+
+  return (
+    <div className="relative">
+      <section className="section-base">
+        <div className="flex justify-between items-center px-3 py-3 pl-5 pr-5 sm:pl-8 sm:pr-8">
+          <div className="flex items-center space-x-4 font-['Raleway',sans-serif]">
+            <Link href="/">
+              <p className="text-lg text-primary">{i18n("title")}</p>
+            </Link>
+          </div>
+
+          <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center space-x-4 max-[768px]:hidden">
+            <p className="text-sm text-gray-500 dark:text-gray-300 font-['Source_Code_Pro',monospace]">
+              {i18n("copyright")}
+            </p>
+          </div>
+
+          <div className="flex items-center space-x-4">
+            <NavigationMenu>
+              <NavigationMenuList>
+                <NavigationMenuItem className="flex flex-row gap-2">
+                  <SocialIconLink href="#">
+                    <IoLogoGithub size={24} />
+                  </SocialIconLink>
+
+                  <SocialIconLink href="#">
+                    <IoLogoGithub size={24} />
+                  </SocialIconLink>
+
+                  <SocialIconLink href="#">
+                    <IoLogoGithub size={24} />
+                  </SocialIconLink>
+
+                  <SocialIconLink href="#">
+                    <IoLogoGithub size={24} />
+                  </SocialIconLink>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
