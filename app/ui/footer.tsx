@@ -5,7 +5,11 @@ import {
   // NavigationMenuLink,
   NavigationMenuList,
 } from "@/components/ui/navigation-menu";
-import { IoLogoGithub } from "react-icons/io5";
+import { FaGithub } from "react-icons/fa6";
+import { FaXTwitter } from "react-icons/fa6";
+import { FaBluesky } from "react-icons/fa6";
+import { FaTelegram } from "react-icons/fa6";
+
 import { useTranslations } from "next-intl";
 
 type SocialIconLinkProps = {
@@ -46,19 +50,19 @@ export default function Footer() {
               <NavigationMenuList>
                 <NavigationMenuItem className="flex flex-row gap-2">
                   <SocialIconLink href="#">
-                    <IoLogoGithub size={24} />
+                    <FaGithub size={22} />
                   </SocialIconLink>
 
                   <SocialIconLink href="#">
-                    <IoLogoGithub size={24} />
+                    <FaXTwitter size={22} />
                   </SocialIconLink>
 
                   <SocialIconLink href="#">
-                    <IoLogoGithub size={24} />
+                    <FaTelegram size={22} />
                   </SocialIconLink>
 
                   <SocialIconLink href="#">
-                    <IoLogoGithub size={24} />
+                    <FaBluesky size={22} />
                   </SocialIconLink>
                 </NavigationMenuItem>
               </NavigationMenuList>

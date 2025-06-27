@@ -24,13 +24,17 @@
     "copyright": "Copyright © 2025 ichiyo"
   },
   "home-title": {
-    "home-title": "This is test title",
-    "home-subtitle": "This is test sub title",
+    "home-title": "Welcome to the era of the 21st century internet",
+    "home-subtitle": "Welcome to the era of the 21st century internet",
     "hr": "&",
-    "text-1": "This is the first line",
-    "text-2": "This is the second line",
-    "text-3": "This is the third line",
-    "text-4": "This is the fourth line"
+    "text-1": "Edge",
+    "text-2": "CV warrior",
+    "text-3": "AI dependency",
+    "text-4": "Programmer",
+    "text-5": "BUG maker",
+    "text-6": "Caffeine dependency",
+    "text-7": "Lazy",
+    "text-8": "Front-end transparent"
   },
   "home-project": {
     "title": "Project title",

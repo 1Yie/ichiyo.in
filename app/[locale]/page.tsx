@@ -4,13 +4,12 @@ import type { Metadata } from "next";
 import Home from "@/app/ui/home-title";
 import HomeProject from "@/app/ui/home-project";
 
-export async function generateMetadata(
-  props: Promise<{ params: { locale: string } }>
-): Promise<Metadata> {
-  const { params } = await props;
+export async function generateMetadata(props: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const params = await props.params;
   const messages = await getMessages();
   const i18n = createTranslator({
-    
     locale: params.locale,
     messages,
     namespace: "site",

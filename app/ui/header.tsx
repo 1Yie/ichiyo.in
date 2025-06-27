@@ -7,25 +7,25 @@ import {
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
-  // NavigationMenuTrigger,
-  // NavigationMenuContent,
 } from "@/components/ui/navigation-menu";
 
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  // DropdownMenuLabel,
-  // DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { IoLanguageSharp } from "react-icons/io5";
-import { MdOutlineDarkMode } from "react-icons/md";
-import { MdOutlineLightMode } from "react-icons/md";
-
-import { IoChevronDownSharp } from "react-icons/io5";
-import { IoDesktopOutline } from "react-icons/io5";
+import {
+  IoLanguageSharp,
+  IoChevronDownSharp,
+  IoDesktopOutline,
+} from "react-icons/io5";
+import {
+  MdOutlineDarkMode,
+  MdOutlineLightMode,
+} from "react-icons/md";
+import { RxHamburgerMenu } from "react-icons/rx";
 
 import { useTranslations, useLocale } from "next-intl";
 import { Link, usePathname } from "../i18n/navigation";
@@ -35,16 +35,12 @@ export default function Header() {
   const i18n = useTranslations("ui-header");
   const pathname = usePathname();
   const currentLocale = useLocale();
-
   const { theme, setAppTheme } = useThemeSwitcher();
 
   useEffect(() => {
     const theme = localStorage.getItem("theme");
-    const systemDark = window.matchMedia(
-      "(prefers-color-scheme: dark)"
-    ).matches;
+    const systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
     const enabled = theme === "dark" || (!theme && systemDark);
-
     document.documentElement.classList.toggle("dark", enabled);
   }, []);
 
@@ -65,20 +61,14 @@ export default function Header() {
 
     useEffect(() => {
       const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-      const handleChange = () => {
-        setIsSystemDark(mediaQuery.matches);
-      };
+      const handleChange = () => setIsSystemDark(mediaQuery.matches);
       setIsSystemDark(mediaQuery.matches);
       mediaQuery.addEventListener("change", handleChange);
-
-      return () => {
-        mediaQuery.removeEventListener("change", handleChange);
-      };
+      return () => mediaQuery.removeEventListener("change", handleChange);
     }, []);
 
     if (theme === "dark") return <MdOutlineDarkMode className="text-lg" />;
     if (theme === "light") return <MdOutlineLightMode className="text-lg" />;
-
     return isSystemDark ? (
       <MdOutlineDarkMode className="text-lg" />
     ) : (
@@ -107,14 +97,14 @@ export default function Header() {
   return (
     <header className="border-b z-10">
       <section className="section-base">
-        <div className="flex justify-between items-center px-3 py-3 pl-5 pr-5 sm:pl-8 sm:pr-8">
+        <div className="flex justify-between items-center px-4 py-3">
           <div className="flex items-center space-x-4 font-['Raleway',sans-serif]">
             <Link href="/">
               <p className="text-lg text-primary">{i18n("title")}</p>
             </Link>
           </div>
 
-          <nav className="flex items-center">
+          <nav className="hidden sm:flex items-center">
             <NavigationMenu>
               <NavigationMenuList>
                 {navItems.map((item) => (
@@ -123,7 +113,9 @@ export default function Header() {
                       <Link
                         href={item.href}
                         className={`px-4 py-2 ${
-                          pathname === item.href ? "bg-accent" : ""
+                          pathname === item.href
+                            ? "bg-accent text-accent-foreground"
+                            : ""
                         }`}
                       >
                         {item.label}
@@ -131,6 +123,7 @@ export default function Header() {
                     </NavigationMenuLink>
                   </NavigationMenuItem>
                 ))}
+
                 <NavigationMenuItem>
                   <DropdownMenu>
                     <DropdownMenuTrigger className="px-4 py-2 hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground rounded-md transition-colors flex items-center gap-1 group">
@@ -140,10 +133,7 @@ export default function Header() {
                         className="transition-transform duration-200 group-data-[state=open]:rotate-180"
                       />
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                      align="center"
-                      className="min-w-[120px] space-y-1"
-                    >
+                    <DropdownMenuContent align="center" className="min-w-[120px] space-y-1">
                       {languages.map(({ locale, label }) => (
                         <DropdownMenuItem key={locale} asChild>
                           <Link
@@ -162,38 +152,105 @@ export default function Header() {
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </NavigationMenuItem>
-                <DropdownMenu>
-                  <DropdownMenuTrigger className="px-4 py-2 hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground rounded-md transition-colors flex items-center gap-1 group">
-                    <ThemeIcon theme={theme} />
-                    <IoChevronDownSharp
-                      size={12}
-                      className="transition-transform duration-200 group-data-[state=open]:rotate-180"
-                    />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    align="center"
-                    className="min-w-[120px] space-y-1"
-                  >
-                    {themeOptions.map(({ value, label, icon }) => (
-                      <DropdownMenuItem
-                        key={value}
-                        className={`cursor-pointer flex items-center gap-2 ${
-                          theme === value
-                            ? "bg-accent text-accent-foreground font-semibold"
-                            : "text-muted-foreground"
-                        }`}
-                        onClick={() =>
-                          setAppTheme(value as "system" | "light" | "dark")
-                        }
-                      >
-                        {icon}
-                        <span>{label}</span>
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
+
+                <NavigationMenuItem>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger className="px-4 py-2 hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground rounded-md transition-colors flex items-center gap-1 group">
+                      <ThemeIcon theme={theme} />
+                      <IoChevronDownSharp
+                        size={12}
+                        className="transition-transform duration-200 group-data-[state=open]:rotate-180"
+                      />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="center" className="min-w-[120px] space-y-1">
+                      {themeOptions.map(({ value, label, icon }) => (
+                        <DropdownMenuItem
+                          key={value}
+                          className={`cursor-pointer flex items-center gap-2 ${
+                            theme === value
+                              ? "bg-accent text-accent-foreground font-semibold"
+                              : "text-muted-foreground"
+                          }`}
+                          onClick={() => setAppTheme(value as "system" | "light" | "dark")}
+                        >
+                          {icon}
+                          <span>{label}</span>
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </NavigationMenuItem>
               </NavigationMenuList>
             </NavigationMenu>
+          </nav>
+
+          <nav className="sm:hidden flex items-center gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger className="p-2 rounded-md hover:bg-accent hover:text-accent-foreground">
+                <IoLanguageSharp className="text-lg" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-[120px] space-y-1">
+                {languages.map(({ locale, label }) => (
+                  <DropdownMenuItem key={locale} asChild>
+                    <Link
+                      href={pathname}
+                      locale={locale}
+                      className={`cursor-pointer ${
+                        currentLocale === locale
+                          ? "bg-accent text-accent-foreground font-semibold"
+                          : "text-muted-foreground"
+                      }`}
+                    >
+                      {label}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger className="p-2 rounded-md hover:bg-accent hover:text-accent-foreground">
+                <ThemeIcon theme={theme} />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-[150px] space-y-1">
+                {themeOptions.map(({ value, label, icon }) => (
+                  <DropdownMenuItem
+                    key={value}
+                    className={`cursor-pointer flex items-center gap-2 ${
+                      theme === value
+                        ? "bg-accent text-accent-foreground font-semibold"
+                        : "text-muted-foreground"
+                    }`}
+                    onClick={() => setAppTheme(value as "system" | "light" | "dark")}
+                  >
+                    {icon}
+                    <span>{label}</span>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger className="p-2 rounded-md hover:bg-accent hover:text-accent-foreground">
+                <RxHamburgerMenu size={20} />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="p-2 space-y-1 z-50">
+                {navItems.map((item) => (
+                  <DropdownMenuItem key={item.href} asChild>
+                    <Link
+                      href={item.href}
+                      className={`cursor-pointer ${
+                        pathname === item.href
+                          ? "bg-accent text-accent-foreground font-semibold"
+                          : "text-muted-foreground"
+                      }`}
+                    >
+                      {item.label}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </nav>
         </div>
       </section>

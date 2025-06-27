@@ -4,11 +4,10 @@ import { getMessages } from "next-intl/server";
 
 import { notFound } from "next/navigation";
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { locale: string };
+export async function generateMetadata(props: {
+  params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
+  const params = await props.params;
   const messages = await getMessages();
   const i18n = createTranslator({
     locale: params.locale,

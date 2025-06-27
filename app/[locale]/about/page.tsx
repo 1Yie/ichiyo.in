@@ -4,9 +4,16 @@ import { getMessages } from "next-intl/server";
 
 import AboutTitle from "@/app/ui/about-title";
 
-export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
+export async function generateMetadata(props: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const params = await props.params;
   const messages = await getMessages();
-  const i18n = createTranslator({ locale: params.locale, messages, namespace: "site" });
+  const i18n = createTranslator({
+    locale: params.locale,
+    messages,
+    namespace: "site",
+  });
 
   return {
     title: `${i18n("title")} | ${i18n("about-title")}`,

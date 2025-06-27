@@ -8,7 +8,7 @@ export default function Home() {
   return (
     <div className="border-b">
       <section className="section-base p-3 bg-squares h-[40vh] sm:h-[60vh]">
-        <div className="flex flex-col justify-center items-center min-h-full text-center">
+        <div className="flex flex-col justify-center items-center min-h-full text-center font-bold font-kinghwa">
           <SplitText
             text={i18n("home-title")}
             className="text-3xl sm:text-5xl"
@@ -27,7 +27,7 @@ export default function Home() {
             easing="ease-out"
             initialOpacity={0}
           >
-            <p className="text-2xl sm:text-4xl text-gray-400 m-5">
+            <p className="text-2xl sm:text-4xl text-gray-400 m-2 sm:m-5">
               {i18n("hr")}
             </p>
           </FadeContent>
@@ -40,6 +40,10 @@ export default function Home() {
               i18n("text-2"),
               i18n("text-3"),
               i18n("text-4"),
+              i18n("text-5"),
+              i18n("text-6"),
+              i18n("text-7"),
+              i18n("text-8"),
             ]}
           />
         </div>
