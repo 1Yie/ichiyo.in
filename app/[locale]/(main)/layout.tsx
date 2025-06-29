@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import { getLocale } from "next-intl/server";
-import { Ubuntu_Sans, Source_Code_Pro, Raleway } from 'next/font/google';
-import "../globals.css";
-import Header from "@/app/ui/header";
-import Footer from "@/app/ui/footer";
+import { Ubuntu_Sans, Source_Code_Pro, Raleway } from "next/font/google";
+import "@/app/globals.css";
+
 import ClientThemeProvider from "./client-theme-provider";
 import { NextIntlClientProvider } from "next-intl";
 import NextTopLoader from "nextjs-toploader";
+
+import Header from "@/app/ui/header";
+import Footer from "@/app/ui/footer";
 
 export const metadata: Metadata = {
   title: "ichiyo (@1Yie)",
@@ -14,24 +16,23 @@ export const metadata: Metadata = {
 };
 
 const ubuntu = Ubuntu_Sans({
-	subsets: ['latin'],
-	weight: ['100', '200', '300', '400', '500', '600', '700', '800'],
-	style: ['normal', 'italic'],
-	display: 'swap',
+  subsets: ["latin"],
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800"],
+  style: ["normal", "italic"],
+  display: "swap",
 });
 
 const sourceCodePro = Source_Code_Pro({
-	subsets: ['latin'],
-	weight: ['500'],
-	display: 'swap',
+  subsets: ["latin"],
+  weight: ["500"],
+  display: "swap",
 });
 
 const raleway = Raleway({
-	subsets: ['latin'],
-	weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
-	display: 'swap',
+  subsets: ["latin"],
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+  display: "swap",
 });
-
 
 export default async function RootLayout({
   children,
@@ -42,7 +43,9 @@ export default async function RootLayout({
 
   return (
     <html lang={locale}>
-      <body className={`antialiased ${ubuntu.className} ${sourceCodePro.className} ${raleway.className}`}>
+      <body
+        className={`antialiased ${ubuntu.className} ${sourceCodePro.className} ${raleway.className}`}
+      >
         <ClientThemeProvider>
           <NextIntlClientProvider>
             <NextTopLoader

@@ -1,0 +1,137 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
+const errorMessages: Record<string, string> = {
+  MISSING_FIELDS: "请输入邮箱和密码",
+  INVALID_CREDENTIALS: "邮箱或密码错误",
+  INTERNAL_ERROR: "服务器错误，请稍后再试",
+  DEFAULT: "登录失败，请重试",
+};
+
+export function LoginForm({
+  className,
+  ...props
+}: React.ComponentProps<"div">) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [errorDialogOpen, setErrorDialogOpen] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const from = searchParams.get("from") || "/dashboard"; // 默认跳转路径
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include", // ✅ 重要：允许服务器设置 cookie
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        // ✅ 不再使用 localStorage，直接跳转回原页面
+        router.replace(from);
+      } else {
+        const msg =
+          errorMessages[data.code as string] ||
+          data.message ||
+          errorMessages.DEFAULT;
+        setErrorMsg(msg);
+        setErrorDialogOpen(true);
+      }
+    } catch (err) {
+      console.error("请求错误:", err);
+      setErrorMsg("请求失败，请检查网络");
+      setErrorDialogOpen(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <>
+      <div className={cn("flex flex-col gap-6", className)} {...props}>
+        <Card>
+          <CardHeader className="text-center">
+            <CardTitle className="text-xl">登录</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleLogin}>
+              <div className="grid gap-6">
+                <div className="grid gap-3">
+                  <Label htmlFor="email">邮箱</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="请输入邮箱"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </div>
+                <div className="grid gap-3">
+                  <Label htmlFor="password">密码</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="请输入密码"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                </div>
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? "登录中..." : "登录"}
+                </Button>
+                <Link href="/register">
+                  <Button type="button" className="w-full" variant="outline">
+                    注册
+                  </Button>
+                </Link>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+
+      <AlertDialog open={errorDialogOpen} onOpenChange={setErrorDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>登录失败</AlertDialogTitle>
+            <AlertDialogDescription>{errorMsg}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setErrorDialogOpen(false)}>
+              关闭
+            </AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  );
+}
