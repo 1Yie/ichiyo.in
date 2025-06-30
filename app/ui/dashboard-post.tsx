@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from 'nextjs-toploader/app'
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import {
   Breadcrumb,
@@ -171,11 +171,11 @@ export default function DashboardPost() {
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BreadcrumbLink href="/dashboard">仪表盘</BreadcrumbLink>
+                <BreadcrumbLink className="cursor-pointer" onClick={() => router.push('/dashboard')}>仪表盘</BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbLink href="/dashboard/post">文章管理</BreadcrumbLink>
+                <BreadcrumbLink className="cursor-pointer" onClick={() => router.push('/dashboard/post')}>文章管理</BreadcrumbLink>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
@@ -186,7 +186,7 @@ export default function DashboardPost() {
         <div className="bg-muted/50 flex-1 rounded-xl p-4">
           <div className="w-full h-full bg-white p-4 rounded-xl">
             <div className="flex items-center justify-between mb-4 ml-2 mr-2">
-              <h1 className="text-2xl font-bold mb-4">文章列表</h1>
+              <h1 className="text-2xl font-bold">文章列表</h1>
               <Button onClick={() => router.push("/dashboard/post/new")}>
                 <Pencil className="mr-1 h-4 w-4" />
                 新建文章

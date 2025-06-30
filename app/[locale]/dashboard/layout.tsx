@@ -4,10 +4,10 @@ import { Ubuntu_Sans, Source_Code_Pro, Raleway } from "next/font/google";
 import "@/app/globals.css";
 
 import { NextIntlClientProvider } from "next-intl";
-import NextTopLoader from "nextjs-toploader";
 
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/ui/app-sidebar";
+import NextTopLoader from "nextjs-toploader";
 
 export const metadata: Metadata = {
   title: "ichiyo (@1Yie)",
@@ -46,19 +46,19 @@ export default async function RootLayout({
         className={`antialiased ${ubuntu.className} ${sourceCodePro.className} ${raleway.className}`}
       >
         <NextIntlClientProvider>
-          <NextTopLoader
-            color="var(--foreground)"
-            initialPosition={0.08}
-            crawlSpeed={200}
-            height={3}
-            crawl={true}
-            showSpinner={false}
-            zIndex={9999}
-            easing="ease"
-            speed={200}
-            shadow="0 0 10px var(--foreground),0 0 5px var(--foreground)"
-          />
           <SidebarProvider>
+            <NextTopLoader
+              color="var(--foreground)"
+              initialPosition={0.08}
+              crawlSpeed={200}
+              height={3}
+              crawl={true}
+              showSpinner={false}
+              zIndex={9999}
+              easing="ease"
+              speed={200}
+              shadow="0 0 10px var(--foreground),0 0 5px var(--foreground)"
+            />
             <AppSidebar />
             {children}
           </SidebarProvider>

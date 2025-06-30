@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../lib/generated/prisma"
 }
 
 datasource db {
@@ -9,23 +8,23 @@ datasource db {
 }
 
 model User {
-  uid          Int      @id @default(autoincrement())
-  id           String   @unique
-  email        String   @unique
+  uid          Int    @id @default(autoincrement())
+  id           String @unique
+  email        String @unique
   hashpassword String
   posts        Post[]
 }
 
 model Post {
-  id        Int      @id @default(autoincrement())
+  id        Int     @id @default(autoincrement())
   title     String
-  slug      String   @unique
+  slug      String  @unique
   content   String
-  published Boolean  @default(false)
+  published Boolean @default(false)
 
-  author    User     @relation(fields: [authorUid], references: [uid])
+  author    User @relation(fields: [authorUid], references: [uid])
   authorUid Int
 
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 }

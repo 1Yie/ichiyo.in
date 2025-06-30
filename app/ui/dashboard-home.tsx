@@ -10,8 +10,10 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
+import { useRouter } from "nextjs-toploader/app";
 
 export default function DashboardHome() {
+  const router = useRouter();
 
   return (
     <SidebarInset>
@@ -25,7 +27,7 @@ export default function DashboardHome() {
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BreadcrumbLink href="#">仪表盘</BreadcrumbLink>
+                <BreadcrumbLink className="cursor-pointer" onClick={() => router.push('/dashboard')}>仪表盘</BreadcrumbLink>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>

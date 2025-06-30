@@ -4,6 +4,7 @@ import * as React from "react";
 
 import { GalleryVerticalEnd, Cog, NotebookTabs } from "lucide-react";
 
+
 import { NavProjects } from "@/components/nav-projects";
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";

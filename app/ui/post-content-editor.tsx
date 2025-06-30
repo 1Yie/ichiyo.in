@@ -1,7 +1,6 @@
-"use client";
-
 import React from "react";
-import ReactMarkdown from "react-markdown";
+import { useEffect, useState } from "react";
+import { parseMarkdown } from "@/lib/markdown";
 import { Textarea } from "@/components/ui/textarea";
 import {
   ResizablePanelGroup,
@@ -22,10 +21,18 @@ export function PostContentEditor({
   textareaRef,
   saving,
 }: PostContentEditorProps) {
+  const [html, setHtml] = useState("");
+  useEffect(() => {
+    async function parse() {
+      const result = await parseMarkdown(content);
+      setHtml(result);
+    }
+    parse();
+  }, [content]);
   return (
     <ResizablePanelGroup
       direction="horizontal"
-      className="rounded-md border mb-4 bg-gray-50"
+      className="rounded-md border mb-4 bg-gray-50 h-full w-full"
     >
       <ResizablePanel defaultSize={50} minSize={30} className="p-2">
         <Textarea
@@ -38,10 +45,15 @@ export function PostContentEditor({
         />
       </ResizablePanel>
       <ResizableHandle withHandle />
-      <ResizablePanel defaultSize={50} minSize={30} className="p-4 overflow-auto">
-        <div className="prose max-w-none">
-          <ReactMarkdown>{content}</ReactMarkdown>
-        </div>
+      <ResizablePanel
+        defaultSize={50}
+        minSize={30}
+        className="p-4 w-2"
+      >
+        <div 
+          className="post-style"
+          dangerouslySetInnerHTML={{ __html: html }}
+        />
       </ResizablePanel>
     </ResizablePanelGroup>
   );

@@ -5,10 +5,11 @@ import { verifyToken } from "@/lib/auth";
 import { generateSlug } from "@/lib/slug";
 
 interface Params {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
-export async function GET(request: Request, { params }: Params) {
+export async function GET(request: Request, props: Params) {
+  const params = await props.params;
   const postId = Number(params.id);
   if (isNaN(postId)) {
     return NextResponse.json({ error: "无效文章ID" }, { status: 400 });
@@ -42,7 +43,8 @@ export async function GET(request: Request, { params }: Params) {
   return NextResponse.json(post);
 }
 
-export async function PATCH(request: Request, { params }: Params) {
+export async function PATCH(request: Request, props: Params) {
+  const params = await props.params;
   const postId = Number(params.id);
   if (isNaN(postId)) {
     return NextResponse.json({ error: "无效文章ID" }, { status: 400 });
@@ -90,7 +92,8 @@ export async function PATCH(request: Request, { params }: Params) {
   return NextResponse.json(updatedPost);
 }
 
-export async function DELETE(request: Request, { params }: Params) {
+export async function DELETE(request: Request, props: Params) {
+  const params = await props.params;
   const postId = Number(params.id);
   if (isNaN(postId)) {
     return NextResponse.json({ error: "无效文章ID" }, { status: 400 });

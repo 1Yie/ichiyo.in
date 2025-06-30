@@ -11,6 +11,11 @@ import {
   Heading4,
   Heading5,
   Heading6,
+  AlertCircle,
+  StickyNote,
+  Lightbulb,
+  Bell,
+  ShieldAlert,
 } from "lucide-react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
@@ -52,17 +57,11 @@ export function FontStyleToggleGroup({
     underline: false,
   });
 
-  // 改进的样式检测函数
   const detectActiveStyles = (selectedText: string) => {
-    // 1. 先检测加粗（**包裹）
     const boldStart = selectedText.startsWith("**");
     const boldEnd = selectedText.endsWith("**");
-
-    // 2. 检测斜体（*包裹，且不被**包含）
     const italicStart = selectedText.startsWith("*") && !boldStart;
     const italicEnd = selectedText.endsWith("*") && !boldEnd;
-
-    // 3. 处理***特殊情况
     const isTripleStar =
       selectedText.startsWith("***") && selectedText.endsWith("***");
 
@@ -74,7 +73,6 @@ export function FontStyleToggleGroup({
     };
   };
 
-  // 检测选区变化并更新按钮状态
   React.useEffect(() => {
     const textarea = textareaRef.current;
     if (!textarea) return;
@@ -82,11 +80,7 @@ export function FontStyleToggleGroup({
     const handleSelectionChange = () => {
       const { selectionStart, selectionEnd } = textarea;
       if (selectionStart === selectionEnd) {
-        setActiveStyles({
-          bold: false,
-          italic: false,
-          underline: false,
-        });
+        setActiveStyles({ bold: false, italic: false, underline: false });
         return;
       }
 
@@ -95,7 +89,6 @@ export function FontStyleToggleGroup({
       setActiveStyles(newActiveStyles);
     };
 
-    // 添加事件监听
     textarea.addEventListener("select", handleSelectionChange);
     textarea.addEventListener("click", handleSelectionChange);
     textarea.addEventListener("keyup", handleSelectionChange);
@@ -117,13 +110,11 @@ export function FontStyleToggleGroup({
 
     const { selectionStart, selectionEnd } = textarea;
     let selectedText = content.slice(selectionStart, selectionEnd);
-
     let newText = "";
     let cursorStart = 0;
     let cursorEnd = 0;
 
     if (remove) {
-      // 移除样式标记
       selectedText = selectedText.slice(before.length, -after.length);
       newText =
         content.slice(0, selectionStart) +
@@ -132,7 +123,6 @@ export function FontStyleToggleGroup({
       cursorStart = selectionStart;
       cursorEnd = selectionStart + selectedText.length;
     } else {
-      // 添加样式标记
       newText =
         content.slice(0, selectionStart) +
         before +
@@ -157,9 +147,7 @@ export function FontStyleToggleGroup({
     const markers = STYLE_MARKERS[style];
     const isActive = activeStyles[style];
 
-    // 特殊处理加粗/斜体的嵌套情况
     if (style === "bold" && activeStyles.italic) {
-      // 如果已经是斜体，先移除斜体再添加加粗
       insertAtSelection(
         STYLE_MARKERS.italic.start,
         STYLE_MARKERS.italic.end,
@@ -175,7 +163,6 @@ export function FontStyleToggleGroup({
     }
 
     if (style === "italic" && activeStyles.bold) {
-      // 如果已经是加粗，先移除加粗再添加斜体
       insertAtSelection(STYLE_MARKERS.bold.start, STYLE_MARKERS.bold.end, true);
       insertAtSelection(markers.start, markers.end);
       setActiveStyles({
@@ -186,7 +173,6 @@ export function FontStyleToggleGroup({
       return;
     }
 
-    // 正常情况处理
     insertAtSelection(markers.start, markers.end, isActive);
     setActiveStyles((prev) => ({ ...prev, [style]: !isActive }));
   };
@@ -194,11 +180,10 @@ export function FontStyleToggleGroup({
   const handleHeadingClick = (level: string) => {
     const textarea = textareaRef.current;
     if (!textarea) return;
-    const { selectionStart } = textarea;
 
+    const { selectionStart } = textarea;
     const lineStart = content.lastIndexOf("\n", selectionStart - 1) + 1;
     const headingPrefix = "#".repeat(Number(level.replace("h", ""))) + " ";
-
     let lineEnd = content.indexOf("\n", selectionStart);
     if (lineEnd === -1) lineEnd = content.length;
 
@@ -211,7 +196,6 @@ export function FontStyleToggleGroup({
       headingPrefix +
       lineContent +
       content.slice(lineEnd);
-
     setContent(newText);
 
     setTimeout(() => {
@@ -225,13 +209,36 @@ export function FontStyleToggleGroup({
     onHeadingLevelChange(level);
   };
 
+  const insertAlertBlock = (type: string) => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const { selectionStart } = textarea;
+    const prefix = `> [!${type.toUpperCase()}]\n> `;
+
+    const newText =
+      content.slice(0, selectionStart) +
+      `${prefix}请输入提示内容..\n\n` +
+      content.slice(selectionStart);
+    setContent(newText);
+
+    setTimeout(() => {
+      if (textareaRef.current) {
+        textareaRef.current.focus();
+        textareaRef.current.setSelectionRange(
+          selectionStart + prefix.length,
+          selectionStart + prefix.length + 9
+        );
+      }
+    }, 0);
+  };
+
   return (
-    <div className="flex items-center space-x-4 mb-2">
+    <div className="flex flex-wrap gap-3 items-center mb-3">
       <ToggleGroup
         type="single"
         variant="outline"
         aria-label="标题级别"
-        className="flex"
         value={headingLevel}
         onValueChange={(val) => val && handleHeadingClick(val)}
       >
@@ -241,11 +248,10 @@ export function FontStyleToggleGroup({
             <ToggleGroupItem
               key={level}
               value={level}
-              aria-label={level}
               title={level.toUpperCase()}
               className="flex items-center justify-center"
             >
-              <Icon className="h-5 w-5" />
+              <Icon className="w-4 h-4" />
             </ToggleGroupItem>
           );
         })}
@@ -255,8 +261,7 @@ export function FontStyleToggleGroup({
         type="multiple"
         variant="outline"
         aria-label="字体样式"
-        className="flex"
-        value={Object.keys(activeStyles).filter((style) => activeStyles[style])}
+        value={Object.keys(activeStyles).filter((s) => activeStyles[s])}
       >
         <ToggleGroupItem
           value="bold"
@@ -264,7 +269,7 @@ export function FontStyleToggleGroup({
           title="加粗"
           aria-pressed={activeStyles.bold}
         >
-          <Bold className="h-4 w-4" />
+          <Bold className="w-4 h-4" />
         </ToggleGroupItem>
         <ToggleGroupItem
           value="italic"
@@ -272,7 +277,7 @@ export function FontStyleToggleGroup({
           title="斜体"
           aria-pressed={activeStyles.italic}
         >
-          <Italic className="h-4 w-4" />
+          <Italic className="w-4 h-4" />
         </ToggleGroupItem>
         <ToggleGroupItem
           value="underline"
@@ -280,7 +285,55 @@ export function FontStyleToggleGroup({
           title="下划线"
           aria-pressed={activeStyles.underline}
         >
-          <Underline className="h-4 w-4" />
+          <Underline className="w-4 h-4" />
+        </ToggleGroupItem>
+      </ToggleGroup>
+
+      <ToggleGroup
+        type="single"
+        variant="outline"
+        className="flex"
+        aria-label="提示块插入"
+      >
+        <ToggleGroupItem
+          value="WARNING"
+          title="警告提示"
+          onClick={() => insertAlertBlock("WARNING")}
+          className="flex items-center justify-center"
+        >
+          <AlertCircle className="w-4 h-4 text-yellow-600" />
+        </ToggleGroupItem>
+        <ToggleGroupItem
+          value="NOTE"
+          title="笔记提示"
+          onClick={() => insertAlertBlock("NOTE")}
+          className="flex items-center justify-center"
+        >
+          <StickyNote className="w-4 h-4 text-blue-500" />
+        </ToggleGroupItem>
+        <ToggleGroupItem
+          value="TIP"
+          title="技巧提示"
+          onClick={() => insertAlertBlock("TIP")}
+          className="flex items-center justify-center"
+        >
+          <Lightbulb className="w-4 h-4 text-green-500" />
+        </ToggleGroupItem>
+        <ToggleGroupItem
+          value="IMPORTANT"
+          title="重要提示"
+          onClick={() => insertAlertBlock("IMPORTANT")}
+          className="flex items-center justify-center"
+        >
+          <Bell className="w-4 h-4 text-red-500" />
+        </ToggleGroupItem>
+        <ToggleGroupItem
+          value="CAUTION"
+          title="小心提示"
+          onClick={() => insertAlertBlock("CAUTION")}
+          className="flex items-center justify-center"
+        >
+          <ShieldAlert className="w-4 h-4 text-orange-500" />
         </ToggleGroupItem>
       </ToggleGroup>
     </div>

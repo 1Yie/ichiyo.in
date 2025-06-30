@@ -1,10 +1,11 @@
 import DashboardEditPost from "@/ui/dashboard-edit-post";
 
 interface Props {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
-export default function DashboardPostEditPage({ params }: Props) {
+export default async function DashboardPostEditPage(props: Props) {
+  const params = await props.params;
   const postId = Number(params.id);
 
   if (isNaN(postId)) {

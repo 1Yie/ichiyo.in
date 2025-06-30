@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import BlogSlug from "@/ui/blog-slug";
 
 interface Post {
   id: number;
@@ -16,46 +17,45 @@ interface Post {
   };
 }
 
-// 动态设置页面标题
 export async function generateMetadata({
   params,
 }: {
   params: { slug: string };
 }): Promise<Metadata> {
-  const res = await fetch(`http://localhost:3000/api/post/${params.slug}`, {
-    next: { revalidate: 60 },
-  });
+  const res = await fetch(
+    `${process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : process.env.NEXT_PUBLIC_API_BASE_URL}/api/post/bySlug/${params.slug}`,
+    {
+      next: { revalidate: 60 },
+    }
+  );
 
   if (!res.ok) {
-    return {
-      title: "文章未找到",
-    };
+    return { title: "404 | ichiyo" };
   }
 
   const post = await res.json();
   return {
-    title: post.title,
+    title: post.title + " | ichiyo",
   };
 }
 
-export default async function Page({ params }: { params: { slug: string } }) {
-  const res = await fetch(`http://localhost:3000/api/post/${params.slug}`, {
-    next: { revalidate: 60 },
+async function getPostData(slug: string): Promise<Post | null> {
+  const res = await fetch(`http://localhost:3000/api/post/bySlug/${slug}`, {
+    cache: "no-store",
   });
 
   if (!res.ok) {
+    return null;
+  }
+
+  return res.json();
+}
+
+export default async function Page({ params }: { params: { slug: string } }) {
+  const post = await getPostData(params.slug);
+  if (!post) {
     notFound();
   }
 
-  const post: Post = await res.json();
-
-  return (
-    <article className="prose lg:prose-xl mx-auto py-8">
-      <h1 className="text-3xl font-bold">{post.title}</h1>
-      <p className="text-gray-500 text-sm">
-        作者：{post.author?.id} ｜ 发布时间：{new Date(post.createdAt).toLocaleDateString()}
-      </p>
-      <div className="mt-6 leading-relaxed whitespace-pre-line">{post.content}</div>
-    </article>
-  );
+  return <BlogSlug params={{ slug: params.slug }} />;
 }

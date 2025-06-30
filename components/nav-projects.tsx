@@ -1,6 +1,7 @@
 "use client";
 
 import { type LucideIcon } from "lucide-react";
+import { useRouter } from "nextjs-toploader/app";
 
 import {
   SidebarGroup,
@@ -21,6 +22,7 @@ export function NavProjects({
   }[];
   label: string;
 }) {
+  const router = useRouter();
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel>{label}</SidebarGroupLabel>
@@ -28,10 +30,10 @@ export function NavProjects({
         {projects.map((item) => (
           <SidebarMenuItem key={item.name}>
             <SidebarMenuButton asChild>
-              <a href={item.url}>
+              <button className="flex w-full" onClick={() => router.push(item.url)}>
                 <item.icon />
                 <span>{item.name}</span>
-              </a>
+              </button>
             </SidebarMenuButton>
           </SidebarMenuItem>
         ))}

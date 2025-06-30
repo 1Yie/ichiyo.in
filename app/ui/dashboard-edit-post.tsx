@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from 'nextjs-toploader/app'
 
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import {
@@ -44,7 +44,7 @@ export default function DashboardEditPost({ postId }: DashboardEditPostProps) {
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const [headingLevel, setHeadingLevel] = useState<string>("h1");
+  const [headingLevel, setHeadingLevel] = useState<string>("");
 
   useEffect(() => {
     async function fetchPost() {
@@ -68,6 +68,7 @@ export default function DashboardEditPost({ postId }: DashboardEditPostProps) {
     }
     fetchPost();
   }, [postId]);
+  
 
   const handleSave = async () => {
     setSaving(true);
@@ -109,15 +110,15 @@ export default function DashboardEditPost({ postId }: DashboardEditPostProps) {
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BreadcrumbLink href="/dashboard">仪表盘</BreadcrumbLink>
+                <BreadcrumbLink className="cursor-pointer" onClick={() => router.push('/dashboard')}>仪表盘</BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbLink href={`/dashboard/post/`}>作品</BreadcrumbLink>
+                <BreadcrumbLink className="cursor-pointer" onClick={() => router.push('/dashboard/post')}>文章管理</BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbLink href={`/dashboard/post/${post?.id}`}>
+                <BreadcrumbLink className="cursor-pointer" onClick={() => router.push(`/dashboard/post/${post?.id}`)}>
                   编辑文章
                 </BreadcrumbLink>
               </BreadcrumbItem>
@@ -125,7 +126,7 @@ export default function DashboardEditPost({ postId }: DashboardEditPostProps) {
           </Breadcrumb>
         </div>
       </header>
-      <div className="flex flex-1 flex-col gap-4 p-4 pt-0 h-full w-full min-w-0">
+      <div className="flex flex-1 flex-col gap-4 p-4 pt-0 h-full w-full">
         <div className="bg-muted/50 flex-1 rounded-xl p-4 h-full w-full min-w-0">
           <div className="bg-white rounded-xl p-4 h-full w-full min-w-0 flex flex-col">
             {loading ? (

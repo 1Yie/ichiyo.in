@@ -3,7 +3,8 @@ import { getLocale } from "next-intl/server";
 import { Ubuntu_Sans, Source_Code_Pro, Raleway } from "next/font/google";
 import "@/app/globals.css";
 
-import ClientThemeProvider from "./client-theme-provider";
+import ClientThemeWrapper from '@/ui/clientTheme-wrapper';
+
 import { NextIntlClientProvider } from "next-intl";
 import NextTopLoader from "nextjs-toploader";
 
@@ -42,11 +43,11 @@ export default async function RootLayout({
   const locale = await getLocale();
 
   return (
-    <html lang={locale}>
-      <body
+    <html  lang={locale}>
+      <body 
         className={`antialiased ${ubuntu.className} ${sourceCodePro.className} ${raleway.className}`}
       >
-        <ClientThemeProvider>
+        <ClientThemeWrapper>
           <NextIntlClientProvider>
             <NextTopLoader
               color="var(--foreground)"
@@ -64,7 +65,7 @@ export default async function RootLayout({
             {children}
             <Footer />
           </NextIntlClientProvider>
-        </ClientThemeProvider>
+        </ClientThemeWrapper>
       </body>
     </html>
   );

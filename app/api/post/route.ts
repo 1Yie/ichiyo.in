@@ -17,7 +17,6 @@ export async function GET(request: Request) {
     }
   }
 
-  // 获取查询参数 ?summary=true
   const { searchParams } = new URL(request.url);
   const summary = searchParams.get("summary") === "true";
 
@@ -27,7 +26,6 @@ export async function GET(request: Request) {
     orderBy: { id: "desc" } as const,
     ...(summary
       ? {
-          // 不返回 content，返回精简字段
           select: {
             id: true,
             slug: true,
