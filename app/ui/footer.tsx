@@ -10,16 +10,12 @@ import { FaXTwitter } from "react-icons/fa6";
 import { FaBluesky } from "react-icons/fa6";
 import { FaTelegram } from "react-icons/fa6";
 
-import { useTranslations } from "next-intl";
-
 type SocialIconLinkProps = {
   href: string;
   children: React.ReactNode;
 };
 
 export default function Footer() {
-  const i18n = useTranslations("ui-footer");
-
   const SocialIconLink = ({ href, children }: SocialIconLinkProps) => (
     <Link
       href={href}
@@ -35,13 +31,13 @@ export default function Footer() {
         <div className="flex justify-between items-center px-3 py-3 pl-5 pr-5 sm:pl-8 sm:pr-8">
           <div className="flex items-center space-x-4 font-['Raleway',sans-serif]">
             <Link href="/">
-              <p className="text-lg text-primary">{i18n("title")}</p>
+              <p className="text-lg text-primary">ichiyo</p>
             </Link>
           </div>
 
           <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center space-x-4 max-[768px]:hidden">
             <p className="text-sm text-gray-500 dark:text-gray-300 font-['Source_Code_Pro',monospace]">
-              {i18n("copyright")}
+              Copyright © 2025 ichiyo
             </p>
           </div>
 

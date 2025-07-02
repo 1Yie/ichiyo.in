@@ -1,37 +1,28 @@
 "use client";
 
 import { useState, useEffect } from "react";
-
 import {
   NavigationMenu,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
 } from "@/components/ui/navigation-menu";
-
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-import {
-  IoLanguageSharp,
-  IoChevronDownSharp,
-  IoDesktopOutline,
-} from "react-icons/io5";
+import { IoChevronDownSharp, IoDesktopOutline } from "react-icons/io5";
 import { MdOutlineDarkMode, MdOutlineLightMode } from "react-icons/md";
 import { RxHamburgerMenu } from "react-icons/rx";
 
-import { useTranslations, useLocale } from "next-intl";
-import { Link, usePathname } from "../i18n/navigation";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useThemeSwitcher } from "@/lib/use-theme-switcher";
 
 export default function Header() {
-  const i18n = useTranslations("ui-header");
   const pathname = usePathname();
-  const currentLocale = useLocale();
   const { theme, setAppTheme } = useThemeSwitcher();
 
   useEffect(() => {
@@ -44,15 +35,10 @@ export default function Header() {
   }, []);
 
   const navItems = [
-    { href: "/", label: i18n("home") },
-    { href: "/blog", label: i18n("blog") },
-    { href: "/about", label: i18n("about") },
-    { href: "/link", label: i18n("link") },
-  ];
-
-  const languages = [
-    { locale: "zh", label: "中文" },
-    { locale: "en", label: "English" },
+    { href: "/", label: "首页" },
+    { href: "/blog", label: "博客" },
+    { href: "/about", label: "关于" },
+    { href: "/link", label: "友链" },
   ];
 
   function ThemeIcon({ theme }: { theme: "system" | "light" | "dark" }) {
@@ -78,17 +64,17 @@ export default function Header() {
   const themeOptions = [
     {
       value: "system",
-      label: i18n("follow-system"),
+      label: "跟随系统",
       icon: <IoDesktopOutline size={18} />,
     },
     {
       value: "light",
-      label: i18n("light"),
+      label: "浅色模式",
       icon: <MdOutlineLightMode size={18} />,
     },
     {
       value: "dark",
-      label: i18n("dark"),
+      label: "深色模式",
       icon: <MdOutlineDarkMode size={18} />,
     },
   ];
@@ -99,7 +85,7 @@ export default function Header() {
         <div className="flex justify-between items-center px-4 py-3">
           <div className="flex items-center space-x-4 font-['Raleway',sans-serif]">
             <Link href="/">
-              <p className="text-lg text-primary">{i18n("title")}</p>
+              <p className="text-lg text-primary">ichiyo</p>
             </Link>
           </div>
 
@@ -122,38 +108,6 @@ export default function Header() {
                     </NavigationMenuLink>
                   </NavigationMenuItem>
                 ))}
-
-                <NavigationMenuItem>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger className="px-4 py-2 hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground rounded-md transition-colors flex items-center gap-1 group">
-                      <IoLanguageSharp className="text-lg" />
-                      <IoChevronDownSharp
-                        size={12}
-                        className="transition-transform duration-200 group-data-[state=open]:rotate-180"
-                      />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                      align="center"
-                      className="min-w-[120px] space-y-1"
-                    >
-                      {languages.map(({ locale, label }) => (
-                        <DropdownMenuItem key={locale} asChild>
-                          <Link
-                            href={pathname}
-                            locale={locale}
-                            className={`cursor-pointer ${
-                              currentLocale === locale
-                                ? "bg-accent text-accent-foreground font-semibold"
-                                : "text-muted-foreground"
-                            }`}
-                          >
-                            {label}
-                          </Link>
-                        </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </NavigationMenuItem>
 
                 <NavigationMenuItem>
                   <DropdownMenu>
@@ -192,32 +146,6 @@ export default function Header() {
           </nav>
 
           <nav className="sm:hidden flex items-center gap-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger className="p-2 rounded-md hover:bg-accent hover:text-accent-foreground">
-                <IoLanguageSharp className="text-lg" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align="end"
-                className="min-w-[120px] space-y-1"
-              >
-                {languages.map(({ locale, label }) => (
-                  <DropdownMenuItem key={locale} asChild>
-                    <Link
-                      href={pathname}
-                      locale={locale}
-                      className={`cursor-pointer ${
-                        currentLocale === locale
-                          ? "bg-accent text-accent-foreground font-semibold"
-                          : "text-muted-foreground"
-                      }`}
-                    >
-                      {label}
-                    </Link>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-
             <DropdownMenu>
               <DropdownMenuTrigger className="p-2 rounded-md hover:bg-accent hover:text-accent-foreground">
                 <ThemeIcon theme={theme} />

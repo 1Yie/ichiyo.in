@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { useTranslations } from "next-intl";
 
 const projects = [
   {
@@ -23,15 +22,14 @@ const projects = [
 ];
 
 export default function HomeProject() {
-  const i18n = useTranslations("home-project");
   return (
     <>
       <div className="border-b bg-gray-50 dark:bg-black">
         <section className="section-base px-8 py-6">
           <div className="flex flex-col">
-            <h1 className="text-2xl">{i18n("title")}</h1>
+            <h1 className="text-2xl">项目</h1>
             <p className="text-lg text-gray-600 dark:text-gray-300">
-              {i18n("subtitle")}
+              不才明主弃，多病故人疏。
             </p>
           </div>
         </section>

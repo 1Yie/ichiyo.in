@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
-import { getLocale } from "next-intl/server";
 import { Ubuntu_Sans, Source_Code_Pro, Raleway } from "next/font/google";
 import "@/app/globals.css";
 
 import ClientThemeWrapper from "@/ui/clientTheme-wrapper";
 
-import { NextIntlClientProvider } from "next-intl";
 import NextTopLoader from "nextjs-toploader";
 import ImageZoom from "@/ui/img-zoom";
 
@@ -41,32 +39,28 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const locale = await getLocale();
-
   return (
-    <html lang={locale}>
+    <html>
       <body
         className={`antialiased ${ubuntu.className} ${sourceCodePro.className} ${raleway.className}`}
       >
         <ClientThemeWrapper>
-          <NextIntlClientProvider>
-            <ImageZoom />
-            <NextTopLoader
-              color="var(--foreground)"
-              initialPosition={0.08}
-              crawlSpeed={200}
-              height={3}
-              crawl={true}
-              showSpinner={false}
-              zIndex={9999}
-              easing="ease"
-              speed={200}
-              shadow="0 0 10px var(--foreground),0 0 5px var(--foreground)"
-            />
-            <Header />
-            {children}
-            <Footer />
-          </NextIntlClientProvider>
+          <ImageZoom />
+          <NextTopLoader
+            color="var(--foreground)"
+            initialPosition={0.08}
+            crawlSpeed={200}
+            height={3}
+            crawl={true}
+            showSpinner={false}
+            zIndex={9999}
+            easing="ease"
+            speed={200}
+            shadow="0 0 10px var(--foreground),0 0 5px var(--foreground)"
+          />
+          <Header />
+          {children}
+          <Footer />
         </ClientThemeWrapper>
       </body>
     </html>

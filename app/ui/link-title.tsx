@@ -1,15 +1,13 @@
-import { useTranslations } from "next-intl";
 import SplitText from "@/components/ui/split-text";
 import FadeContent from "@/components/ui/fade-content";
 
 export default function LinkTitle() {
-  const i18n = useTranslations("link-title");
   return (
     <div className="border-b">
       <section className="flex justify-center items-start flex-col section-base bg-squares h-[15vh] sm:h-[20vh]">
         <div className="p-4">
           <SplitText
-            text={i18n("link-title")}
+            text={"友链 / 朋友"}
             className="text-2xl sm:text-4xl"
             delay={30}
             duration={0.4}
@@ -27,7 +25,7 @@ export default function LinkTitle() {
             easing="ease-out"
             initialOpacity={0}
           >
-            <p className="text-sm text-gray-600 dark:text-gray-300 sm:text-lg">{i18n("link-sub-title")}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-300 sm:text-lg">江南无所有，聊赠一枝春。</p>
           </FadeContent>
         </div>
       </section>

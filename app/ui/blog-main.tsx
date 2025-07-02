@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "nextjs-toploader/app";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Link } from "../i18n/navigation";
+import  Link from "next/link";
+
 
 interface Post {
   id: number;
