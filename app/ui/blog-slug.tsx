@@ -86,6 +86,7 @@ export default function PostPage({ params }: { params: { slug: string } }) {
             duration={0.4}
             ease="power3.out"
             splitType="chars"
+            textAlign="left"
             from={{ opacity: 0, y: 40 }}
             to={{ opacity: 1, y: 0 }}
             threshold={0.1}
@@ -102,7 +103,9 @@ export default function PostPage({ params }: { params: { slug: string } }) {
         <section className="section-base">
           <div
             className="post-style max-[768px]:px-[20px] max-[768px]:py-[30px] py-[20px] px-[120px] leading-relaxed"
-            dangerouslySetInnerHTML={{ __html: htmlContent }}
+            dangerouslySetInnerHTML={{
+              __html: htmlContent.replace(/<img/g, '<img data-zoom="true"'),
+            }}
           />
         </section>
       </div>

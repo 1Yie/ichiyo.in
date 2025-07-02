@@ -5,15 +5,40 @@ import {
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
-  // BreadcrumbPage,
-  // BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { useRouter } from "nextjs-toploader/app";
+import { useEffect } from "react";
+
+declare global {
+  interface Window {
+    Artalk: {
+      loadCountWidget: (options: {
+        server: string;
+        site: string;
+        pvEl: string;
+        countEl: string;
+        statPageKeyAttr?: string;
+      }) => void;
+    };
+  }
+}
 
 export default function DashboardHome() {
   const router = useRouter();
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.Artalk?.loadCountWidget) {
+      window.Artalk.loadCountWidget({
+        server: "https://artalk.ichiyo.in/",
+        site: "blog-artalk",
+        pvEl: ".artalk-pv-count",
+        countEl: ".artalk-comment-count",
+        statPageKeyAttr: "data-path",
+      });
+    }
+  }, []);
 
   return (
     <SidebarInset>
@@ -27,12 +52,18 @@ export default function DashboardHome() {
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BreadcrumbLink className="cursor-pointer" onClick={() => router.push('/dashboard')}>仪表盘</BreadcrumbLink>
+                <BreadcrumbLink
+                  className="cursor-pointer"
+                  onClick={() => router.push("/dashboard")}
+                >
+                  仪表盘
+                </BreadcrumbLink>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
         </div>
       </header>
+
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
         <div className="grid auto-rows-min gap-4 md:grid-cols-3">
           <div className="bg-muted/50 aspect-video p-3 rounded-xl grid grid-cols-2 grid-rows-2 gap-3">
@@ -40,18 +71,32 @@ export default function DashboardHome() {
               <h1 className="text-3xl text-gray-600">文章数量</h1>
               <p className="text-2xl text-gray-500">100</p>
             </div>
+
             <div className="flex flex-col bg-white p-2 rounded-xl">
               <h1 className="text-3xl text-gray-600">评论数量</h1>
-              <p className="text-2xl text-gray-500">100</p>
+              <p
+                className="text-2xl text-gray-500 artalk-comment-count"
+                data-page-key="/dashboard"
+              >
+                {/* 评论数量将自动填充 */}
+              </p>
             </div>
+
             <div className="flex flex-col bg-white p-2 rounded-xl">
               <h1 className="text-3xl text-gray-600">阅读数量</h1>
-              <p className="text-2xl text-gray-500">100</p>
+              <p
+                className="text-2xl text-gray-500 artalk-pv-count"
+                data-page-key="/dashboard"
+              >
+                {/* 阅读数量将自动填充 */}
+              </p>
             </div>
           </div>
+
           <div className="bg-muted/50 aspect-video rounded-xl" />
           <div className="bg-muted/50 aspect-video rounded-xl" />
         </div>
+
         <div className="bg-muted/50 min-h-[100vh] flex-1 rounded-xl md:min-h-min" />
       </div>
     </SidebarInset>

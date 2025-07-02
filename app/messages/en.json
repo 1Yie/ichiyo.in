@@ -24,33 +24,37 @@
     "copyright": "Copyright © 2025 ichiyo"
   },
   "home-title": {
-    "home-title": "Welcome to the era of the 21st century internet",
-    "home-subtitle": "Welcome to the era of the 21st century internet",
-    "hr": "&",
-    "text-1": "Edge",
-    "text-2": "CV warrior",
-    "text-3": "AI dependency",
+    "home-title": "Surviving in the 21st Century Internet",
+    "home-subtitle": "This is a subtitle",
+    "hr": "'s",
+    "text-1": "Marginal",
+    "text-2": "CV Warrior",
+    "text-3": "AI Dependent",
     "text-4": "Programmer",
-    "text-5": "BUG maker",
-    "text-6": "Caffeine dependency",
-    "text-7": "Lazy",
-    "text-8": "Front-end transparent"
+    "text-5": "BUG Creator",
+    "text-6": "Coffee Addict",
+    "text-7": "Chronic Procrastinator",
+    "text-8": "Front-end Novice"
   },
   "home-project": {
-    "title": "Project title",
-    "subtitle": "Project sub title"
+    "title": "Projects",
+    "subtitle": "Lost in obscurity, drifting from familiar shores."
   },
   "about-title": {
-    "about-title": "ABOUT TITLE",
-    "about-sub-title": "ABOUT SUB TITLE"
+    "about-title": "About",
+    "about-sub-title": "A nomad between realms, tracing dreams in the clouds"
+  },
+  "blog-title": {
+    "blog-title": "Blog",
+    "blog-sub-title": "Years pass in verses, ink marks on paper."
   },
   "link-title": {
-    "link-title": "LINK TITLE",
-    "link-sub-title": "LINK SUB TITLE"
+    "link-title": "Links / Friends",
+    "link-sub-title": "From the south, I bring but a touch of spring."
   },
   "error-404": {
-    "title": "404 Not Found",
-    "sub-title": "The page you are looking for does not exist.",
-    "back-link": "Go back to home"
+    "title": "Page Not Found",
+    "sub-title": "The page you visited does not exist",
+    "back-link": "Back to Home"
   }
 }

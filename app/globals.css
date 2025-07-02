@@ -160,6 +160,15 @@
   z-index: 9999;
 }
 
+.medium-zoom-overlay {
+  z-index: 1000;
+  background: var(--background) !important;
+}
+
+.medium-zoom-image {
+  z-index: 1001;
+}
+
 html {
   scroll-behavior: smooth;
 }
@@ -225,8 +234,13 @@ scrollbar-thumb {
         transparent 20px);
   }
 
+
+  .atk-layer-wrap .atk-layer-mask {
+    backdrop-filter: blur(4px);
+  }
+
   .artalk {
-    --at-color-main: var(--color-background) !important;
+    
     border-radius: 0 !important;
 
     .atk-main-editor {
@@ -234,17 +248,19 @@ scrollbar-thumb {
     }
 
     .atk-send-btn {
+      background-color: var(--color-foreground) !important;
       color: var(--color-background) !important;
       border-radius: 0 !important;
     }
 
     .atk-list {
       --at-color-main: var(--primary) !important;
+
       .atk-copyright {
         padding-right: 0 !important;
       }
     }
-}
+  }
 
 
 
@@ -377,7 +393,7 @@ scrollbar-thumb {
     }
 
     img {
-      max-width: 60%;
+      max-width: 50%;
       height: auto;
       display: block;
       margin: 0 auto;

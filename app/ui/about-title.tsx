@@ -26,7 +26,7 @@ export default function AboutTitle() {
             easing="ease-out"
             initialOpacity={0}
           >
-            <p className="text-sm sm:text-lg">{i18n("about-sub-title")}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-300 sm:text-lg">{i18n("about-sub-title")}</p>
           </FadeContent>
         </div>
       </section>

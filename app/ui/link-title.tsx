@@ -15,6 +15,7 @@ export default function LinkTitle() {
             duration={0.4}
             ease="power3.out"
             splitType="chars"
+            textAlign="left"
             from={{ opacity: 0, y: 40 }}
             to={{ opacity: 1, y: 0 }}
             threshold={0.1}
@@ -26,7 +27,7 @@ export default function LinkTitle() {
             easing="ease-out"
             initialOpacity={0}
           >
-            <p className="text-sm sm:text-lg">{i18n("link-sub-title")}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-300 sm:text-lg">{i18n("link-sub-title")}</p>
           </FadeContent>
         </div>
       </section>

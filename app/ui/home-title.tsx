@@ -16,6 +16,7 @@ export default function Home() {
             duration={0.6}
             ease="power3.out"
             splitType="chars"
+            textAlign="left"
             from={{ opacity: 0, y: 40 }}
             to={{ opacity: 1, y: 0 }}
             threshold={0.1}

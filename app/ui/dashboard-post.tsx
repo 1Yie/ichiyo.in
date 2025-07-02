@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from 'nextjs-toploader/app'
+import { useRouter } from "nextjs-toploader/app";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import {
   Breadcrumb,
@@ -20,9 +20,20 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Pencil, ArrowUp, ArrowDown } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 
 interface Post {
   id: number;
@@ -40,9 +51,12 @@ type SortOrder = "asc" | "desc";
 export default function DashboardPost() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
-
   const [sortField, setSortField] = useState<SortField>("id");
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
+  const [deleteId, setDeleteId] = useState<number | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [errorDialogOpen, setErrorDialogOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const router = useRouter();
 
@@ -53,15 +67,13 @@ export default function DashboardPost() {
         method: "GET",
         credentials: "include",
       });
-      if (!res.ok) {
-        const errorText = await res.text();
-        console.error("Fetch posts error:", res.status, errorText);
-        throw new Error("获取文章失败");
-      }
+      if (!res.ok) throw new Error("获取文章失败");
       const data = await res.json();
       setPosts(data);
     } catch (err) {
       console.error(err);
+      setErrorMessage("获取文章失败，请稍后再试");
+      setErrorDialogOpen(true);
     } finally {
       setLoading(false);
     }
@@ -75,33 +87,33 @@ export default function DashboardPost() {
     router.push(`/dashboard/post/${id}`);
   };
 
-  const handleDelete = async (id: number) => {
-    if (!confirm("确认删除这篇文章吗？")) return;
+  const handleDelete = async () => {
+    if (deleteId === null) return;
     try {
-      const res = await fetch(`/api/post/byId/${id}`, {
+      const res = await fetch(`/api/post/byId/${deleteId}`, {
         method: "DELETE",
         credentials: "include",
       });
       if (!res.ok) throw new Error("删除失败");
-      alert("删除成功");
       fetchPosts();
     } catch (err) {
-      alert("删除失败，请稍后重试");
       console.error(err);
+      setErrorMessage("删除失败，请稍后再试");
+      setErrorDialogOpen(true);
+    } finally {
+      setShowDeleteDialog(false);
+      setDeleteId(null);
     }
   };
 
-  // 点击列头切换排序字段和顺序
-  function handleSort(field: SortField) {
+  const handleSort = (field: SortField) => {
     if (field === sortField) {
-      // 同一字段切换升降序
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     } else {
-      // 新字段默认降序
       setSortField(field);
       setSortOrder("desc");
     }
-  }
+  };
 
   const sortedPosts = [...posts].sort((a, b) => {
     let compareA: number;
@@ -161,21 +173,28 @@ export default function DashboardPost() {
 
   return (
     <SidebarInset>
-      <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+      <header className="flex h-16 items-center gap-2">
         <div className="flex items-center gap-2 px-4">
           <SidebarTrigger className="-ml-1" />
-          <Separator
-            orientation="vertical"
-            className="mr-2 data-[orientation=vertical]:h-4"
-          />
+          <Separator orientation="vertical" className="mr-2 h-4" />
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BreadcrumbLink className="cursor-pointer" onClick={() => router.push('/dashboard')}>仪表盘</BreadcrumbLink>
+                <BreadcrumbLink
+                  className="cursor-pointer"
+                  onClick={() => router.push("/dashboard")}
+                >
+                  仪表盘
+                </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbLink className="cursor-pointer" onClick={() => router.push('/dashboard/post')}>文章管理</BreadcrumbLink>
+                <BreadcrumbLink
+                  className="cursor-pointer"
+                  onClick={() => router.push("/dashboard/post")}
+                >
+                  文章管理
+                </BreadcrumbLink>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
@@ -192,19 +211,18 @@ export default function DashboardPost() {
                 新建文章
               </Button>
             </div>
+
             <div className="rounded-xl bg-muted/50 p-4">
               {loading ? (
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="font-bold">ID</TableHead>
-                      <TableHead className="font-bold">标题</TableHead>
-                      <TableHead className="font-bold">状态</TableHead>
-                      <TableHead className="font-bold">创建时间</TableHead>
-                      <TableHead className="font-bold">更新时间</TableHead>
-                      <TableHead className="text-right font-bold">
-                        操作
-                      </TableHead>
+                      <TableHead>ID</TableHead>
+                      <TableHead>标题</TableHead>
+                      <TableHead>状态</TableHead>
+                      <TableHead>创建时间</TableHead>
+                      <TableHead>更新时间</TableHead>
+                      <TableHead className="text-right">操作</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -240,29 +258,27 @@ export default function DashboardPost() {
                   <TableHeader>
                     <TableRow>
                       <TableHead
-                        className="font-bold cursor-pointer"
+                        className="cursor-pointer"
                         onClick={() => handleSort("id")}
                       >
                         ID {renderSortIcon("id")}
                       </TableHead>
-                      <TableHead className="font-bold">Slug</TableHead>
-                      <TableHead className="font-bold">标题</TableHead>
-                      <TableHead className="font-bold">状态</TableHead>
+                      <TableHead>Slug</TableHead>
+                      <TableHead>标题</TableHead>
+                      <TableHead>状态</TableHead>
                       <TableHead
-                        className="font-bold cursor-pointer"
+                        className="cursor-pointer"
                         onClick={() => handleSort("createdAt")}
                       >
                         创建时间 {renderSortIcon("createdAt")}
                       </TableHead>
                       <TableHead
-                        className="font-bold cursor-pointer"
+                        className="cursor-pointer"
                         onClick={() => handleSort("updatedAt")}
                       >
                         更新时间 {renderSortIcon("updatedAt")}
                       </TableHead>
-                      <TableHead className="text-right font-bold">
-                        操作
-                      </TableHead>
+                      <TableHead className="text-right">操作</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -300,7 +316,10 @@ export default function DashboardPost() {
                           <Button
                             size="sm"
                             variant="destructive"
-                            onClick={() => handleDelete(post.id)}
+                            onClick={() => {
+                              setDeleteId(post.id);
+                              setShowDeleteDialog(true);
+                            }}
                           >
                             删除
                           </Button>
@@ -314,6 +333,44 @@ export default function DashboardPost() {
           </div>
         </div>
       </div>
+
+      {/* 删除确认弹窗 */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              <p className="text-lg">
+                确定要删除文章《{posts.find((p) => p.id === deleteId)?.title}》吗？
+              </p>
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              删除后将无法恢复该文章，是否继续？
+            </AlertDialogDescription>
+            <AlertDialogDescription>
+              Tips: 建议将文章状态改为“未发布”，而不是直接删除。
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete}>确认删除</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* 错误提示弹窗 */}
+      <AlertDialog open={errorDialogOpen} onOpenChange={setErrorDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>操作失败</AlertDialogTitle>
+            <AlertDialogDescription>{errorMessage}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setErrorDialogOpen(false)}>
+              知道了
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </SidebarInset>
   );
 }

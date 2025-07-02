@@ -21,10 +21,7 @@ import {
   IoChevronDownSharp,
   IoDesktopOutline,
 } from "react-icons/io5";
-import {
-  MdOutlineDarkMode,
-  MdOutlineLightMode,
-} from "react-icons/md";
+import { MdOutlineDarkMode, MdOutlineLightMode } from "react-icons/md";
 import { RxHamburgerMenu } from "react-icons/rx";
 
 import { useTranslations, useLocale } from "next-intl";
@@ -39,7 +36,9 @@ export default function Header() {
 
   useEffect(() => {
     const theme = localStorage.getItem("theme");
-    const systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const systemDark = window.matchMedia(
+      "(prefers-color-scheme: dark)"
+    ).matches;
     const enabled = theme === "dark" || (!theme && systemDark);
     document.documentElement.classList.toggle("dark", enabled);
   }, []);
@@ -133,7 +132,10 @@ export default function Header() {
                         className="transition-transform duration-200 group-data-[state=open]:rotate-180"
                       />
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="center" className="min-w-[120px] space-y-1">
+                    <DropdownMenuContent
+                      align="center"
+                      className="min-w-[120px] space-y-1"
+                    >
                       {languages.map(({ locale, label }) => (
                         <DropdownMenuItem key={locale} asChild>
                           <Link
@@ -162,7 +164,10 @@ export default function Header() {
                         className="transition-transform duration-200 group-data-[state=open]:rotate-180"
                       />
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="center" className="min-w-[120px] space-y-1">
+                    <DropdownMenuContent
+                      align="center"
+                      className="min-w-[120px] space-y-1"
+                    >
                       {themeOptions.map(({ value, label, icon }) => (
                         <DropdownMenuItem
                           key={value}
@@ -171,7 +176,9 @@ export default function Header() {
                               ? "bg-accent text-accent-foreground font-semibold"
                               : "text-muted-foreground"
                           }`}
-                          onClick={() => setAppTheme(value as "system" | "light" | "dark")}
+                          onClick={() =>
+                            setAppTheme(value as "system" | "light" | "dark")
+                          }
                         >
                           {icon}
                           <span>{label}</span>
@@ -189,7 +196,10 @@ export default function Header() {
               <DropdownMenuTrigger className="p-2 rounded-md hover:bg-accent hover:text-accent-foreground">
                 <IoLanguageSharp className="text-lg" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="min-w-[120px] space-y-1">
+              <DropdownMenuContent
+                align="end"
+                className="min-w-[120px] space-y-1"
+              >
                 {languages.map(({ locale, label }) => (
                   <DropdownMenuItem key={locale} asChild>
                     <Link
@@ -212,7 +222,10 @@ export default function Header() {
               <DropdownMenuTrigger className="p-2 rounded-md hover:bg-accent hover:text-accent-foreground">
                 <ThemeIcon theme={theme} />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="min-w-[150px] space-y-1">
+              <DropdownMenuContent
+                align="end"
+                className="min-w-[150px] space-y-1"
+              >
                 {themeOptions.map(({ value, label, icon }) => (
                   <DropdownMenuItem
                     key={value}
@@ -221,7 +234,9 @@ export default function Header() {
                         ? "bg-accent text-accent-foreground font-semibold"
                         : "text-muted-foreground"
                     }`}
-                    onClick={() => setAppTheme(value as "system" | "light" | "dark")}
+                    onClick={() =>
+                      setAppTheme(value as "system" | "light" | "dark")
+                    }
                   >
                     {icon}
                     <span>{label}</span>

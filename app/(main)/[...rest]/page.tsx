@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import { createTranslator } from "next-intl";
 import { getMessages } from "next-intl/server";
 
-import AboutTitle from "@/app/ui/about-title";
-import AboutMain from "@/app/ui/about-main";
+import { notFound } from "next/navigation";
 
 export async function generateMetadata(props: {
   params: Promise<{ locale: string }>;
@@ -15,17 +14,11 @@ export async function generateMetadata(props: {
     messages,
     namespace: "site",
   });
-
   return {
-    title: `${i18n("title")} | ${i18n("about-title")}`,
+    title: `${i18n("title")} | ${i18n("error-404")}`,
   };
 }
 
-export default function About() {
-  return (
-    <>
-      <AboutTitle />
-      <AboutMain />
-    </>
-  );
+export default function CatchAllPage() {
+  notFound();
 }

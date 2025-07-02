@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { useRouter } from 'nextjs-toploader/app'
+import { useRouter } from "nextjs-toploader/app";
 
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import {
@@ -12,6 +12,16 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
+
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
 
 import { Input } from "@/components/ui/input";
 
@@ -45,12 +55,13 @@ export default function DashboardEditPost({ postId }: DashboardEditPostProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const [headingLevel, setHeadingLevel] = useState<string>("");
+  const [showErrorDialog, setShowErrorDialog] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     async function fetchPost() {
       try {
         const res = await fetch(`/api/post/byId/${postId}`, {
-
           credentials: "include",
         });
         if (!res.ok) throw new Error("获取文章失败");
@@ -68,13 +79,11 @@ export default function DashboardEditPost({ postId }: DashboardEditPostProps) {
     }
     fetchPost();
   }, [postId]);
-  
 
   const handleSave = async () => {
     setSaving(true);
     try {
       const res = await fetch(`/api/post/byId/${postId}`, {
-
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -85,10 +94,16 @@ export default function DashboardEditPost({ postId }: DashboardEditPostProps) {
           slug: slug.trim() || undefined,
         }),
       });
-      if (!res.ok) throw new Error("保存失败");
+      if (!res.ok) {
+        const data = await res.json();
+        const msg = data?.error || "创建失败，请重试";
+        throw new Error(msg);
+      }
       router.push("/dashboard/post");
     } catch (err) {
-      alert("保存失败，请重试");
+      const msg = err instanceof Error ? err.message : "创建失败，请重试";
+      setErrorMessage(msg);
+      setShowErrorDialog(true);
       console.error(err);
     } finally {
       setSaving(false);
@@ -110,15 +125,28 @@ export default function DashboardEditPost({ postId }: DashboardEditPostProps) {
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BreadcrumbLink className="cursor-pointer" onClick={() => router.push('/dashboard')}>仪表盘</BreadcrumbLink>
+                <BreadcrumbLink
+                  className="cursor-pointer"
+                  onClick={() => router.push("/dashboard")}
+                >
+                  仪表盘
+                </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbLink className="cursor-pointer" onClick={() => router.push('/dashboard/post')}>文章管理</BreadcrumbLink>
+                <BreadcrumbLink
+                  className="cursor-pointer"
+                  onClick={() => router.push("/dashboard/post")}
+                >
+                  文章管理
+                </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbLink className="cursor-pointer" onClick={() => router.push(`/dashboard/post/${post?.id}`)}>
+                <BreadcrumbLink
+                  className="cursor-pointer"
+                  onClick={() => router.push(`/dashboard/post/${post?.id}`)}
+                >
                   编辑文章
                 </BreadcrumbLink>
               </BreadcrumbItem>
@@ -228,6 +256,17 @@ export default function DashboardEditPost({ postId }: DashboardEditPostProps) {
           </div>
         </div>
       </div>
+      <AlertDialog open={showErrorDialog} onOpenChange={setShowErrorDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>出错了</AlertDialogTitle>
+            <AlertDialogDescription>{errorMessage}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>关闭</AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </SidebarInset>
   );
 }

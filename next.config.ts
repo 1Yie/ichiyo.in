@@ -3,7 +3,7 @@ import createNextIntlPlugin from "next-intl/plugin";
 
 const nextConfig: NextConfig = {
   images: {
-    domains: ["*.ichiyo.in"],
+    domains: ["*.ichiyo.in", "dn-qiniu-avatar.qbox.me"],
   },
 };
 

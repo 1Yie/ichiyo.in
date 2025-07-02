@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { createTranslator } from "next-intl";
 import { getMessages } from "next-intl/server";
 
-import AboutTitle from "@/app/ui/about-title";
-import AboutMain from "@/app/ui/about-main";
+import BlogTitle from "@/app/ui/blog-title";
+import BlogMain from "@/app/ui/blog-main";
 
 export async function generateMetadata(props: {
   params: Promise<{ locale: string }>;
@@ -17,15 +17,15 @@ export async function generateMetadata(props: {
   });
 
   return {
-    title: `${i18n("title")} | ${i18n("about-title")}`,
+    title: `${i18n("title")} | ${i18n("blog-title")}`,
   };
 }
 
-export default function About() {
+export default function Blog() {
   return (
     <>
-      <AboutTitle />
-      <AboutMain />
+      <BlogTitle />
+      <BlogMain />
     </>
   );
 }

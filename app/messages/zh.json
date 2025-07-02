@@ -38,15 +38,19 @@
   },
   "home-project": {
     "title": "项目",
-    "subtitle": "这是项目副标题"
+    "subtitle": "不才明主弃，多病故人疏。"
   },
   "about-title": {
-    "about-title": "关于标题",
-    "about-sub-title": "关于副标题"
+    "about-title": "关于",
+    "about-sub-title": "逍遥天地间，心梦随云烟。"
+  },
+  "blog-title": {
+    "blog-title": "博客",
+    "blog-sub-title": "岁吟事，墨记笺。"
   },
   "link-title": {
-    "link-title": "友链标题",
-    "link-sub-title": "友链副标题"
+    "link-title": "友链 / 朋友",
+    "link-sub-title": "江南无所有，聊赠一枝春。"
   },
   "error-404": {
     "title": "页面未找到",

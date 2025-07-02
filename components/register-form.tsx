@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { SecretInput } from "@/components/ui/secret-input";
 import Link from "next/link";
 
 import {
@@ -148,9 +149,8 @@ export function RegisterForm({
                 </div>
                 <div className="grid gap-3">
                   <Label htmlFor="registerKey">注册密钥</Label>
-                  <Input
+                  <SecretInput
                     id="registerKey"
-                    type="password"
                     required
                     placeholder="请输入注册密钥"
                     value={registerKey}

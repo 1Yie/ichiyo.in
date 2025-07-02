@@ -1,11 +1,21 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { useRouter } from 'nextjs-toploader/app'
+import { useRouter } from "nextjs-toploader/app";
+
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
 
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import {
-  Breadcrumb, 
+  Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
@@ -13,7 +23,6 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
-
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FontStyleToggleGroup } from "@/ui/font-style-toggle-group";
@@ -30,6 +39,9 @@ export default function DashboardNewPost() {
   const [saving, setSaving] = useState(false);
   const [headingLevel, setHeadingLevel] = useState<string>("");
 
+  const [showErrorDialog, setShowErrorDialog] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
   const handleCreate = async () => {
     setSaving(true);
     try {
@@ -44,11 +56,19 @@ export default function DashboardNewPost() {
           published,
         }),
       });
-      if (!res.ok) throw new Error("创建失败");
+
+      if (!res.ok) {
+        const data = await res.json();
+        const msg = data?.error || "创建失败，请重试";
+        throw new Error(msg);
+      }
+
       router.push("/dashboard/post");
     } catch (err) {
-      alert("创建失败，请重试");
-      console.error(err);
+      const msg = err instanceof Error ? err.message : "创建失败，请重试";
+      setErrorMessage(msg);
+      setShowErrorDialog(true);
+      console.error("创建文章失败:", err);
     } finally {
       setSaving(false);
     }
@@ -70,16 +90,28 @@ export default function DashboardNewPost() {
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BreadcrumbLink className="cursor-pointer" onClick={() => router.push('/dashboard')}>仪表盘</BreadcrumbLink>
-
+                <BreadcrumbLink
+                  className="cursor-pointer"
+                  onClick={() => router.push("/dashboard")}
+                >
+                  仪表盘
+                </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbLink className="cursor-pointer" onClick={() => router.push('/dashboard/post')}>文章管理</BreadcrumbLink>
+                <BreadcrumbLink
+                  className="cursor-pointer"
+                  onClick={() => router.push("/dashboard/post")}
+                >
+                  文章管理
+                </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbLink className="cursor-pointer" onClick={() => router.push('/dashboard/post/new')}>
+                <BreadcrumbLink
+                  className="cursor-pointer"
+                  onClick={() => router.push("/dashboard/post/new")}
+                >
                   新建文章
                 </BreadcrumbLink>
               </BreadcrumbItem>
@@ -106,6 +138,7 @@ export default function DashboardNewPost() {
               />
             </div>
 
+            {/* Slug 输入 */}
             <div className="mb-4">
               <label htmlFor="slug" className="block mb-1 font-semibold">
                 自定义 URL Slug（可留空）
@@ -167,6 +200,19 @@ export default function DashboardNewPost() {
           </div>
         </div>
       </div>
+
+      {/* 错误弹窗 */}
+      <AlertDialog open={showErrorDialog} onOpenChange={setShowErrorDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>出错了</AlertDialogTitle>
+            <AlertDialogDescription>{errorMessage}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>关闭</AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </SidebarInset>
   );
 }
