@@ -31,11 +31,30 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { FontStyleToggleGroup } from "@/ui/font-style-toggle-group";
 import { PostContentEditor } from "@/ui/post-content-editor";
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
 interface Post {
   id: number;
   title: string;
+  slug?: string;
   content: string;
   published: boolean;
+  authors: {
+    user: { uid: number; id: string; email: string; name?: string };
+  }[];
+}
+
+interface User {
+  uid: number;
+  id: string;
+  email: string;
+  name?: string;
 }
 
 interface DashboardEditPostProps {
@@ -46,39 +65,89 @@ export default function DashboardEditPost({ postId }: DashboardEditPostProps) {
   const router = useRouter();
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
+
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
   const [content, setContent] = useState("");
   const [published, setPublished] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [allUsers, setAllUsers] = useState<User[]>([]);
+  const [currentUserUid, setCurrentUserUid] = useState<number | null>(null);
+  const [selectedAuthors, setSelectedAuthors] = useState<number[]>([]);
 
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [headingLevel, setHeadingLevel] = useState<string>("");
+
   const [showErrorDialog, setShowErrorDialog] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    async function fetchPost() {
+    async function fetchPostAndUsers() {
+      setLoading(true);
       try {
-        const res = await fetch(`/api/post/byId/${postId}`, {
+        // 1. 获取文章详情
+        const postRes = await fetch(`/api/post/byId/${postId}`, {
           credentials: "include",
         });
-        if (!res.ok) throw new Error("获取文章失败");
-        const data = await res.json();
-        setPost(data);
-        setTitle(data.title);
-        setContent(data.content);
-        setPublished(data.published);
-        setSlug(data.slug || "");
+        if (!postRes.ok) throw new Error("获取文章失败");
+        const postData = await postRes.json();
+        setPost(postData);
+        setTitle(postData.title);
+        setContent(postData.content);
+        setPublished(postData.published);
+        setSlug(postData.slug || "");
+        // 默认选中文章的作者 uid
+        setSelectedAuthors(
+          postData.authors.map((a: { user: User }) => a.user.uid)
+        );
+
+        // 2. 获取当前登录用户信息和所有用户列表
+        const [meRes, usersRes] = await Promise.all([
+          fetch("/api/me", { credentials: "include" }),
+          fetch("/api/users", { credentials: "include" }),
+        ]);
+        if (!meRes.ok) throw new Error("获取当前用户失败");
+        if (!usersRes.ok) throw new Error("获取用户列表失败");
+
+        const meData = await meRes.json();
+        const usersData = await usersRes.json();
+
+        setCurrentUserUid(meData.user.uid);
+        setAllUsers(usersData.users);
+
+        // 确保自己在作者中（如果接口没返回，也可以加）
+        if (
+          meData.user.uid &&
+          !postData.authors.some(
+            (a: { user: User }) => a.user.uid === meData.user.uid
+          )
+        ) {
+          setSelectedAuthors((prev) => [...prev, meData.user.uid]);
+        }
       } catch (err) {
         console.error(err);
+        setErrorMessage(err instanceof Error ? err.message : "加载失败");
+        setShowErrorDialog(true);
       } finally {
         setLoading(false);
       }
     }
-    fetchPost();
+    fetchPostAndUsers();
   }, [postId]);
+
+  // 添加作者，防止重复和添加自己（自己已默认且不可删）
+  const handleAddAuthor = (uid: number) => {
+    if (uid === currentUserUid) return;
+    if (selectedAuthors.includes(uid)) return;
+    setSelectedAuthors([...selectedAuthors, uid]);
+  };
+
+  // 移除作者（不可移除自己）
+  const handleRemoveAuthor = (uid: number) => {
+    if (uid === currentUserUid) return;
+    setSelectedAuthors(selectedAuthors.filter((id) => id !== uid));
+  };
 
   const handleSave = async () => {
     setSaving(true);
@@ -92,16 +161,17 @@ export default function DashboardEditPost({ postId }: DashboardEditPostProps) {
           content,
           published,
           slug: slug.trim() || undefined,
+          authors: selectedAuthors,
         }),
       });
       if (!res.ok) {
         const data = await res.json();
-        const msg = data?.error || "创建失败，请重试";
+        const msg = data?.error || "保存失败，请重试";
         throw new Error(msg);
       }
       router.push("/dashboard/post");
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "创建失败，请重试";
+      const msg = err instanceof Error ? err.message : "保存失败，请重试";
       setErrorMessage(msg);
       setShowErrorDialog(true);
       console.error(err);
@@ -109,6 +179,7 @@ export default function DashboardEditPost({ postId }: DashboardEditPostProps) {
       setSaving(false);
     }
   };
+
   const handleCancel = () => {
     router.push("/dashboard/post");
   };
@@ -206,6 +277,88 @@ export default function DashboardEditPost({ postId }: DashboardEditPostProps) {
                     placeholder="例如 how-to-use-app，留空则自动生成"
                   />
                 </div>
+
+                {/* 作者选择 */}
+                <div className="mb-4">
+                  <label className="block mb-1 font-semibold">作者</label>
+                  <p className="mb-2 text-sm text-gray-500">
+                    多作者文章可添加多个作者，自己为必选且不可移除
+                  </p>
+
+                  <Select
+                    onValueChange={(val) => {
+                      if (!val) return;
+                      const uid = Number(val);
+                      handleAddAuthor(uid);
+                    }}
+                    value=""
+                  >
+                    <SelectTrigger
+                      className="w-[200px]"
+                      aria-label="选择作者添加"
+                    >
+                      <SelectValue placeholder="添加作者" />
+                    </SelectTrigger>
+
+                    <SelectContent>
+                      {allUsers
+                        .filter(
+                          (u) =>
+                            u.uid !== currentUserUid &&
+                            !selectedAuthors.includes(u.uid)
+                        )
+                        .map((user) => (
+                          <SelectItem
+                            key={user.uid}
+                            value={user.uid.toString()}
+                          >
+                            {user.id} ({user.email})
+                          </SelectItem>
+                        ))}
+                      {allUsers.filter(
+                        (u) =>
+                          u.uid !== currentUserUid &&
+                          !selectedAuthors.includes(u.uid)
+                      ).length === 0 && (
+                        <div className="p-1 text-sm text-gray-500">
+                          无更多作者可添加
+                        </div>
+                      )}
+                    </SelectContent>
+                  </Select>
+
+                  {/* 已选作者显示 */}
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {selectedAuthors.map((uid) => {
+                      const user = allUsers.find((u) => u.uid === uid);
+                      if (!user) return null;
+                      const isSelf = uid === currentUserUid;
+                      return (
+                        <div
+                          key={uid}
+                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-sm border ${
+                            isSelf
+                              ? "bg-gray-100 text-gray-700 border-gray-300"
+                              : "bg-blue-100 text-blue-700 border-blue-300"
+                          }`}
+                        >
+                          {user.id}
+                          {!isSelf && (
+                            <button
+                              type="button"
+                              className="ml-1 text-blue-700 hover:text-blue-900"
+                              onClick={() => handleRemoveAuthor(uid)}
+                              aria-label={`删除作者 ${user.email}`}
+                            >
+                              &times;
+                            </button>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
                 <div className="mb-2">
                   <label htmlFor="content" className="block mb-1 font-semibold">
                     内容

@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { verifyToken } from "@/lib/auth";
+import prisma from "@/lib/prisma";
 
-export function GET(request: Request) {
+export async function GET(request: Request) {
   const cookie = request.headers.get("cookie") || "";
   const tokenMatch = cookie.match(/token=([^;]+)/);
   if (!tokenMatch) {
@@ -14,12 +15,19 @@ export function GET(request: Request) {
     if (!payload) {
       return NextResponse.json({ authenticated: false }, { status: 401 });
     }
+   
+    const user = await prisma.user.findUnique({
+      where: { uid: payload.uid },
+      select: { isAdmin: true },
+    });
+
     return NextResponse.json({
       authenticated: true,
       user: {
         id: payload.id ?? null,
         email: payload.email ?? null,
         uid: payload.uid ?? null,
+        isAdmin: user?.isAdmin ?? false,
       },
     });
   } catch {

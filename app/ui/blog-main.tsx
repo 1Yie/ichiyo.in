@@ -3,21 +3,21 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "nextjs-toploader/app";
 import { Skeleton } from "@/components/ui/skeleton";
-import  Link from "next/link";
-
+import Link from "next/link";
 
 interface Post {
   id: number;
   slug: string;
   title: string;
-  published: boolean;
   createdAt: string;
   updatedAt: string;
-  author: {
-    uid: number;
-    id: string;
-    email: string;
-  };
+  authors: {
+    user: {
+      uid: number;
+      id: string;
+      email: string;
+    };
+  }[];
 }
 
 export default function BlogMain() {
@@ -31,7 +31,7 @@ export default function BlogMain() {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch("/api/post/public/?summary=true");
+        const res = await fetch("/api/post/public?summary=true");
         if (!res.ok) throw new Error("获取文章失败");
         const data = await res.json();
         console.log("获取到的文章数据：", data);
@@ -76,33 +76,48 @@ export default function BlogMain() {
     <div className="border-b">
       <section className="section-base">
         <div>
-          <ul className="space-y-4">
-            {posts.map((post) => (
-              <li key={post.id} className="m-0 p-0 border-b last:border-b-0">
-                <Link
-                  href={`/blog/${post.slug}`}
-                  className="cursor-pointer block "
-                  onClick={(e) => {
-                    e.preventDefault();
-                    router.push(`/blog/${post.slug}`);
-                  }}
-                >
-                  <div className="p-4 hover:bg-gray-50 dark:hover:bg-black transition-colors duration-300">
-                    <p className="text-2xl font-semibold">{post.title}</p>
-                    <div className="flex flex-row gap-2 items-center justify-start">
-                      <p className="text-lg text-gray-500">
-                        {post.author?.id ?? "匿名"}
-                      </p>
-                      <p className="text-sm text-gray-500">|</p>
-                      <p className="text-lg text-gray-500">
-                        {new Date(post.createdAt).toLocaleDateString()}
-                      </p>
+          {posts.length === 0 ? (
+            <p className="p-4 text-center text-gray-500 dark:text-gray-400">
+              暂无文章
+            </p>
+          ) : (
+            <ul className="space-y-4">
+              {posts.map((post) => (
+                <li key={post.id} className="m-0 p-0 border-b last:border-b-0">
+                  <Link
+                    href={`/blog/${post.slug}`}
+                    className="cursor-pointer block "
+                    onClick={(e) => {
+                      e.preventDefault();
+                      router.push(`/blog/${post.slug}`);
+                    }}
+                  >
+                    <div className="p-4 hover:bg-gray-50 dark:hover:bg-black transition-colors duration-300">
+                      <p className="text-2xl font-semibold">{post.title}</p>
+                      <div className="flex flex-row gap-2 items-center justify-start">
+                        <p className="text-lg text-gray-500 dark:text-gray-400">
+                          {post.authors.length > 0
+                            ? post.authors.map((author, index) => (
+                                <span key={index}>
+                                  {index > 0 && ", "}
+                                  {author.user.id}
+                                </span>
+                              ))
+                            : "匿名"}
+                        </p>
+                        <p className="text-lg text-gray-500 dark:text-gray-600">
+                          ·
+                        </p>
+                        <p className="text-lg text-gray-500 dark:text-gray-400">
+                          {new Date(post.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                </Link>
-              </li>
-            ))}
-          </ul>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </section>
     </div>

@@ -493,7 +493,7 @@ scrollbar-thumb {
 
 @layer components {
   .section-base {
-    @apply relative max-w-[1200px] mx-auto border-l border-r box-border;
+    @apply relative max-w-[1200px] mx-auto border-l border-r box-border max-[728px]:border-l-0 max-[728px]:border-r-0;
   }
 
   .s-border {

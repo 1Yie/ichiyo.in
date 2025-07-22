@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
 import { generateSlug } from "@/lib/slug";
 
+
 interface Params {
   params: Promise<{ id: string }>;
 }
@@ -15,8 +16,8 @@ export async function GET(request: Request, props: Params) {
     return NextResponse.json({ error: "无效文章ID" }, { status: 400 });
   }
 
-  const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value;
+  const cookieStore = cookies();
+  const token = (await cookieStore).get("token")?.value;
   if (!token) {
     return NextResponse.json({ error: "未登录" }, { status: 401 });
   }
@@ -31,12 +32,30 @@ export async function GET(request: Request, props: Params) {
     return NextResponse.json({ error: "无效身份" }, { status: 401 });
   }
 
-  const post = await prisma.post.findUnique({ where: { id: postId } });
+  const post = await prisma.post.findUnique({
+    where: { id: postId },
+    include: {
+      authors: {
+        include: {
+          user: true,
+        },
+      },
+    },
+  });
+
   if (!post) {
     return NextResponse.json({ error: "文章不存在" }, { status: 404 });
   }
 
-  if (post.authorUid !== payload.uid) {
+  const user = await prisma.user.findUnique({
+    where: { uid: payload.uid },
+    select: { isAdmin: true },
+  });
+
+  const isOwnerOrAdmin =
+    post.authors.some((a) => a.userId === payload.uid) || user?.isAdmin;
+
+  if (!isOwnerOrAdmin) {
     return NextResponse.json({ error: "无权限访问此文章" }, { status: 403 });
   }
 
@@ -50,8 +69,8 @@ export async function PATCH(request: Request, props: Params) {
     return NextResponse.json({ error: "无效文章ID" }, { status: 400 });
   }
 
-  const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value;
+  const cookieStore = cookies();
+  const token = (await cookieStore).get("token")?.value;
   if (!token) {
     return NextResponse.json({ error: "未登录" }, { status: 401 });
   }
@@ -66,42 +85,97 @@ export async function PATCH(request: Request, props: Params) {
     return NextResponse.json({ error: "无效身份" }, { status: 401 });
   }
 
-  const post = await prisma.post.findUnique({ where: { id: postId } });
+  const post = await prisma.post.findUnique({
+    where: { id: postId },
+    include: { authors: true },
+  });
+
   if (!post) {
     return NextResponse.json({ error: "文章不存在" }, { status: 404 });
   }
 
-  if (post.authorUid !== payload.uid) {
+  const user = await prisma.user.findUnique({
+    where: { uid: payload.uid },
+    select: { isAdmin: true },
+  });
+
+  const isOwnerOrAdmin =
+    post.authors.some((a) => a.userId === payload.uid) || user?.isAdmin;
+
+  if (!isOwnerOrAdmin) {
     return NextResponse.json({ error: "无权限操作此文章" }, { status: 403 });
   }
 
   const body = await request.json();
-  const { title, content, published, slug: rawSlug } = body;
+  const { title, content, published, slug: rawSlug, authors } = body;
 
-  if (!title || !title.trim()) {
-    return NextResponse.json({ error: "标题不能为空" }, { status: 400 });
+  if (!Array.isArray(authors)) {
+    return NextResponse.json({ error: "作者列表格式错误" }, { status: 400 });
   }
 
-  if (!content || !content.trim()) {
-    return NextResponse.json({ error: "内容不能为空" }, { status: 400 });
-  }
-
+  // 校验 slug 格式
   const slug = rawSlug?.trim() || generateSlug(title);
-
-  if (slug && !/^[a-z0-9-]+$/.test(slug)) {
+  if (!/^[a-z0-9-]+$/.test(slug)) {
     return NextResponse.json(
       { error: "Slug 格式不合法，只允许小写字母、数字和连字符" },
       { status: 400 }
     );
   }
 
+  // 校验标题和内容
+  const hasContentChanged =
+    title.trim() !== post.title ||
+    content.trim() !== post.content ||
+    slug !== post.slug;
+
+  if (hasContentChanged) {
+    if (!title?.trim()) {
+      return NextResponse.json({ error: "标题不能为空" }, { status: 400 });
+    }
+    if (!content?.trim()) {
+      return NextResponse.json({ error: "内容不能为空" }, { status: 400 });
+    }
+  }
+
+  // 校验作者 ID 是否都有效（存在数据库）
+  const validUsers = await prisma.user.findMany({
+    where: {
+      uid: { in: authors },
+    },
+    select: { uid: true },
+  });
+
+  if (validUsers.length !== authors.length) {
+    return NextResponse.json({ error: "存在无效作者" }, { status: 400 });
+  }
+
+  // 保证自己一定是作者（避免自己被删除）
+  if (!authors.includes(payload.uid)) {
+    authors.push(payload.uid);
+  }
+
+  // 更新文章及作者关联，先删除所有作者，再批量创建
   const updatedPost = await prisma.post.update({
     where: { id: postId },
     data: {
-      title: title.trim(),
-      content: content.trim(),
       published,
-      slug,
+      title: hasContentChanged ? title.trim() : undefined,
+      content: hasContentChanged ? content.trim() : undefined,
+      slug: hasContentChanged ? slug : undefined,
+      updatedAt: hasContentChanged ? new Date() : undefined,
+      authors: {
+        deleteMany: {},
+        create: authors.map((uid: number) => ({
+          user: { connect: { uid } },
+        })),
+      },
+    },
+    include: {
+      authors: {
+        include: {
+          user: true,
+        },
+      },
     },
   });
 
@@ -115,8 +189,8 @@ export async function DELETE(request: Request, props: Params) {
     return NextResponse.json({ error: "无效文章ID" }, { status: 400 });
   }
 
-  const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value;
+  const cookieStore = cookies();
+  const token = (await cookieStore).get("token")?.value;
   if (!token) {
     return NextResponse.json({ error: "未登录" }, { status: 401 });
   }
@@ -131,12 +205,24 @@ export async function DELETE(request: Request, props: Params) {
     return NextResponse.json({ error: "无效身份" }, { status: 401 });
   }
 
-  const post = await prisma.post.findUnique({ where: { id: postId } });
+  const post = await prisma.post.findUnique({
+    where: { id: postId },
+    include: { authors: true },
+  });
+
   if (!post) {
     return NextResponse.json({ error: "文章不存在" }, { status: 404 });
   }
 
-  if (post.authorUid !== payload.uid) {
+  const user = await prisma.user.findUnique({
+    where: { uid: payload.uid },
+    select: { isAdmin: true },
+  });
+
+  const isOwnerOrAdmin =
+    post.authors.some((a) => a.userId === payload.uid) || user?.isAdmin;
+
+  if (!isOwnerOrAdmin) {
     return NextResponse.json({ error: "无权限操作此文章" }, { status: 403 });
   }
 

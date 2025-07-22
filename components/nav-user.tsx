@@ -29,6 +29,7 @@ export function NavUser() {
     name: string;
     email: string;
     avatar: string;
+    isAdmin?: boolean;
   }>({
     name: "",
     email: "",
@@ -47,7 +48,12 @@ export function NavUser() {
             const name = data.user.id || "用户";
             const emailHash = md5(email.trim().toLowerCase());
             const gravatarUrl = `https://www.gravatar.com/avatar/${emailHash}?d=identicon`;
-            setUserInfo({ name, email, avatar: gravatarUrl });
+            setUserInfo({
+              name,
+              email,
+              avatar: gravatarUrl,
+              isAdmin: data.user.isAdmin,
+            });
           } else {
             router.replace("/login");
           }
@@ -71,6 +77,17 @@ export function NavUser() {
     });
     router.replace("/login");
   };
+
+  // 提取管理员标识 JSX
+  const adminFlag = userInfo.isAdmin ? (
+    <span className="text-xs font-semibold text-red-600 bg-red-100 px-1 rounded">
+      管理员
+    </span>
+  ) : (
+    <span className="text-xs font-semibold text-gray-400 bg-gray-100 px-1 rounded">
+      成员
+    </span>
+  );
 
   return (
     <SidebarMenu>
@@ -99,8 +116,9 @@ export function NavUser() {
                     </AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight px-2">
-                    <span className="truncate font-medium">
+                    <span className="truncate font-medium flex items-center gap-1">
                       {userInfo.name}
+                      {adminFlag}
                     </span>
                     <span className="truncate text-xs">{userInfo.email}</span>
                   </div>
@@ -133,8 +151,9 @@ export function NavUser() {
                     </AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-medium">
+                    <span className="truncate font-medium flex items-center gap-1">
                       {userInfo.name}
+                      {adminFlag}
                     </span>
                     <span className="truncate text-xs">{userInfo.email}</span>
                   </div>

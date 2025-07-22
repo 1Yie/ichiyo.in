@@ -24,15 +24,23 @@ export function NavProjects({
 }) {
   const router = useRouter();
   return (
-    <SidebarGroup className="group-data-[collapsible=icon]:hidden">
+    <SidebarGroup>
       <SidebarGroupLabel>{label}</SidebarGroupLabel>
       <SidebarMenu>
         {projects.map((item) => (
           <SidebarMenuItem key={item.name}>
-            <SidebarMenuButton asChild>
-              <button className="flex w-full" onClick={() => router.push(item.url)}>
+            <SidebarMenuButton
+              asChild
+              tooltip={item.name}
+            >
+              <button
+                className="flex w-full"
+                onClick={() => router.push(item.url)}
+              >
                 <item.icon />
-                <span>{item.name}</span>
+                <span className="group-data-[collapsible=icon]:hidden">
+                  {item.name}
+                </span>
               </button>
             </SidebarMenuButton>
           </SidebarMenuItem>

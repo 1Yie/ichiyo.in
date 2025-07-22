@@ -14,14 +14,17 @@ export async function GET(request: Request) {
             id: true,
             slug: true,
             title: true,
-            published: true,
             createdAt: true,
             updatedAt: true,
-            author: {
+            authors: {
               select: {
-                uid: true,
-                id: true,
-                email: true,
+                user: {
+                  select: {
+                    uid: true,
+                    id: true,
+                    email: true,
+                  },
+                },
               },
             },
           },

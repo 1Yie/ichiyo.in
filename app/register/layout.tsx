@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
-import { getLocale } from "next-intl/server";
+
 import { Ubuntu_Sans, Source_Code_Pro, Raleway } from "next/font/google";
 import "@/app/globals.css";
-
-import { NextIntlClientProvider } from "next-intl";
 
 export const metadata: Metadata = {
   title: "ichiyo (@1Yie)",
@@ -34,16 +32,12 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const locale = await getLocale();
-
   return (
-    <html lang={locale}>
+    <html>
       <body
         className={`antialiased ${ubuntu.className} ${sourceCodePro.className} ${raleway.className}`}
       >
-        <NextIntlClientProvider>
-          {children}
-        </NextIntlClientProvider>
+        {children}
       </body>
     </html>
   );

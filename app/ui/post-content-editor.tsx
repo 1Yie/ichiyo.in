@@ -45,12 +45,8 @@ export function PostContentEditor({
         />
       </ResizablePanel>
       <ResizableHandle withHandle />
-      <ResizablePanel
-        defaultSize={50}
-        minSize={30}
-        className="p-4 w-2"
-      >
-        <div 
+      <ResizablePanel defaultSize={50} minSize={30} className="p-4 w-2">
+        <div
           className="post-style"
           dangerouslySetInnerHTML={{ __html: html }}
         />

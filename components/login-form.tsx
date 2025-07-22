@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -36,8 +36,6 @@ export function LoginForm({
   const [errorMsg, setErrorMsg] = useState("");
 
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const from = searchParams.get("from") || "/dashboard"; // 默认跳转路径
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,15 +45,14 @@ export function LoginForm({
       const res = await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include", // ✅ 重要：允许服务器设置 cookie
+        credentials: "include",
         body: JSON.stringify({ email, password }),
       });
 
       const data = await res.json();
 
       if (res.ok) {
-        // ✅ 不再使用 localStorage，直接跳转回原页面
-        router.replace(from);
+        router.refresh();
       } else {
         const msg =
           errorMessages[data.code as string] ||
@@ -92,6 +89,7 @@ export function LoginForm({
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    disabled={loading}
                   />
                 </div>
                 <div className="grid gap-3">
@@ -103,6 +101,7 @@ export function LoginForm({
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    disabled={loading}
                   />
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>

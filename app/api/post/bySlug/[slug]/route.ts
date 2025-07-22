@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
-export async function GET(request: Request, props: { params: Promise<{ slug: string }> }) {
+export async function GET(
+  request: Request,
+  props: { params: Promise<{ slug: string }> }
+) {
   const params = await props.params;
   const { slug } = params;
 
@@ -15,11 +18,15 @@ export async function GET(request: Request, props: { params: Promise<{ slug: str
       published: true,
       createdAt: true,
       updatedAt: true,
-      author: {
+      authors: {
         select: {
-          uid: true,
-          id: true,
-          email: true,
+          user: {
+            select: {
+              uid: true,
+              id: true,
+              email: true,
+            },
+          },
         },
       },
     },
@@ -30,10 +37,15 @@ export async function GET(request: Request, props: { params: Promise<{ slug: str
   }
 
   if (!post.published) {
-    // 如果你需要做权限校验，可以在这里判断访问者身份
-    // 暂时默认不允许未发布文章被匿名访问
-    return NextResponse.json({ error: "文章未发布" }, { status: 403 });
+    // return NextResponse.json({ error: "文章未发布" }, { status: 403 });
+    return NextResponse.json({ error: "文章不存在" }, { status: 404 });
   }
 
-  return NextResponse.json(post);
+  // 提取 authors 中的 user
+  const authors = post.authors.map((a) => a.user);
+
+  return NextResponse.json({
+    ...post,
+    authors,
+  });
 }

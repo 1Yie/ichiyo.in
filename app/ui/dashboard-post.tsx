@@ -35,14 +35,34 @@ import {
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 
+// 修改：Post 类型 author 改成 authors 数组
 interface Post {
   id: number;
   slug: string;
   title: string;
-  content: string;
+  content?: string; // summary=true 时可能没 content，改为可选
   published: boolean;
   createdAt: string;
   updatedAt: string;
+
+  authors: {
+    user: {
+      id: string;
+      email: string;
+      uid: number;
+    };
+  }[];
+}
+
+interface CurrentUser {
+  uid: number;
+  email: string;
+  isAdmin: boolean;
+}
+
+interface PostsResponse {
+  posts: Post[];
+  currentUser: CurrentUser;
 }
 
 type SortField = "id" | "createdAt" | "updatedAt";
@@ -50,6 +70,7 @@ type SortOrder = "asc" | "desc";
 
 export default function DashboardPost() {
   const [posts, setPosts] = useState<Post[]>([]);
+  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [sortField, setSortField] = useState<SortField>("id");
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
@@ -63,13 +84,14 @@ export default function DashboardPost() {
   const fetchPosts = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/post", {
+      const res = await fetch("/api/post?summary=true", {
         method: "GET",
         credentials: "include",
       });
       if (!res.ok) throw new Error("获取文章失败");
-      const data = await res.json();
-      setPosts(data);
+      const data: PostsResponse = await res.json();
+      setPosts(data.posts);
+      setCurrentUser(data.currentUser);
     } catch (err) {
       console.error(err);
       setErrorMessage("获取文章失败，请稍后再试");
@@ -173,10 +195,13 @@ export default function DashboardPost() {
 
   return (
     <SidebarInset>
-      <header className="flex h-16 items-center gap-2">
+      <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
         <div className="flex items-center gap-2 px-4">
           <SidebarTrigger className="-ml-1" />
-          <Separator orientation="vertical" className="mr-2 h-4" />
+          <Separator
+            orientation="vertical"
+            className="mr-2 data-[orientation=vertical]:h-4"
+          />
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
@@ -218,6 +243,8 @@ export default function DashboardPost() {
                   <TableHeader>
                     <TableRow>
                       <TableHead>ID</TableHead>
+                      <TableHead>Slug</TableHead>
+                      {currentUser?.isAdmin && <TableHead>作者</TableHead>}
                       <TableHead>标题</TableHead>
                       <TableHead>状态</TableHead>
                       <TableHead>创建时间</TableHead>
@@ -234,6 +261,11 @@ export default function DashboardPost() {
                         <TableCell>
                           <Skeleton className="h-4 w-40" />
                         </TableCell>
+                        {currentUser?.isAdmin && (
+                          <TableCell>
+                            <Skeleton className="h-4 w-15" />
+                          </TableCell>
+                        )}
                         <TableCell>
                           <Skeleton className="h-6 w-16 rounded" />
                         </TableCell>
@@ -264,6 +296,7 @@ export default function DashboardPost() {
                         ID {renderSortIcon("id")}
                       </TableHead>
                       <TableHead>Slug</TableHead>
+                      <TableHead>作者</TableHead>
                       <TableHead>标题</TableHead>
                       <TableHead>状态</TableHead>
                       <TableHead
@@ -286,6 +319,15 @@ export default function DashboardPost() {
                       <TableRow key={post.id}>
                         <TableCell>{post.id}</TableCell>
                         <TableCell>{post.slug}</TableCell>
+
+                        <TableCell>
+                          {post.authors.length > 0
+                            ? post.authors
+                                .map((author) => author.user.id)
+                                .join(", ")
+                            : "匿名"}
+                        </TableCell>
+
                         <TableCell>{post.title}</TableCell>
                         <TableCell>
                           <span
@@ -340,7 +382,8 @@ export default function DashboardPost() {
           <AlertDialogHeader>
             <AlertDialogTitle>
               <p className="text-lg">
-                确定要删除文章《{posts.find((p) => p.id === deleteId)?.title}》吗？
+                确定要删除文章《{posts.find((p) => p.id === deleteId)?.title}
+                》吗？
               </p>
             </AlertDialogTitle>
             <AlertDialogDescription>
@@ -352,7 +395,9 @@ export default function DashboardPost() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>取消</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete}>确认删除</AlertDialogAction>
+            <AlertDialogAction onClick={handleDelete}>
+              确认删除
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

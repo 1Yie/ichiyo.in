@@ -19,7 +19,7 @@ export default function Footer() {
   const SocialIconLink = ({ href, children }: SocialIconLinkProps) => (
     <Link
       href={href}
-      className="transition-colors hover:text-gray-600 dark:hover:text-gray-300"
+      className="transition-colors hover:text-gray-700 dark:hover:text-gray-300"
     >
       {children}
     </Link>

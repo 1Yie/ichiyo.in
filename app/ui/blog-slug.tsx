@@ -5,7 +5,13 @@ import { useEffect, useState } from "react";
 import { parseMarkdown } from "@/lib/markdown";
 import { Skeleton } from "@/components/ui/skeleton";
 import Comments from "@/components/ui/comment";
-import SplitText from "@/components/ui/split-text";
+import { ChevronLeft } from "lucide-react";
+
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface Post {
   id: number;
@@ -15,11 +21,66 @@ interface Post {
   published: boolean;
   createdAt: string;
   updatedAt: string;
-  author: {
+  authors: {
+    uid: number;
     id: string;
     email: string;
-    uid: number;
-  };
+  }[];
+}
+
+function timeDiffText(createdAt: string, updatedAt: string) {
+  const created = new Date(createdAt);
+  const updated = new Date(updatedAt);
+  const now = new Date();
+
+  const createdDiffDays = Math.floor(
+    (now.getTime() - created.getTime()) / (1000 * 60 * 60 * 24)
+  );
+  const updatedDiffDays = Math.floor(
+    (now.getTime() - updated.getTime()) / (1000 * 60 * 60 * 24)
+  );
+
+  const formatDate = (d: Date) =>
+    `${d.getFullYear()}/${(d.getMonth() + 1).toString().padStart(2, "0")}/${d
+      .getDate()
+      .toString()
+      .padStart(2, "0")}`;
+
+  const createdText =
+    createdDiffDays <= 7
+      ? createdDiffDays === 0
+        ? "今天"
+        : `${createdDiffDays} 天前`
+      : formatDate(created);
+
+  const updatedText =
+    updatedDiffDays <= 7
+      ? updatedDiffDays === 0
+        ? "今天"
+        : `${updatedDiffDays} 天前`
+      : formatDate(updated);
+
+  const isUpdated = updated.getTime() > created.getTime();
+  const showUpdated = isUpdated && createdText !== updatedText;
+
+  return (
+    <div className="inline-block text-gray-500 text-lg dark:text-gray-400 ">
+      <div>
+        <Tooltip>
+          <TooltipTrigger>创建于 {createdText}</TooltipTrigger>
+          <TooltipContent> 创建于 {formatDate(created)}</TooltipContent>
+        </Tooltip>
+      </div>
+      {showUpdated && (
+        <div>
+          <Tooltip>
+            <TooltipTrigger>更新于 {updatedText}</TooltipTrigger>
+            <TooltipContent>更新于 {formatDate(updated)}</TooltipContent>
+          </Tooltip>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function PostPage({ params }: { params: { slug: string } }) {
@@ -78,25 +139,27 @@ export default function PostPage({ params }: { params: { slug: string } }) {
   return (
     <>
       <div className="border-b">
-        <section className="section-base p-12 bg-squares">
-          <SplitText
-            text={post.title}
-            className="text-5xl font-bold mt-2 mb-2"
-            delay={30}
-            duration={0.4}
-            ease="power3.out"
-            splitType="chars"
-            textAlign="left"
-            from={{ opacity: 0, y: 40 }}
-            to={{ opacity: 1, y: 0 }}
-            threshold={0.1}
-          />
+        <section className="section-base p-12 bg-squares relative">
+          <div className="absolute top-0 right-full max-[768px]:hidden">
+            <button
+              className="flex items-center justify-center w-10 h-10 border-l border-b cursor-pointer"
+              onClick={() => window.history.back()}
+              title="返回"
+            >
+              <p className="text-muted-foreground">
+                <ChevronLeft className="w-6 h-6" />
+              </p>
+            </button>
+          </div>
+
+          <h1 className="text-5xl font-bold mt-2 mb-2">{post.title}</h1>
           <p className="text-gray-600 text-2xl mb-3 dark:text-gray-300">
-            {post.author?.id}
+            {post.authors && post.authors.length > 0
+              ? post.authors.map((a) => a.id).join(", ")
+              : "匿名"}
           </p>
-          <p className="text-gray-500 text-lg dark:text-gray-400">
-            {new Date(post.createdAt).toLocaleDateString()}
-          </p>
+
+          {timeDiffText(post.createdAt, post.updatedAt)}
         </section>
       </div>
       <div className="border-b">

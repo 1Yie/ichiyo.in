@@ -234,7 +234,7 @@ export function FontStyleToggleGroup({
   };
 
   return (
-    <div className="flex flex-wrap gap-3 items-center mb-3">
+    <div className="flex flex-wrap gap-3 items-center mb-2">
       <ToggleGroup
         type="single"
         variant="outline"
