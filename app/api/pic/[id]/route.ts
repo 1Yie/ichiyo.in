@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma"; // 你项目中 Prisma 客户端的导入路径
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: number } }
-) {
+export async function GET(request: NextRequest, props: { params: Promise<{ id: number }> }) {
+  const params = await props.params;
   const id = Number(params.id);
   if (isNaN(id))
     return NextResponse.json({ error: "无效的图片ID" }, { status: 400 });
@@ -15,10 +13,8 @@ export async function GET(
   return NextResponse.json(pic);
 }
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: { id: number } }
-) {
+export async function PATCH(request: NextRequest, props: { params: Promise<{ id: number }> }) {
+  const params = await props.params;
   const id = Number(params.id);
   if (isNaN(id))
     return NextResponse.json({ error: "无效的图片ID" }, { status: 400 });
@@ -58,10 +54,8 @@ export async function PATCH(
   }
 }
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const id = Number(params.id);
   if (isNaN(id))
     return NextResponse.json({ error: "无效的图片ID" }, { status: 400 });

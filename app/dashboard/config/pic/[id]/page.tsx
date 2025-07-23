@@ -1,12 +1,13 @@
 import DashboardConfigPicEdit from "@/ui/dashboard-config-pic-edit";
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: number;
-  };
+  }>;
 }
 
-export default function PagePicEdit({ params }: PageProps) {
+export default async function PagePicEdit(props: PageProps) {
+  const params = await props.params;
   const { id } = params;
 
   return <DashboardConfigPicEdit id={id} />;
