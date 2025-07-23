@@ -1,7 +1,12 @@
-import { GalleryVerticalEnd } from "lucide-react"
+import { GalleryVerticalEnd } from "lucide-react";
+import { Metadata } from "next";
 
-import { RegisterForm } from "@/components/register-form"
-import Link from "next/link"
+import { RegisterForm } from "@/components/register-form";
+import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "ichiyo | 注册",
+};
 
 export default function RegisterPage() {
   return (

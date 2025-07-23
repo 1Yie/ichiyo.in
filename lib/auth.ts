@@ -1,7 +1,9 @@
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+import jwt, { SignOptions } from "jsonwebtoken";
+import ms from "ms";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_key";
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "1d";
 
 // 哈希密码
 export async function hashPassword(password: string): Promise<string> {
@@ -25,7 +27,12 @@ export interface JwtPayload {
 
 // 生成 JWT
 export function generateToken(payload: JwtPayload): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: "1h" });
+  const options: SignOptions = {
+    expiresIn: JWT_EXPIRES_IN as ms.StringValue,
+    algorithm: "HS256",
+  };
+  
+  return jwt.sign(payload, JWT_SECRET, options);
 }
 
 // 验证 JWT

@@ -13,6 +13,7 @@ interface PostContentEditorProps {
   setContent: (content: string) => void;
   textareaRef: React.RefObject<HTMLTextAreaElement | null>;
   saving: boolean;
+  placeholder?: string;
 }
 
 export function PostContentEditor({
@@ -20,6 +21,7 @@ export function PostContentEditor({
   setContent,
   textareaRef,
   saving,
+  placeholder,
 }: PostContentEditorProps) {
   const [html, setHtml] = useState("");
   useEffect(() => {
@@ -41,6 +43,7 @@ export function PostContentEditor({
           value={content}
           onChange={(e) => setContent(e.target.value)}
           className="h-full bg-white"
+          placeholder={placeholder}
           disabled={saving}
         />
       </ResizablePanel>

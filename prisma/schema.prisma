@@ -24,9 +24,11 @@ model Post {
   content   String
   published Boolean  @default(false)
   createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   authors PostAuthor[]
+
+  tags Tag[] @relation("PostTags")
 }
 
 model PostAuthor {
@@ -37,4 +39,11 @@ model PostAuthor {
   user User @relation(fields: [userId], references: [uid], onDelete: Cascade)
 
   @@id([postId, userId])
+}
+
+model Tag {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
+  posts Post[] @relation("PostTags")
 }

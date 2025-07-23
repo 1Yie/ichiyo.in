@@ -261,6 +261,7 @@ export default function DashboardEditPost({ postId }: DashboardEditPostProps) {
                     type="text"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
+                    placeholder="请输入标题"
                     disabled={saving}
                   />
                 </div>
@@ -377,6 +378,7 @@ export default function DashboardEditPost({ postId }: DashboardEditPostProps) {
                   setContent={setContent}
                   textareaRef={textareaRef}
                   saving={saving}
+                  placeholder="请输入内容"
                 />
                 <div className="mb-4 flex items-center gap-2">
                   <Checkbox

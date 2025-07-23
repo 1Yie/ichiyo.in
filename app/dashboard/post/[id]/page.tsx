@@ -1,4 +1,9 @@
 import DashboardEditPost from "@/ui/dashboard-edit-post";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "ichiyo | 编辑文章",
+};
 
 interface Props {
   params: Promise<{ id: string }>;

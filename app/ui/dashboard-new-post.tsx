@@ -185,6 +185,7 @@ export default function DashboardNewPost() {
                 id="title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
+                placeholder="请输入标题"
                 disabled={saving}
               />
             </div>
@@ -198,7 +199,7 @@ export default function DashboardNewPost() {
                 id="slug"
                 value={slug}
                 onChange={(e) => setSlug(e.target.value)}
-                placeholder="例如 how-to-use-app"
+                placeholder="例如 how-to-use-app，留空则自动生成"
                 disabled={saving}
               />
             </div>
@@ -291,6 +292,7 @@ export default function DashboardNewPost() {
               setContent={setContent}
               textareaRef={textareaRef}
               saving={saving}
+              placeholder="请输入内容"
             />
 
             {/* 发布 */}

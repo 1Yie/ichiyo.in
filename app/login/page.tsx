@@ -1,7 +1,12 @@
 import { GalleryVerticalEnd } from "lucide-react";
+import { Metadata } from "next";
 
 import { LoginForm } from "@/components/login-form";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "ichiyo | 登录",
+};
 
 export default function LoginPage() {
   return (
