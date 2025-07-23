@@ -234,6 +234,15 @@ scrollbar-thumb {
         transparent 20px);
   }
 
+  
+  .bg-diagonal-stripes-sm {
+    background-size: 100%;
+    background-image: repeating-linear-gradient(45deg,
+        var(--border-sub-color) 0,
+        var(--border-sub-color) 1px,
+        transparent 1px,
+        transparent 8px);
+  }
 
   .atk-layer-wrap .atk-layer-mask {
     backdrop-filter: blur(4px);

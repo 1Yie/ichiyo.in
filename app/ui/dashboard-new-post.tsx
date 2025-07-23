@@ -31,6 +31,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  SelectGroup
 } from "@/components/ui/select";
 
 import { FontStyleToggleGroup } from "@/ui/font-style-toggle-group";
@@ -46,6 +47,9 @@ export default function DashboardNewPost() {
   const [published, setPublished] = useState(false);
   const [saving, setSaving] = useState(false);
   const [headingLevel, setHeadingLevel] = useState<string>("");
+
+  const [tagInput, setTagInput] = useState("");
+  const [tags, setTags] = useState<string[]>([]);
 
   const [showErrorDialog, setShowErrorDialog] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -91,6 +95,18 @@ export default function DashboardNewPost() {
     setSelectedAuthors(selectedAuthors.filter((id) => id !== uid));
   };
 
+  const handleAddTag = () => {
+    const trimmed = tagInput.trim();
+    if (trimmed && !tags.includes(trimmed)) {
+      setTags([...tags, trimmed]);
+    }
+    setTagInput("");
+  };
+
+  const handleRemoveTag = (tag: string) => {
+    setTags(tags.filter((t) => t !== tag));
+  };
+
   const handleCreate = async () => {
     setSaving(true);
     try {
@@ -104,6 +120,7 @@ export default function DashboardNewPost() {
           content,
           published,
           authors: selectedAuthors.map(Number),
+          tags,
         }),
       });
 
@@ -212,11 +229,12 @@ export default function DashboardNewPost() {
               <p className="mb-2 text-sm text-gray-500">
                 多作者文章可添加多个作者，自己为必选且不可移除
               </p>
-              <Select onValueChange={(val) => handleAddAuthor(val)} value="">
-                <SelectTrigger className="w-[200px]">
+              <Select  onValueChange={(val) => handleAddAuthor(val)} value="">
+                <SelectTrigger  className="w-[200px]">
                   <SelectValue placeholder="添加作者" />
                 </SelectTrigger>
-                <SelectContent>
+               <SelectContent>
+                  <SelectGroup>
                   {allUsers
                     .filter(
                       (u) =>
@@ -237,6 +255,7 @@ export default function DashboardNewPost() {
                       无更多作者可添加
                     </div>
                   )}
+                  </SelectGroup>
                 </SelectContent>
               </Select>
 
@@ -269,6 +288,56 @@ export default function DashboardNewPost() {
                     </div>
                   );
                 })}
+              </div>
+            </div>
+
+            {/* 标签输入 */}
+            <div className="mb-4">
+              <label htmlFor="tags" className="block mb-1 font-semibold">
+                标签（可选）
+              </label>
+              <div className="flex gap-2">
+                <Input
+                  id="tags"
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  placeholder="输入标签后点击添加"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleAddTag();
+                    }
+                  }}
+                  disabled={saving}
+                  className="w-[200px]"
+                />
+                <Button onClick={handleAddTag} type="button" disabled={saving}>
+                  添加
+                </Button>
+              </div>
+
+              {/* 已选标签展示 */}
+              <div className="mt-2 flex flex-wrap gap-2">
+                {tags.length === 0 ? (
+                  <div className="text-sm text-gray-400">暂无标签，可添加标签</div>
+                ) : (
+                  tags.map((tag) => (
+                    <div
+                      key={tag}
+                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-sm border bg-green-100 text-green-700 border-green-300"
+                    >
+                      {tag}
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveTag(tag)}
+                        className="ml-1 hover:text-red-600"
+                        aria-label="移除标签"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
 

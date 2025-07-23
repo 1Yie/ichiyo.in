@@ -4,7 +4,6 @@ import prisma from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
 import { generateSlug } from "@/lib/slug";
 
-
 interface Params {
   params: Promise<{ id: string }>;
 }
@@ -40,6 +39,7 @@ export async function GET(request: Request, props: Params) {
           user: true,
         },
       },
+      tags: true,
     },
   });
 
@@ -87,7 +87,7 @@ export async function PATCH(request: Request, props: Params) {
 
   const post = await prisma.post.findUnique({
     where: { id: postId },
-    include: { authors: true },
+    include: { authors: true, tags: true },
   });
 
   if (!post) {
@@ -107,10 +107,14 @@ export async function PATCH(request: Request, props: Params) {
   }
 
   const body = await request.json();
-  const { title, content, published, slug: rawSlug, authors } = body;
+  const { title, content, published, slug: rawSlug, authors, tags } = body;
 
   if (!Array.isArray(authors)) {
     return NextResponse.json({ error: "作者列表格式错误" }, { status: 400 });
+  }
+
+  if (tags && !Array.isArray(tags)) {
+    return NextResponse.json({ error: "标签格式错误" }, { status: 400 });
   }
 
   // 校验 slug 格式
@@ -122,7 +126,7 @@ export async function PATCH(request: Request, props: Params) {
     );
   }
 
-  // 校验标题和内容
+  // 校验标题和内容变更
   const hasContentChanged =
     title.trim() !== post.title ||
     content.trim() !== post.content ||
@@ -154,7 +158,31 @@ export async function PATCH(request: Request, props: Params) {
     authors.push(payload.uid);
   }
 
-  // 更新文章及作者关联，先删除所有作者，再批量创建
+  // 处理标签：去重、过滤空，查询已有，创建新增
+  let tagRecords: { id: number; name: string }[] = [];
+  if (tags && tags.length > 0) {
+    const tagNames = Array.from(
+      new Set(tags.map((t: string) => t.trim()).filter(Boolean))
+    );
+
+    const existingTags = await prisma.tag.findMany({
+      where: { name: { in: tagNames as string[] } },
+    });
+
+    const existingTagNames = existingTags.map((t) => t.name);
+    const newTagNames = tagNames.filter(
+      (name): name is string =>
+        typeof name === "string" && !existingTagNames.includes(name)
+    );
+
+    const newTags = await Promise.all(
+      newTagNames.map((name) => prisma.tag.create({ data: { name } }))
+    );
+
+    tagRecords = [...existingTags, ...newTags];
+  }
+
+  // 更新文章及关联
   const updatedPost = await prisma.post.update({
     where: { id: postId },
     data: {
@@ -169,6 +197,9 @@ export async function PATCH(request: Request, props: Params) {
           user: { connect: { uid } },
         })),
       },
+      tags: {
+        set: tagRecords.map((t) => ({ id: t.id })),
+      },
     },
     include: {
       authors: {
@@ -176,6 +207,7 @@ export async function PATCH(request: Request, props: Params) {
           user: true,
         },
       },
+      tags: true,
     },
   });
 

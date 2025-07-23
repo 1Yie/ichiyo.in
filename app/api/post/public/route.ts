@@ -16,6 +16,11 @@ export async function GET(request: Request) {
             title: true,
             createdAt: true,
             updatedAt: true,
+            tags: {
+              select: {
+                name: true,
+              },
+            },
             authors: {
               select: {
                 user: {

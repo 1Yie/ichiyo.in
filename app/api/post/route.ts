@@ -43,6 +43,7 @@ export async function GET(request: Request) {
               published: true,
               createdAt: true,
               updatedAt: true,
+              tags: { select: { id: true, name: true } },
               authors: {
                 select: {
                   user: {
@@ -60,9 +61,16 @@ export async function GET(request: Request) {
           posts = await prisma.post.findMany({
             orderBy: { id: "desc" },
             include: {
+              tags: true,
               authors: {
                 include: {
-                  user: true,
+                  user: {
+                    select: {
+                      uid: true,
+                      id: true,
+                      email: true,
+                    },
+                  },
                 },
               },
             },
@@ -80,6 +88,7 @@ export async function GET(request: Request) {
               published: true,
               createdAt: true,
               updatedAt: true,
+              tags: { select: { id: true, name: true } },
               authors: {
                 select: {
                   user: {
@@ -98,9 +107,16 @@ export async function GET(request: Request) {
             where: { authors: { some: { userId: payload.uid } } },
             orderBy: { id: "desc" },
             include: {
+              tags: true,
               authors: {
                 include: {
-                  user: true,
+                  user: {
+                    select: {
+                      uid: true,
+                      id: true,
+                      email: true,
+                    },
+                  },
                 },
               },
             },
@@ -120,6 +136,7 @@ export async function GET(request: Request) {
             published: true,
             createdAt: true,
             updatedAt: true,
+            tags: { select: { id: true, name: true } },
             authors: {
               select: {
                 user: {
@@ -138,9 +155,16 @@ export async function GET(request: Request) {
           where: { published: true },
           orderBy: { id: "desc" },
           include: {
+            tags: true,
             authors: {
               include: {
-                user: true,
+                user: {
+                  select: {
+                    uid: true,
+                    id: true,
+                    email: true,
+                  },
+                },
               },
             },
           },
@@ -180,6 +204,7 @@ export async function POST(request: Request) {
       published,
       slug: rawSlug,
       authors,
+      tags,
     } = await request.json();
 
     if (!title || !content) {
@@ -215,6 +240,18 @@ export async function POST(request: Request) {
       new Set([payload.uid, ...(authors ?? [])])
     );
 
+    const tagData =
+      Array.isArray(tags) && tags.length > 0
+        ? {
+            tags: {
+              connectOrCreate: tags.map((name: string) => ({
+                where: { name },
+                create: { name },
+              })),
+            },
+          }
+        : {};
+
     const post = await prisma.post.create({
       data: {
         title,
@@ -225,6 +262,15 @@ export async function POST(request: Request) {
           create: uniqueAuthors.map((uid: number) => ({
             user: { connect: { uid } },
           })),
+        },
+        ...tagData,
+      },
+      include: {
+        tags: true,
+        authors: {
+          include: {
+            user: true,
+          },
         },
       },
     });

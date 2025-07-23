@@ -1,11 +1,11 @@
+import TagsMain from "@/app/ui/tags-main";
+import TagsTitle from "@/app/ui/tags-title";
+
 export default function Tags() {
     return (
         <>
-        <div className="border-b">
-            <section className="section-base p-12">
-                <h1>TAGS</h1>
-            </section>
-        </div>
+        <TagsTitle />
+        <TagsMain />
         </>
     )
 }

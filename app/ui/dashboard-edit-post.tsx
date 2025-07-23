@@ -37,6 +37,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  SelectGroup,
 } from "@/components/ui/select";
 
 interface Post {
@@ -82,6 +83,9 @@ export default function DashboardEditPost({ postId }: DashboardEditPostProps) {
   const [showErrorDialog, setShowErrorDialog] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
+  const [tagInput, setTagInput] = useState("");
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+
   useEffect(() => {
     async function fetchPostAndUsers() {
       setLoading(true);
@@ -97,6 +101,9 @@ export default function DashboardEditPost({ postId }: DashboardEditPostProps) {
         setContent(postData.content);
         setPublished(postData.published);
         setSlug(postData.slug || "");
+        setSelectedTags(
+          postData.tags?.map((t: { name: string }) => t.name) || []
+        );
         // 默认选中文章的作者 uid
         setSelectedAuthors(
           postData.authors.map((a: { user: User }) => a.user.uid)
@@ -149,6 +156,18 @@ export default function DashboardEditPost({ postId }: DashboardEditPostProps) {
     setSelectedAuthors(selectedAuthors.filter((id) => id !== uid));
   };
 
+  const handleAddTag = () => {
+    const newTag = tagInput.trim();
+    if (newTag && !selectedTags.includes(newTag)) {
+      setSelectedTags([...selectedTags, newTag]);
+    }
+    setTagInput("");
+  };
+
+  const handleRemoveTag = (tag: string) => {
+    setSelectedTags(selectedTags.filter((t) => t !== tag));
+  };
+
   const handleSave = async () => {
     setSaving(true);
     try {
@@ -162,6 +181,7 @@ export default function DashboardEditPost({ postId }: DashboardEditPostProps) {
           published,
           slug: slug.trim() || undefined,
           authors: selectedAuthors,
+          tags: selectedTags,
         }),
       });
       if (!res.ok) {
@@ -302,29 +322,31 @@ export default function DashboardEditPost({ postId }: DashboardEditPostProps) {
                     </SelectTrigger>
 
                     <SelectContent>
-                      {allUsers
-                        .filter(
+                      <SelectGroup>
+                        {allUsers
+                          .filter(
+                            (u) =>
+                              u.uid !== currentUserUid &&
+                              !selectedAuthors.includes(u.uid)
+                          )
+                          .map((user) => (
+                            <SelectItem
+                              key={user.uid}
+                              value={user.uid.toString()}
+                            >
+                              {user.id} ({user.email})
+                            </SelectItem>
+                          ))}
+                        {allUsers.filter(
                           (u) =>
                             u.uid !== currentUserUid &&
                             !selectedAuthors.includes(u.uid)
-                        )
-                        .map((user) => (
-                          <SelectItem
-                            key={user.uid}
-                            value={user.uid.toString()}
-                          >
-                            {user.id} ({user.email})
-                          </SelectItem>
-                        ))}
-                      {allUsers.filter(
-                        (u) =>
-                          u.uid !== currentUserUid &&
-                          !selectedAuthors.includes(u.uid)
-                      ).length === 0 && (
-                        <div className="p-1 text-sm text-gray-500">
-                          无更多作者可添加
-                        </div>
-                      )}
+                        ).length === 0 && (
+                          <div className="p-1 text-sm text-gray-500">
+                            无更多作者可添加
+                          </div>
+                        )}
+                      </SelectGroup>
                     </SelectContent>
                   </Select>
 
@@ -347,7 +369,7 @@ export default function DashboardEditPost({ postId }: DashboardEditPostProps) {
                           {!isSelf && (
                             <button
                               type="button"
-                              className="ml-1 text-blue-700 hover:text-blue-900"
+                              className="ml-1 hover:text-red-600"
                               onClick={() => handleRemoveAuthor(uid)}
                               aria-label={`删除作者 ${user.email}`}
                             >
@@ -360,6 +382,63 @@ export default function DashboardEditPost({ postId }: DashboardEditPostProps) {
                   </div>
                 </div>
 
+                {/* 标签输入与显示 */}
+                <div className="mb-4">
+                  <label htmlFor="tags" className="block mb-1 font-semibold">
+                    标签（可选）
+                  </label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="tags"
+                      value={tagInput}
+                      onChange={(e) => setTagInput(e.target.value)}
+                      placeholder="输入标签后点击添加"
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          handleAddTag();
+                        }
+                      }}
+                      disabled={saving}
+                      className="w-[200px]"
+                    />
+                    <Button
+                      onClick={handleAddTag}
+                      type="button"
+                      disabled={saving}
+                    >
+                      添加
+                    </Button>
+                  </div>
+
+                  {/* 标签输入 */}
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {selectedTags.length === 0 ? (
+                      <div className="text-sm text-gray-400">
+                        暂无标签，可添加标签
+                      </div>
+                    ) : (
+                      selectedTags.map((tag) => (
+                        <div
+                          key={tag}
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-sm border bg-green-100 text-green-700 border-green-300"
+                        >
+                          {tag}
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveTag(tag)}
+                            className="ml-1 hover:text-red-600"
+                            aria-label="移除标签"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                {/* 样式按钮 */}
                 <div className="mb-2">
                   <label htmlFor="content" className="block mb-1 font-semibold">
                     内容

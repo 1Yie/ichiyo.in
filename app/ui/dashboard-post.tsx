@@ -35,12 +35,11 @@ import {
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 
-// 修改：Post 类型 author 改成 authors 数组
 interface Post {
   id: number;
   slug: string;
   title: string;
-  content?: string; // summary=true 时可能没 content，改为可选
+  content?: string;
   published: boolean;
   createdAt: string;
   updatedAt: string;

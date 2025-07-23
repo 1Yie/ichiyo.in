@@ -23,6 +23,6 @@
       "@/ui/*": ["./app/ui/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/api/login/[...nextauth].js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/api/login/[...nextauth].js", "app/ui/tags-params-title.tsx"],
   "exclude": ["node_modules"]
 }

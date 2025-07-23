@@ -28,17 +28,20 @@ interface Post {
   }[];
 }
 
+function dayDiff(d1: Date, d2: Date) {
+  const date1 = new Date(d1.getFullYear(), d1.getMonth(), d1.getDate());
+  const date2 = new Date(d2.getFullYear(), d2.getMonth(), d2.getDate());
+  const diffTime = date2.getTime() - date1.getTime();
+  return Math.floor(diffTime / (1000 * 60 * 60 * 24));
+}
+
 function timeDiffText(createdAt: string, updatedAt: string) {
   const created = new Date(createdAt);
   const updated = new Date(updatedAt);
   const now = new Date();
 
-  const createdDiffDays = Math.floor(
-    (now.getTime() - created.getTime()) / (1000 * 60 * 60 * 24)
-  );
-  const updatedDiffDays = Math.floor(
-    (now.getTime() - updated.getTime()) / (1000 * 60 * 60 * 24)
-  );
+  const createdDiffDays = dayDiff(created, now);
+  const updatedDiffDays = dayDiff(updated, now);
 
   const formatDate = (d: Date) =>
     `${d.getFullYear()}/${(d.getMonth() + 1).toString().padStart(2, "0")}/${d
