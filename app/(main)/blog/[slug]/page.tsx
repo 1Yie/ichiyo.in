@@ -57,11 +57,12 @@ async function getPostData(slug: string): Promise<Post | null> {
   return res.json();
 }
 
-export default async function Page({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+export default async function Page(
+  props: {
+    params: Promise<{ slug: string }>;
+  }
+) {
+  const params = await props.params;
   const realParams = await params;
 
   const post = await getPostData(realParams.slug);

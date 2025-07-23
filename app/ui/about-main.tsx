@@ -20,7 +20,7 @@ export default function AboutMain() {
   useEffect(() => {
     const loadSlides = async () => {
       try {
-        const res = await fetch("/api/site/data");
+        const res = await fetch("/api/pic");
         if (!res.ok) throw new Error("请求失败");
         const data = await res.json();
         setSlides(data);

@@ -4,7 +4,7 @@ import prisma from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
 
 export async function GET() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const cookieStoreInstance = await cookieStore;
   const token = cookieStoreInstance.get("token")?.value;
 

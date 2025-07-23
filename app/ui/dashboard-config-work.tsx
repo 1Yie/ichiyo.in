@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "nextjs-toploader/app";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import {
@@ -20,7 +20,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Pencil } from "lucide-react";
+import { Pencil, ArrowUp, ArrowDown } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -32,7 +32,8 @@ import {
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
-import Image from 'next/image';
+import Image from "next/image";
+import { cn } from "@/lib/utils";
 
 interface Project {
   id: number;
@@ -42,6 +43,9 @@ interface Project {
   icon: string;
 }
 
+type SortField = "id" | "name" | "description" | "link";
+type SortOrder = "asc" | "desc";
+
 export default function DashboardConfigWork() {
   const router = useRouter();
 
@@ -49,6 +53,9 @@ export default function DashboardConfigWork() {
   const [loading, setLoading] = useState(true);
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+  const [sortField, setSortField] = useState<SortField>("id");
+  const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
 
   const fetchProjects = async () => {
     try {
@@ -88,6 +95,56 @@ export default function DashboardConfigWork() {
     }
   };
 
+  const handleSort = (field: SortField) => {
+    if (field === sortField) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortOrder("asc");
+    }
+  };
+
+  const sortedProjects = useMemo(() => {
+    if (!projects) return [];
+    return [...projects].sort((a, b) => {
+      let aVal = a[sortField];
+      let bVal = b[sortField];
+
+      if (aVal === undefined || aVal === null) aVal = "";
+      if (bVal === undefined || bVal === null) bVal = "";
+
+      if (sortField === "id") {
+        return sortOrder === "asc"
+          ? Number(aVal) - Number(bVal)
+          : Number(bVal) - Number(aVal);
+      }
+
+      return sortOrder === "asc"
+        ? String(aVal).localeCompare(String(bVal))
+        : String(bVal).localeCompare(String(aVal));
+    });
+  }, [projects, sortField, sortOrder]);
+
+  const renderSortIcon = (field: SortField) => {
+    const isActive = field === sortField;
+    return (
+      <>
+        <ArrowUp
+          className={cn(
+            "inline-block h-4 w-4",
+            isActive && sortOrder === "asc" ? "text-black" : "text-gray-300"
+          )}
+        />
+        <ArrowDown
+          className={cn(
+            "inline-block h-4 w-4",
+            isActive && sortOrder === "desc" ? "text-black" : "text-gray-300"
+          )}
+        />
+      </>
+    );
+  };
+
   return (
     <SidebarInset>
       <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
@@ -99,14 +156,16 @@ export default function DashboardConfigWork() {
           />
           <Breadcrumb>
             <BreadcrumbList>
-              <BreadcrumbItem>
+              <BreadcrumbItem className="cursor-pointer">
                 <BreadcrumbLink onClick={() => router.push("/dashboard")}>
                   仪表盘
                 </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbLink onClick={() => router.push("/dashboard/config/work")}>
+              <BreadcrumbItem className="cursor-pointer">
+                <BreadcrumbLink
+                  onClick={() => router.push("/dashboard/config/work")}
+                >
                   作品
                 </BreadcrumbLink>
               </BreadcrumbItem>
@@ -129,11 +188,31 @@ export default function DashboardConfigWork() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>ID</TableHead>
+                    <TableHead
+                      className="cursor-pointer select-none"
+                      onClick={() => handleSort("id")}
+                    >
+                      ID {renderSortIcon("id")}
+                    </TableHead>
                     <TableHead>图标</TableHead>
-                    <TableHead>名称</TableHead>
-                    <TableHead>描述</TableHead>
-                    <TableHead>链接</TableHead>
+                    <TableHead
+                      className="cursor-pointer select-none"
+                      onClick={() => handleSort("name")}
+                    >
+                      名称
+                    </TableHead>
+                    <TableHead
+                      className="cursor-pointer select-none"
+                      onClick={() => handleSort("description")}
+                    >
+                      描述
+                    </TableHead>
+                    <TableHead
+                      className="cursor-pointer select-none"
+                      onClick={() => handleSort("link")}
+                    >
+                      链接
+                    </TableHead>
                     <TableHead className="text-right">操作</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -141,34 +220,48 @@ export default function DashboardConfigWork() {
                   {loading ? (
                     Array.from({ length: 3 }).map((_, i) => (
                       <TableRow key={i}>
-                        <TableCell><Skeleton className="h-4 w-6" /></TableCell>
-                        <TableCell><Skeleton className="h-8 w-8 rounded" /></TableCell>
-                        <TableCell><Skeleton className="h-4 w-24" /></TableCell>
-                        <TableCell><Skeleton className="h-4 w-48" /></TableCell>
-                        <TableCell><Skeleton className="h-4 w-32" /></TableCell>
+                        <TableCell>
+                          <Skeleton className="h-4 w-6" />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton className="h-8 w-8 rounded" />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton className="h-4 w-24" />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton className="h-4 w-48" />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton className="h-4 w-32" />
+                        </TableCell>
                         <TableCell className="text-right">
                           <Skeleton className="h-8 w-16 inline-block" />
                         </TableCell>
                       </TableRow>
                     ))
-                  ) : projects && projects.length === 0 ? (
+                  ) : sortedProjects.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center text-muted-foreground">
+                      <TableCell
+                        colSpan={6}
+                        className="text-center text-muted-foreground"
+                      >
                         暂无作品
                       </TableCell>
                     </TableRow>
                   ) : (
-                    projects?.map((project) => (
+                    sortedProjects.map((project) => (
                       <TableRow key={project.id}>
                         <TableCell>{project.id}</TableCell>
                         <TableCell>
-
                           <Image
                             src={project.icon}
                             alt="icon"
                             width={32}
                             height={32}
-                            className="h-8 w-8 rounded"
+                            className="h-12 w-auto rounded"
+                            unoptimized
+                            priority
                           />
                         </TableCell>
                         <TableCell>{project.name}</TableCell>
@@ -178,7 +271,7 @@ export default function DashboardConfigWork() {
                             href={project.link}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-blue-600 underline"
+                            className="underline"
                           >
                             {project.link}
                           </a>
@@ -187,7 +280,11 @@ export default function DashboardConfigWork() {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => router.push(`/dashboard/config/work/${project.id}`)}
+                            onClick={() =>
+                              router.push(
+                                `/dashboard/config/work/${project.id}`
+                              )
+                            }
                           >
                             编辑
                           </Button>
@@ -221,7 +318,9 @@ export default function DashboardConfigWork() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>取消</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete}>确认删除</AlertDialogAction>
+            <AlertDialogAction onClick={handleDelete}>
+              确认删除
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

@@ -6,7 +6,7 @@ import { generateSlug } from "@/lib/slug";
 
 export async function GET(request: Request) {
   try {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const token = (await cookieStore).get("token")?.value;
 
     let payload = null;
@@ -181,7 +181,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const token = (await cookieStore).get("token")?.value;
 
     if (!token) {

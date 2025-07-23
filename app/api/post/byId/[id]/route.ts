@@ -15,7 +15,7 @@ export async function GET(request: Request, props: Params) {
     return NextResponse.json({ error: "无效文章ID" }, { status: 400 });
   }
 
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const token = (await cookieStore).get("token")?.value;
   if (!token) {
     return NextResponse.json({ error: "未登录" }, { status: 401 });
@@ -69,7 +69,7 @@ export async function PATCH(request: Request, props: Params) {
     return NextResponse.json({ error: "无效文章ID" }, { status: 400 });
   }
 
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const token = (await cookieStore).get("token")?.value;
   if (!token) {
     return NextResponse.json({ error: "未登录" }, { status: 401 });
@@ -221,7 +221,7 @@ export async function DELETE(request: Request, props: Params) {
     return NextResponse.json({ error: "无效文章ID" }, { status: 400 });
   }
 
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const token = (await cookieStore).get("token")?.value;
   if (!token) {
     return NextResponse.json({ error: "未登录" }, { status: 401 });

@@ -1,6 +1,10 @@
-"use client";;
 import { use } from "react";
 import DashboardEditProject from "@/ui/dashboard-config-work-edit";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "ichiyo | 编辑作品",
+};
 
 interface PageProps {
   params: Promise<{ id: string }>;

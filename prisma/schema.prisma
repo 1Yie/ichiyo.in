@@ -57,3 +57,12 @@ model Project {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+
+model Pic {
+  id     Int      @id @default(autoincrement())
+  title  String
+  src    String
+  button String?
+  link   String?
+  newTab Boolean?
+}

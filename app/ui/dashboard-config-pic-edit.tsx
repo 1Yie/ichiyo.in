@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "nextjs-toploader/app";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { ImageUrlWithPreview } from "@/ui/ImageUrlWithPreview";
+
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -25,80 +26,89 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 
-interface Project {
+interface Pic {
   id: number;
-  name: string;
-  description: string;
-  link: string;
-  icon: string;
+  title: string;
+  src: string;
+  button?: string | null;
+  link?: string | null;
+  newTab?: boolean | null;
 }
 
-interface DashboardEditProjectProps {
-  projectId: number;
+interface DashboardConfigPicEditProps {
+  id: number;
 }
 
-export default function DashboardEditProject({
-  projectId,
-}: DashboardEditProjectProps) {
+export default function DashboardConfigPicEdit({
+  id,
+}: DashboardConfigPicEditProps) {
   const router = useRouter();
-  const id = projectId;
-  const [, setProject] = useState<Project | null>(null);
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
+
+  const [, setPic] = useState<Pic | null>(null);
+  const [title, setTitle] = useState("");
+  const [src, setSrc] = useState("");
+  const [button, setButton] = useState("");
   const [link, setLink] = useState("");
-  const [icon, setIcon] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [newTab, setNewTab] = useState(false);
+
   const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true); 
   const [showErrorDialog, setShowErrorDialog] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    const fetchProject = async () => {
+    async function fetchPic() {
       setLoading(true);
       try {
-        const res = await fetch(`/api/project/${id}`, {
-          credentials: "include",
-        });
-        if (!res.ok) throw new Error("获取作品失败");
+        const res = await fetch(`/api/pic/${id}`, { credentials: "include" });
+        if (!res.ok) throw new Error("获取图片失败");
         const data = await res.json();
-        setProject(data);
-        setName(data.name);
-        setDescription(data.description);
-        setLink(data.link);
-        setIcon(data.icon);
-      } catch (err) {
-        console.error(err);
+        setPic(data);
+        setTitle(data.title || "");
+        setSrc(data.src || "");
+        setButton(data.button || "");
+        setLink(data.link || "");
+        setNewTab(!!data.newTab);
+      } catch (error) {
+        console.error(error);
         setErrorMessage("加载失败，请稍后再试");
         setShowErrorDialog(true);
       } finally {
         setLoading(false);
       }
-    };
-    fetchProject();
+    }
+    fetchPic();
   }, [id]);
 
-  const handleSave = async () => {
+  async function handleSave() {
     setSaving(true);
     try {
-      const res = await fetch(`/api/project/${id}`, {
+      const res = await fetch(`/api/pic/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ name, description, link, icon }),
+        body: JSON.stringify({
+          title,
+          src,
+          button: button.trim() === "" ? null : button,
+          link: link.trim() === "" ? null : link,
+          newTab,
+        }),
       });
       if (!res.ok) {
         const data = await res.json();
         throw new Error(data?.error || "保存失败，请重试");
       }
-      router.push("/dashboard/config/work");
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "保存失败，请稍后再试";
+      router.push("/dashboard/config/pic");
+    } catch (error) {
+      const msg =
+        error instanceof Error ? error.message : "保存失败，请稍后再试";
       setErrorMessage(msg);
       setShowErrorDialog(true);
     } finally {
       setSaving(false);
     }
-  };
+  }
 
   return (
     <SidebarInset>
@@ -119,17 +129,17 @@ export default function DashboardEditProject({
               <BreadcrumbSeparator />
               <BreadcrumbItem className="cursor-pointer">
                 <BreadcrumbLink
-                  onClick={() => router.push("/dashboard/config/work")}
+                  onClick={() => router.push("/dashboard/config/pic")}
                 >
-                  作品
+                  图片
                 </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem className="cursor-pointer">
                 <BreadcrumbLink
-                  onClick={() => router.push(`/dashboard/config/work/${id}`)}
+                  onClick={() => router.push(`/dashboard/config/pic/${id}`)}
                 >
-                  编辑作品
+                  编辑图片
                 </BreadcrumbLink>
               </BreadcrumbItem>
             </BreadcrumbList>
@@ -140,55 +150,119 @@ export default function DashboardEditProject({
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0 h-full w-full">
         <div className="bg-muted/50 flex-1 rounded-xl p-4 h-full w-full min-w-0">
           <div className="bg-white rounded-xl p-4 h-full w-full min-w-0 flex flex-col">
-            <h1 className="text-2xl font-bold mb-4">编辑作品 #{id}</h1>
+            <h1 className="text-2xl font-bold mb-4">编辑图片 #{id}</h1>
+
             <div className="space-y-4">
+              {/* 标题 */}
               <div>
-                <label className="block mb-1 font-semibold">名称</label>
+                <label className="block mb-1 font-semibold" htmlFor="title">
+                  标题
+                </label>
                 {loading ? (
                   <Skeleton className="h-10 w-full rounded-md" />
                 ) : (
                   <Input
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    id="title"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder="请输入标题"
                   />
                 )}
               </div>
+
+              {/* 图片 URL */}
+              {/* <div>
+                <label className="block mb-1 font-semibold" htmlFor="src">
+                  图片 URL
+                </label>
+                {loading ? (
+                  <Skeleton className="h-10 w-full rounded-md" />
+                ) : (
+                  <Input
+                    id="src"
+                    value={src}
+                    onChange={(e) => setSrc(e.target.value)}
+                    placeholder="请输入图片地址"
+                  />
+                )}
+              </div> */}
               <ImageUrlWithPreview
-                labelName="图标 URL"
+                labelName="图片 URL"
                 labelClassName="block mb-1 font-semibold"
-                src={icon}
-                setSrc={setIcon}
+                src={src}
+                setSrc={setSrc}
               />
+              {/* 按钮文字 */}
               <div>
-                <label className="block mb-1 font-semibold">描述</label>
+                <label className="block mb-1 font-semibold" htmlFor="button">
+                  按钮文字 (留空则不开启按钮)
+                </label>
                 {loading ? (
                   <Skeleton className="h-10 w-full rounded-md" />
                 ) : (
                   <Input
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
+                    id="button"
+                    value={button}
+                    onChange={(e) => setButton(e.target.value)}
+                    placeholder="按钮显示的文字"
                   />
                 )}
               </div>
+
+              {/* 链接 URL */}
               <div>
-                <label className="block mb-1 font-semibold">链接 URL</label>
+                <label className="block mb-1 font-semibold" htmlFor="link">
+                  链接 URL (按钮跳转链接)
+                </label>
                 {loading ? (
                   <Skeleton className="h-10 w-full rounded-md" />
                 ) : (
                   <Input
+                    id="link"
                     value={link}
                     onChange={(e) => setLink(e.target.value)}
+                    placeholder="点击按钮跳转的链接"
+                    disabled={button.trim() === ""}
                   />
                 )}
               </div>
-              <div></div>
-              <div className="flex gap-2">
+
+              {/* 是否新标签页 */}
+              <div className="flex items-center space-x-2">
+                {loading ? (
+                  <Skeleton className="h-6 w-6 rounded" />
+                ) : (
+                  <>
+                    <input
+                      id="newTab"
+                      type="checkbox"
+                      checked={newTab}
+                      onChange={(e) => setNewTab(e.target.checked)}
+                      disabled={button.trim() === ""}
+                      className="cursor-pointer"
+                    />
+                    <label
+                      htmlFor="newTab"
+                      className={`select-none ${
+                        button.trim() === ""
+                          ? "opacity-50 cursor-not-allowed"
+                          : ""
+                      }`}
+                    >
+                      是否新标签页打开链接
+                    </label>
+                  </>
+                )}
+              </div>
+
+              {/* 操作按钮 */}
+              <div className="flex gap-2 justify-start">
                 <Button onClick={handleSave} disabled={saving || loading}>
                   {saving ? "保存中..." : "保存"}
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() => router.push("/dashboard/config/work")}
+                  onClick={() => router.push("/dashboard/config/pic")}
                   disabled={saving || loading}
                 >
                   取消
