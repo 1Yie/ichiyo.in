@@ -32,9 +32,9 @@ const data = {
       icon: Cog,
       isActive: true,
       items: [
-        { title: "作品", url: "#" },
-        { title: "友链", url: "#" },
-        { title: "图片", url: "#" },
+        { title: "作品", url: "/dashboard/config/work" },
+        { title: "友链", url: "/dashboard/config/link" },
+        { title: "图片", url: "/dashboard/config/pic" },
       ],
     },
   ],

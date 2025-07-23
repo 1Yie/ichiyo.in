@@ -34,46 +34,52 @@ export default function TagParams({ data }: { data: TagData }) {
           </p>
         ) : (
           <ul className="space-y-4">
-            {data.posts.map((post) => (
-              <li key={post.id} className="m-0 p-0 border-b last:border-b-0">
-                <Link
-                  href={`/blog/${post.slug}`}
-                  className="cursor-pointer block"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    router.push(`/blog/${post.slug}`);
-                  }}
-                >
-                  <div className="p-4 hover:bg-gray-50 dark:hover:bg-black transition-colors duration-300">
-                    <p className="text-2xl font-semibold">
-                      {post.title || post.slug}
-                    </p>
-                    {post.authors && post.authors.length > 0 && (
-                      <div className="flex flex-row gap-2 items-center justify-start">
-                        <p className="text-lg text-gray-500 dark:text-gray-400">
-                          {post.authors.map((author, index) => (
-                            <span key={index}>
-                              {index > 0 && ", "}
-                              {author.user.id}
-                            </span>
-                          ))}
-                        </p>
-                        {post.createdAt && (
-                          <>
-                            <p className="text-lg text-gray-500 dark:text-gray-600">
-                              ·
-                            </p>
-                            <p className="text-lg text-gray-500 dark:text-gray-400">
-                              {new Date(post.createdAt).toLocaleDateString()}
-                            </p>
-                          </>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </Link>
-              </li>
-            ))}
+            {[...data.posts]
+              .sort(
+                (a, b) =>
+                  new Date(b.createdAt).getTime() -
+                  new Date(a.createdAt).getTime()
+              )
+              .map((post) => (
+                <li key={post.id} className="m-0 p-0 border-b last:border-b-0">
+                  <Link
+                    href={`/blog/${post.slug}`}
+                    className="cursor-pointer block"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      router.push(`/blog/${post.slug}`);
+                    }}
+                  >
+                    <div className="p-4 hover:bg-gray-50 dark:hover:bg-black transition-colors duration-300">
+                      <p className="text-2xl font-semibold">
+                        {post.title || post.slug}
+                      </p>
+                      {post.authors && post.authors.length > 0 && (
+                        <div className="flex flex-row gap-2 items-center justify-start">
+                          <p className="text-lg text-gray-500 dark:text-gray-400">
+                            {post.authors.map((author, index) => (
+                              <span key={index}>
+                                {index > 0 && ", "}
+                                {author.user.id}
+                              </span>
+                            ))}
+                          </p>
+                          {post.createdAt && (
+                            <>
+                              <p className="text-lg text-gray-500 dark:text-gray-600">
+                                ·
+                              </p>
+                              <p className="text-lg text-gray-500 dark:text-gray-400">
+                                {new Date(post.createdAt).toLocaleDateString()}
+                              </p>
+                            </>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </Link>
+                </li>
+              ))}
           </ul>
         )}
       </section>

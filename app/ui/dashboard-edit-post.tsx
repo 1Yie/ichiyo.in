@@ -90,7 +90,7 @@ export default function DashboardEditPost({ postId }: DashboardEditPostProps) {
     async function fetchPostAndUsers() {
       setLoading(true);
       try {
-        // 1. 获取文章详情
+        // 获取文章详情
         const postRes = await fetch(`/api/post/byId/${postId}`, {
           credentials: "include",
         });

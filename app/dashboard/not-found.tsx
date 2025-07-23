@@ -1,5 +1,6 @@
 import { Metadata } from "next";
-import { SidebarInset } from "@/components/ui/sidebar";
+
+import DashboardError from "@/ui/dashboard-error";
 
 export const metadata: Metadata = {
   title: "ichiyo | 404",
@@ -8,9 +9,7 @@ export const metadata: Metadata = {
 export default function NotFound() {
   return (
     <>
-      <SidebarInset>
-        <div className="p-3">404 Not Found</div>
-      </SidebarInset>
+      <DashboardError />
     </>
   );
 }
