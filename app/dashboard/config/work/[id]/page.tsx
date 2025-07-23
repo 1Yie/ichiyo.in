@@ -1,11 +1,13 @@
-"use client";
+"use client";;
+import { use } from "react";
 import DashboardEditProject from "@/ui/dashboard-config-work-edit";
 
 interface PageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
-export default function PageDashboardEditProject({ params }: PageProps) {
+export default function PageDashboardEditProject(props: PageProps) {
+  const params = use(props.params);
   const id = Number(params.id);
   if (isNaN(id)) return <div>非法 ID</div>;
   return <DashboardEditProject projectId={id} />;

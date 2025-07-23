@@ -1,27 +1,52 @@
-import Image from "next/image";
+"use client";
 
-const projects = [
-  {
-    name: "AI 聊天助手",
-    description: "一个基于 AI 的智能对话系统，支持上下文记忆与多轮对话。",
-    link: "https://example.com/chatbot",
-    icon: "https://file.ichiyo.in/sakura/icons/check-light.svg",
-  },
-  {
-    name: "个人博客系统",
-    description: "支持 Markdown 编写、评论与标签分类的全栈博客平台。",
-    link: "https://example.com/blog",
-    icon: "https://file.ichiyo.in/sakura/icons/check-light.svg",
-  },
-  {
-    name: "任务管理工具",
-    description: "类似于 Trello 的可视化任务协作平台，支持多人实时协作。",
-    link: "https://example.com/tasks",
-    icon: "https://file.ichiyo.in/sakura/icons/check-light.svg",
-  },
-];
+import Image from "next/image";
+import { useEffect, useState } from "react";
+
+interface Project {
+  name: string;
+  description: string;
+  link: string;
+  icon: string;
+}
 
 export default function HomeProject() {
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    async function fetchProjects() {
+      try {
+        const res = await fetch("/api/project");
+        if (!res.ok) throw new Error("获取项目列表失败");
+        const data = await res.json();
+        setProjects(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "未知错误");
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchProjects();
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="section-base px-8 py-6 text-center">
+        加载中...
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="section-base px-8 py-6 text-center text-red-500">
+        错误：{error}
+      </section>
+    );
+  }
+
   return (
     <>
       <div className="border-b bg-gray-50 dark:bg-black">
@@ -40,7 +65,7 @@ export default function HomeProject() {
             {projects.map((project, index) => (
               <li
                 key={index}
-                className="grid grid-cols-[0.5fr_1fr_0.5fr] h-[200px] max-[920px]:h-[160px] max-[768px]:h-[150px] border-b  last:border-b-0
+                className="grid grid-cols-[0.5fr_1fr_0.5fr] h-[200px] max-[920px]:h-[160px] max-[768px]:h-[150px] border-b last:border-b-0
                     max-[920px]:grid-cols-[0.5fr_1fr] 
                     max-[768px]:grid-cols-1
                     "

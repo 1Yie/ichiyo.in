@@ -2,11 +2,12 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
 interface Params {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 // 获取单个项目
-export async function GET(req: Request, { params }: Params) {
+export async function GET(req: Request, props: Params) {
+  const params = await props.params;
   const { id } = params;
   try {
     const project = await prisma.project.findUnique({
@@ -24,7 +25,8 @@ export async function GET(req: Request, { params }: Params) {
 }
 
 // 修改项目
-export async function PATCH(req: Request, { params }: Params) {
+export async function PATCH(req: Request, props: Params) {
+  const params = await props.params;
   const { id } = params;
   try {
     const body = await req.json();
@@ -39,7 +41,8 @@ export async function PATCH(req: Request, { params }: Params) {
 }
 
 // 删除项目
-export async function DELETE(req: Request, { params }: Params) {
+export async function DELETE(req: Request, props: Params) {
+  const params = await props.params;
   const { id } = params;
   try {
     await prisma.project.delete({
