@@ -27,16 +27,23 @@ interface Friend {
 }
 
 // 无动画灰色占位块，用于接口返回空数据时显示
-function PlaceholderBlock({ className }: { className: string }) {
+function PlaceholderBlock({
+  className,
+  style,
+}: {
+  className?: string;
+  style?: React.CSSProperties;
+}) {
   return (
     <div
-      className={`${className} bg-gray-300 dark:bg-gray-700 rounded-md select-none`}
+      className={`${className} bg-gray-300 dark:bg-gray-700 select-none`}
+      style={style}
       aria-hidden="true"
     />
   );
 }
 
-// 虚拟占位骨架屏（无动画版）
+// 骨架屏动画版虚拟占位（带动画）
 function FriendPlaceholder({
   isPinned = false,
   isReversed = false,
@@ -51,23 +58,86 @@ function FriendPlaceholder({
           isReversed ? "flex-row-reverse text-right" : "flex-row"
         }`}
       >
-        {/* 圆形头像占位 */}
-        <div
-          className="rounded-full border-2 border-gray-300 dark:border-gray-600 bg-gray-300 dark:bg-gray-700 select-none"
+        <Skeleton
+          className="rounded-full border-2 border-gray-300 dark:border-gray-600"
           style={{ width: 150, height: 150 }}
-          aria-hidden="true"
         />
         <div
-          className={`max-w-lg space-y-2 ${isReversed ? "text-right ml-auto" : ""}`}
+          className={`max-w-lg space-y-2 ${
+            isReversed ? "text-right ml-auto" : ""
+          }`}
         >
-          <PlaceholderBlock
-            className={`h-6 w-32 ${isReversed ? "ml-auto" : ""}`}
-          />
-          <PlaceholderBlock
-            className={`h-4 w-full max-w-[300px] ${isReversed ? "ml-auto" : ""}`}
+          <Skeleton className={`h-6 w-32 ${isReversed ? "ml-auto" : ""}`} />
+          <Skeleton
+            className={`h-4 w-full max-w-[300px] ${
+              isReversed ? "ml-auto" : ""
+            }`}
           />
           <div
-            className={`flex gap-3 ${isReversed ? "justify-end" : "justify-start"}`}
+            className={`flex gap-3 ${
+              isReversed ? "justify-end" : "justify-start"
+            }`}
+          >
+            <Skeleton className="w-5 h-5 rounded-full" />
+            <Skeleton className="w-5 h-5 rounded-full" />
+          </div>
+        </div>
+      </div>
+    );
+  } else {
+    return (
+      <div className="w-40 flex flex-col items-center text-center space-y-2">
+        <Skeleton
+          className="rounded-full border-2 border-gray-300 dark:border-gray-600"
+          style={{ width: 90, height: 90 }}
+        />
+        <Skeleton className="w-20 h-4 mx-auto" />
+        <Skeleton className="w-24 h-3 mx-auto" />
+        <div className="flex gap-2 justify-center">
+          <Skeleton className="w-5 h-5 rounded-full" />
+          <Skeleton className="w-5 h-5 rounded-full" />
+        </div>
+      </div>
+    );
+  }
+}
+
+// 加载完成但无数据时显示的静态灰色占位块
+function FriendPlaceholderStatic({
+  isPinned = false,
+  isReversed = false,
+}: {
+  isPinned?: boolean;
+  isReversed?: boolean;
+}) {
+  if (isPinned) {
+    return (
+      <div
+        className={`flex items-center gap-4 sm:gap-6 ${
+          isReversed ? "flex-row-reverse text-right" : "flex-row"
+        }`}
+      >
+        <PlaceholderBlock
+          className="rounded-full border-2 border-gray-300 dark:border-gray-600"
+          style={{ width: 150, height: 150 }}
+        />
+        <div
+          className={`max-w-lg space-y-2 ${
+            isReversed ? "text-right ml-auto" : ""
+          }`}
+        >
+          <PlaceholderBlock
+            className={`h-6 w-32 rounded ${isReversed ? "ml-auto" : ""}`}
+          />
+          <PlaceholderBlock
+            className={`h-4 w-full max-w-[300px] rounded ${
+              isReversed ? "ml-auto" : ""
+            }`}
+          />
+          <div
+            className={`flex gap-3  ${
+              isReversed ? "justify-end" : "justify-start"
+            }`}
           >
             <PlaceholderBlock className="w-5 h-5 rounded-full" />
             <PlaceholderBlock className="w-5 h-5 rounded-full" />
@@ -78,14 +148,12 @@ function FriendPlaceholder({
   } else {
     return (
       <div className="w-40 flex flex-col items-center text-center space-y-2">
-        {/* 圆形头像占位 */}
-        <div
-          className="rounded-full border-2 border-gray-300 dark:border-gray-600 bg-gray-300 dark:bg-gray-700 select-none"
+        <PlaceholderBlock
+          className="rounded-full border-2 border-gray-300 dark:border-gray-600"
           style={{ width: 90, height: 90 }}
-          aria-hidden="true"
         />
-        <PlaceholderBlock className="w-20 h-4 mx-auto" />
-        <PlaceholderBlock className="w-24 h-3 mx-auto" />
+        <PlaceholderBlock className="w-20 h-4 mx-auto rounded" />
+        <PlaceholderBlock className="w-24 h-3 mx-auto rounded" />
         <div className="flex gap-2 justify-center">
           <PlaceholderBlock className="w-5 h-5 rounded-full" />
           <PlaceholderBlock className="w-5 h-5 rounded-full" />
@@ -162,14 +230,19 @@ export default function LinkMain() {
             <div className="space-y-8 sm:space-y-10">
               {loading
                 ? Array.from({ length: 2 }).map((_, idx) => (
-                    <Skeleton
+                    <FriendPlaceholder
                       key={idx}
-                      className={`w-full h-[160px] rounded-lg`}
+                      isPinned
+                      isReversed={idx % 2 !== 0}
                     />
                   ))
                 : showPinnedPlaceholder
                 ? Array.from({ length: 2 }).map((_, idx) => (
-                    <FriendPlaceholder key={idx} isPinned isReversed={idx % 2 !== 0} />
+                    <FriendPlaceholderStatic
+                      key={idx}
+                      isPinned
+                      isReversed={idx % 2 !== 0}
+                    />
                   ))
                 : pinnedFriends.map((friend, idx) => (
                     <div
@@ -237,22 +310,11 @@ export default function LinkMain() {
             <div className="flex flex-wrap justify-center gap-4 sm:gap-8">
               {loading
                 ? Array.from({ length: 4 }).map((_, idx) => (
-                    <div
-                      key={idx}
-                      className="w-24 sm:w-40 flex flex-col items-center text-center space-y-2"
-                    >
-                      <Skeleton className="w-[60px] h-[60px] sm:w-[90px] sm:h-[90px] rounded-full" />
-                      <Skeleton className="w-20 h-4" />
-                      <Skeleton className="w-24 h-3" />
-                      <div className="flex gap-2">
-                        <Skeleton className="w-5 h-5 rounded-full" />
-                        <Skeleton className="w-5 h-5 rounded-full" />
-                      </div>
-                    </div>
+                    <FriendPlaceholder key={idx} />
                   ))
                 : showOtherPlaceholder
                 ? Array.from({ length: 4 }).map((_, idx) => (
-                    <FriendPlaceholder key={idx} />
+                    <FriendPlaceholderStatic key={idx} />
                   ))
                 : otherFriends.map((friend, idx) => (
                     <div
@@ -312,12 +374,19 @@ export default function LinkMain() {
             <AccordionItem value="item-1">
               <div className="flex flex-col px-4 py-1 sm:px-8 sm:py-2">
                 <AccordionTrigger className="p-2 hover:no-underline hover:bg-accent cursor-pointer">
-                  <h1 className="text-xl sm:text-2xl font-bold">如何加入友链？</h1>
+                  <h1 className="text-xl sm:text-2xl font-bold">
+                    如何加入友链？
+                  </h1>
                 </AccordionTrigger>
                 <AccordionContent>
                   <ul className="list-decimal pl-6 sm:pl-8 marker:text-gray-400 text-base sm:text-lg text-gray-700 dark:text-gray-300 space-y-1">
-                    <li>确保<strong>内容活跃</strong>，有足够的阅读量；</li>
-                    <li> <strong>不轻易弃坑</strong>，保持存活与互联网之中；</li>
+                    <li>
+                      确保<strong>内容活跃</strong>，有足够的阅读量；
+                    </li>
+                    <li>
+                      {" "}
+                      <strong>不轻易弃坑</strong>，保持存活与互联网之中；
+                    </li>
                     <li>
                       内容要求<strong>不得违反</strong>国家法律法规，
                       <strong>不涉及</strong>政治敏感内容；
@@ -339,20 +408,24 @@ export default function LinkMain() {
             <AccordionItem value="item-2">
               <div className="flex flex-col px-4 py-1 sm:px-8 sm:py-2">
                 <AccordionTrigger className="p-2 hover:no-underline hover:bg-accent cursor-pointer">
-                  <h1 className="text-xl sm:text-2xl font-bold">如何申请友链？</h1>
+                  <h1 className="text-xl sm:text-2xl font-bold">
+                    如何申请友链？
+                  </h1>
                 </AccordionTrigger>
                 <AccordionContent>
                   <ul className="text-base sm:text-lg text-gray-700 dark:text-gray-300 break-words">
                     <li className="flex items-start gap-1.5 sm:gap-2">
                       <Highlighter className="w-4 h-4 sm:w-5 sm:h-5 shrink-0 mt-1" />
                       <span>
-                        <strong>内容包含</strong>：头像、名称、介绍、链接、以及社交账号地址；
+                        <strong>内容包含</strong>
+                        ：头像、名称、介绍、链接、以及社交账号地址；
                       </span>
                     </li>
                     <li className="flex items-start gap-1.5 sm:gap-2">
                       <StickyNote className="w-4 h-4 sm:w-5 sm:h-5 shrink-0 mt-1" />
                       <span>
-                        <strong>邮箱主题</strong>：友链申请，我将在第一时间审核并添加到友链栏目中。
+                        <strong>邮箱主题</strong>
+                        ：友链申请，我将在第一时间审核并添加到友链栏目中。
                       </span>
                     </li>
                     <li className="flex items-start gap-1.5 sm:gap-2">

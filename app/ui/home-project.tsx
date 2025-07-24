@@ -36,10 +36,10 @@ export default function HomeProject() {
     <>
       {/* 标题区域，无论加载与否都显示 */}
       <div className="border-b bg-gray-50 dark:bg-black">
-        <section className="section-base px-8 py-6">
+        <section className="section-base px-8 py-4 sm:px-16 sm:py-8">
           <div className="flex flex-col">
-            <h1 className="text-2xl">项目</h1>
-            <p className="text-lg text-gray-600 dark:text-gray-300">
+            <h1 className="text-lg sm:text-2xl">项目</h1>
+            <p className="text-sm sm:text-lg text-gray-600 dark:text-gray-300">
               不才明主弃，多病故人疏。
             </p>
           </div>

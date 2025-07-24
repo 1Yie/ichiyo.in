@@ -82,7 +82,7 @@ export default function Header() {
   return (
     <header className="border-b z-10">
       <section className="section-base">
-        <div className="flex justify-between items-center px-4 py-3">
+        <div className="h-14 flex justify-between items-center px-4">
           <div className="flex items-center space-x-4 font-['Raleway',sans-serif]">
             <Link href="/">
               <p className="text-lg text-primary">ichiyo</p>

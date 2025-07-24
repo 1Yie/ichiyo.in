@@ -9,6 +9,8 @@ import { FaGithub } from "react-icons/fa6";
 import { FaXTwitter } from "react-icons/fa6";
 import { FaBluesky } from "react-icons/fa6";
 import { FaTelegram } from "react-icons/fa6";
+import { FaEnvelope } from "react-icons/fa6";
+import { FaBilibili } from "react-icons/fa6";
 
 type SocialIconLinkProps = {
   href: string;
@@ -19,6 +21,8 @@ export default function Footer() {
   const SocialIconLink = ({ href, children }: SocialIconLinkProps) => (
     <Link
       href={href}
+      target="_blank"
+      rel="noopener noreferrer"
       className="transition-colors hover:text-gray-700 dark:hover:text-gray-300"
     >
       {children}
@@ -28,7 +32,7 @@ export default function Footer() {
   return (
     <div className="relative">
       <section className="section-base">
-        <div className="flex justify-between items-center px-3 py-3 pl-5 pr-5 sm:pl-8 sm:pr-8">
+        <div className="h-14 flex justify-between items-center px-4 sm:px-8">
           <div className="flex items-center space-x-4 font-['Raleway',sans-serif]">
             <Link href="/">
               <p className="text-lg text-primary">ichiyo</p>
@@ -45,19 +49,27 @@ export default function Footer() {
             <NavigationMenu>
               <NavigationMenuList>
                 <NavigationMenuItem className="flex flex-row gap-2">
-                  <SocialIconLink href="#">
+                  <SocialIconLink href="mailto:me@ichiyo.in">
+                    <FaEnvelope size={22} />
+                  </SocialIconLink>
+
+                  <SocialIconLink href="https://space.bilibili.com/35020597">
+                    <FaBilibili size={22} />
+                  </SocialIconLink>
+
+                  <SocialIconLink href="https://github.com/1Yie">
                     <FaGithub size={22} />
                   </SocialIconLink>
 
-                  <SocialIconLink href="#">
+                  <SocialIconLink href="https://x.com/IchiyoNico">
                     <FaXTwitter size={22} />
                   </SocialIconLink>
 
-                  <SocialIconLink href="#">
+                  <SocialIconLink href="https://t.me/ichiyo233">
                     <FaTelegram size={22} />
                   </SocialIconLink>
 
-                  <SocialIconLink href="#">
+                  <SocialIconLink href="https://bsky.app/profile/ichiyo.in">
                     <FaBluesky size={22} />
                   </SocialIconLink>
                 </NavigationMenuItem>
