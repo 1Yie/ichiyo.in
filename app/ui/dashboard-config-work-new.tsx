@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "nextjs-toploader/app";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
+
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -22,6 +23,7 @@ import {
   AlertDialogFooter,
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
+import { ImageUrlWithPreview } from "@/ui/ImageUrlWithPreview";
 
 export default function DashboardCreateProject() {
   const router = useRouter();
@@ -62,19 +64,32 @@ export default function DashboardCreateProject() {
       <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
         <div className="flex items-center gap-2 px-4">
           <SidebarTrigger className="-ml-1" />
-          <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
+          <Separator
+            orientation="vertical"
+            className="mr-2 data-[orientation=vertical]:h-4"
+          />
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem className="cursor-pointer">
-                <BreadcrumbLink onClick={() => router.push("/dashboard")}>仪表盘</BreadcrumbLink>
+                <BreadcrumbLink onClick={() => router.push("/dashboard")}>
+                  仪表盘
+                </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbLink onClick={() => router.push("/dashboard/config/work")}>作品</BreadcrumbLink>
+                <BreadcrumbLink
+                  onClick={() => router.push("/dashboard/config/work")}
+                >
+                  作品
+                </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem className="cursor-pointer">
-                <BreadcrumbLink onClick={() => router.push("/dashboard/config/work/new")}>新建作品</BreadcrumbLink>
+                <BreadcrumbLink
+                  onClick={() => router.push("/dashboard/config/work/new")}
+                >
+                  新建作品
+                </BreadcrumbLink>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
@@ -91,16 +106,21 @@ export default function DashboardCreateProject() {
                 <Input value={name} onChange={(e) => setName(e.target.value)} />
               </div>
               <div>
+                <ImageUrlWithPreview
+                  src={icon}
+                  setSrc={setIcon}
+                  labelName="图标 URL"
+                  labelClassName="block mb-1 font-semibold"
+                />
                 <label className="block mb-1 font-semibold">描述</label>
-                <Input value={description} onChange={(e) => setDescription(e.target.value)} />
+                <Input
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                />
               </div>
               <div>
                 <label className="block mb-1 font-semibold">链接 URL</label>
                 <Input value={link} onChange={(e) => setLink(e.target.value)} />
-              </div>
-              <div>
-                <label className="block mb-1 font-semibold">图标 URL</label>
-                <Input value={icon} onChange={(e) => setIcon(e.target.value)} />
               </div>
               <div className="flex gap-2">
                 <Button onClick={handleCreate} disabled={saving}>

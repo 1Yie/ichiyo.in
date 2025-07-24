@@ -1,11 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma"; // 你项目中 Prisma 客户端的导入路径
+import { cookies } from "next/headers";
+import prisma from "@/lib/prisma";
+import { verifyToken } from "@/lib/auth";
 
-export async function GET(request: NextRequest, props: { params: Promise<{ id: number }> }) {
+export async function GET(request: NextRequest, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
   const id = Number(params.id);
   if (isNaN(id))
     return NextResponse.json({ error: "无效的图片ID" }, { status: 400 });
+
+  // token 校验
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token")?.value;
+  if (!token) return NextResponse.json({ error: "未登录" }, { status: 401 });
+
+  let payload;
+  try {
+    payload = verifyToken(token);
+    if (!payload) return NextResponse.json({ error: "无效身份" }, { status: 401 });
+  } catch {
+    return NextResponse.json({ error: "无效身份" }, { status: 401 });
+  }
 
   const pic = await prisma.pic.findUnique({ where: { id } });
   if (!pic) return NextResponse.json({ error: "图片未找到" }, { status: 404 });
@@ -13,11 +28,24 @@ export async function GET(request: NextRequest, props: { params: Promise<{ id: n
   return NextResponse.json(pic);
 }
 
-export async function PATCH(request: NextRequest, props: { params: Promise<{ id: number }> }) {
+export async function PATCH(request: NextRequest, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
   const id = Number(params.id);
   if (isNaN(id))
     return NextResponse.json({ error: "无效的图片ID" }, { status: 400 });
+
+  // token 校验
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token")?.value;
+  if (!token) return NextResponse.json({ error: "未登录" }, { status: 401 });
+
+  let payload;
+  try {
+    payload = verifyToken(token);
+    if (!payload) return NextResponse.json({ error: "无效身份" }, { status: 401 });
+  } catch {
+    return NextResponse.json({ error: "无效身份" }, { status: 401 });
+  }
 
   const body = await request.json();
   const dataToUpdate: Partial<{
@@ -60,9 +88,22 @@ export async function DELETE(request: NextRequest, props: { params: Promise<{ id
   if (isNaN(id))
     return NextResponse.json({ error: "无效的图片ID" }, { status: 400 });
 
+  // token 校验
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token")?.value;
+  if (!token) return NextResponse.json({ error: "未登录" }, { status: 401 });
+
+  let payload;
+  try {
+    payload = verifyToken(token);
+    if (!payload) return NextResponse.json({ error: "无效身份" }, { status: 401 });
+  } catch {
+    return NextResponse.json({ error: "无效身份" }, { status: 401 });
+  }
+
   try {
     await prisma.pic.delete({ where: { id } });
-    return new Response(null, { status: 204 });
+    return NextResponse.json({ message: "删除成功" }, { status: 204 });
   } catch {
     return NextResponse.json({ error: "删除失败" }, { status: 500 });
   }

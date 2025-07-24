@@ -63,7 +63,7 @@ export default function BlogMain() {
               Tags
             </Link>
             <Link href="/feed.xml" className="flex items-center gap-1 text-lg ">
-              <Rss size={19} />
+              <Rss size={17} />
               RSS
             </Link>
           </section>
@@ -97,7 +97,7 @@ export default function BlogMain() {
             Tags
           </Link>
           <Link href="/feed.xml" className="flex items-center gap-1 text-lg ">
-            <Rss size={19} />
+            <Rss size={17} />
             RSS
           </Link>
         </section>

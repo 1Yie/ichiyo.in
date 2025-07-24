@@ -1,14 +1,37 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import prisma from "@/lib/prisma";
+import { verifyToken } from "@/lib/auth";
 
 interface Params {
   params: Promise<{ id: string }>;
 }
 
-// 获取单个项目
+async function validateToken() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token")?.value;
+  if (!token) {
+    return { valid: false, response: NextResponse.json({ error: "未登录" }, { status: 401 }) };
+  }
+
+  try {
+    const payload = verifyToken(token);
+    if (!payload) {
+      return { valid: false, response: NextResponse.json({ error: "无效身份" }, { status: 401 }) };
+    }
+    return { valid: true, payload };
+  } catch {
+    return { valid: false, response: NextResponse.json({ error: "无效身份" }, { status: 401 }) };
+  }
+}
+
 export async function GET(req: Request, props: Params) {
+  const validation = await validateToken();
+  if (!validation.valid) return validation.response;
+
   const params = await props.params;
   const { id } = params;
+
   try {
     const project = await prisma.project.findUnique({
       where: { id: Number(id) },
@@ -24,10 +47,13 @@ export async function GET(req: Request, props: Params) {
   }
 }
 
-// 修改项目
 export async function PATCH(req: Request, props: Params) {
+  const validation = await validateToken();
+  if (!validation.valid) return validation.response;
+
   const params = await props.params;
   const { id } = params;
+
   try {
     const body = await req.json();
     const updated = await prisma.project.update({
@@ -40,10 +66,13 @@ export async function PATCH(req: Request, props: Params) {
   }
 }
 
-// 删除项目
 export async function DELETE(req: Request, props: Params) {
+  const validation = await validateToken();
+  if (!validation.valid) return validation.response;
+
   const params = await props.params;
   const { id } = params;
+
   try {
     await prisma.project.delete({
       where: { id: Number(id) },

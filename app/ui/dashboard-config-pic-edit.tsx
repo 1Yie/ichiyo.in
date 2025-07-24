@@ -191,6 +191,7 @@ export default function DashboardConfigPicEdit({
                 labelClassName="block mb-1 font-semibold"
                 src={src}
                 setSrc={setSrc}
+                loading={loading}
               />
               {/* 按钮文字 */}
               <div>

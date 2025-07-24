@@ -1,4 +1,5 @@
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 
@@ -7,50 +8,93 @@ export function ImageUrlWithPreview({
   labelClassName,
   src,
   setSrc,
+  loading = false,
 }: {
   src: string;
   setSrc: (val: string) => void;
   labelName: string;
   labelClassName: string;
+  loading?: boolean;
 }) {
   const [preview, setPreview] = useState(src);
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [hasError, setHasError] = useState(false);
 
-  // 防抖更新预览图
+  // 防抖更新 preview
   useEffect(() => {
+    setImageLoaded(false);
+
     const timeout = setTimeout(() => {
       setPreview(src);
     }, 300);
+
     return () => clearTimeout(timeout);
   }, [src]);
 
+  // 每次预览地址变更，清除错误状态
+  useEffect(() => {
+    setHasError(false);
+  }, [preview]);
+
   return (
     <div className="flex items-start gap-4">
-      {/* 输入框 */}
+      {/* 输入框区域 */}
       <div className="flex-1 space-y-2">
-        <label htmlFor="src" className={labelClassName}>
-          {labelName}
-        </label>
-        <Input
-          id="src"
-          value={src}
-          onChange={(e) => setSrc(e.target.value)}
-          placeholder="https://example.com/image.png"
-        />
+        {loading ? (
+          <>
+            <Skeleton className="h-5 w-24" />
+            <Skeleton className="h-10 w-full" />
+          </>
+        ) : (
+          <>
+            <label htmlFor="src" className={labelClassName}>
+              {labelName}
+            </label>
+            <Input
+              id="src"
+              value={src}
+              onChange={(e) => setSrc(e.target.value)}
+              placeholder="https://example.com/image.png"
+            />
+          </>
+        )}
       </div>
 
-      {/* 预览区域 */}
-      <div className="w-48 h-32 flex items-center justify-center rounded-lg border border-gray-200 overflow-hidden bg-white">
-        {preview ? (
+      {/* 图片预览区域 */}
+      <div className="w-48 h-32 relative flex items-center justify-center rounded-lg border border-gray-200 overflow-hidden bg-white">
+        {/* 正常显示图片 */}
+        {!loading && preview && !hasError && (
           <Image
             src={preview}
             alt="图片预览"
-            width={128}
-            height={80}
-            className="flex object-contain w-full h-full"
+            fill
+            className="object-contain"
             unoptimized
+            onLoad={() => setImageLoaded(true)}
+            onError={() => {
+              setHasError(true);
+              setImageLoaded(false);
+            }}
           />
-        ) : (
-          <span className="text-xs text-gray-400">无预览</span>
+        )}
+
+        {/* 骨架屏遮罩 */}
+        {(loading || (!imageLoaded && !hasError)) && (
+          <div className="absolute inset-0">
+            <Skeleton className="w-full h-full" />
+          </div>
+        )}
+
+        {/* 加载失败提示 */}
+        {hasError && !loading && (
+          <span className="text-xs text-red-400 absolute text-center px-2">
+            图片加载失败
+          </span>
+        )}
+
+        {/* 无图片预览时 */}
+        {!src.trim() && !loading && (
+          <span className="text-xs text-gray-400 absolute">无预览</span>
         )}
       </div>
     </div>

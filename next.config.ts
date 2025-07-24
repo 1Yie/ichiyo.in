@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
       "file.ichiyo.in",
       "dn-qiniu-avatar.qbox.me",
       "images.unsplash.com",
+      "iph.href.lu"
     ],
   },
   async rewrites() {

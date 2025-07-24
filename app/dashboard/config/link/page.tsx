@@ -1,4 +1,4 @@
-import DashboardConfigLink from "@/ui/dashboard-config-link";
+import DashboardConfigFriend from "@/ui/dashboard-config-friend";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -6,5 +6,5 @@ export const metadata: Metadata = {
 };
 
 export default function PageDashboardConfigLink() {
-  return <DashboardConfigLink />;
+  return <DashboardConfigFriend />;
 }

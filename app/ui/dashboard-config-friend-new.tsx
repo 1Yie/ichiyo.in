@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "nextjs-toploader/app";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
-import { ImageUrlWithPreview } from "@/ui/ImageUrlWithPreview";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -23,82 +22,46 @@ import {
   AlertDialogFooter,
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
-import { Skeleton } from "@/components/ui/skeleton";
+import { ImageUrlWithPreview } from "@/ui/ImageUrlWithPreview";
 
-interface Project {
-  id: number;
-  name: string;
-  description: string;
-  link: string;
-  icon: string;
-}
-
-interface DashboardEditProjectProps {
-  projectId: number;
-}
-
-export default function DashboardEditProject({
-  projectId,
-}: DashboardEditProjectProps) {
+export default function DashboardConfigFriendNew() {
   const router = useRouter();
-  const id = projectId;
-  const [, setProject] = useState<Project | null>(null);
+
   const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
   const [link, setLink] = useState("");
   const [icon, setIcon] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [description, setDescription] = useState("");
+
   const [saving, setSaving] = useState(false);
   const [showErrorDialog, setShowErrorDialog] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  useEffect(() => {
-    const fetchProject = async () => {
-      setLoading(true);
-      try {
-        const res = await fetch(`/api/project/${id}`, {
-          credentials: "include",
-        });
-        if (!res.ok) throw new Error("获取作品失败");
-        const data = await res.json();
-        setProject(data);
-        setName(data.name);
-        setDescription(data.description);
-        setLink(data.link);
-        setIcon(data.icon);
-      } catch (err) {
-        console.error(err);
-        setErrorMessage("加载失败，请稍后再试");
-        setShowErrorDialog(true);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProject();
-  }, [id]);
-
-  const handleSave = async () => {
+  async function handleSave() {
     setSaving(true);
     try {
-      const res = await fetch(`/api/project/${id}`, {
-        method: "PATCH",
+      const res = await fetch("/api/friend", {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ name, description, link, icon }),
+        body: JSON.stringify({
+          name: name.trim(),
+          link: link.trim(),
+          icon: icon.trim(),
+          description: description.trim(),
+        }),
       });
       if (!res.ok) {
         const data = await res.json();
         throw new Error(data?.error || "保存失败，请重试");
       }
-      router.push("/dashboard/config/work");
+      router.push("/dashboard/config/link");
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "保存失败，请稍后再试";
-      setErrorMessage(msg);
+      setErrorMessage(err instanceof Error ? err.message : "保存失败，请稍后再试");
       setShowErrorDialog(true);
     } finally {
       setSaving(false);
     }
-  };
+  }
 
   return (
     <SidebarInset>
@@ -118,19 +81,13 @@ export default function DashboardEditProject({
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem className="cursor-pointer">
-                <BreadcrumbLink
-                  onClick={() => router.push("/dashboard/config/work")}
-                >
-                  作品
+                <BreadcrumbLink onClick={() => router.push("/dashboard/config/link")}>
+                  友链
                 </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem className="cursor-pointer">
-                <BreadcrumbLink
-                  onClick={() => router.push(`/dashboard/config/work/${id}`)}
-                >
-                  编辑作品
-                </BreadcrumbLink>
+                新建友链
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
@@ -140,57 +97,66 @@ export default function DashboardEditProject({
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0 h-full w-full">
         <div className="bg-muted/50 flex-1 rounded-xl p-4 h-full w-full min-w-0">
           <div className="bg-white rounded-xl p-4 h-full w-full min-w-0 flex flex-col">
-            <h1 className="text-2xl font-bold mb-4">编辑作品 #{id}</h1>
+            <h1 className="text-2xl font-bold mb-4">新建友链</h1>
+
             <div className="space-y-4">
+              {/* 名称 */}
               <div>
-                <label className="block mb-1 font-semibold">名称</label>
-                {loading ? (
-                  <Skeleton className="h-10 w-full rounded-md" />
-                ) : (
-                  <Input
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                  />
-                )}
+                <label className="block mb-1 font-semibold" htmlFor="name">
+                  名称
+                </label>
+                <Input
+                  id="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="请输入名称"
+                />
               </div>
+
+              {/* 链接 */}
+              <div>
+                <label className="block mb-1 font-semibold" htmlFor="link">
+                  链接 URL
+                </label>
+                <Input
+                  id="link"
+                  value={link}
+                  onChange={(e) => setLink(e.target.value)}
+                  placeholder="请输入链接"
+                />
+              </div>
+
+              {/* 图标 */}
               <ImageUrlWithPreview
                 labelName="图标 URL"
                 labelClassName="block mb-1 font-semibold"
                 src={icon}
                 setSrc={setIcon}
-                loading={loading}
+                loading={false}
               />
+
+              {/* 描述 */}
               <div>
-                <label className="block mb-1 font-semibold">描述</label>
-                {loading ? (
-                  <Skeleton className="h-10 w-full rounded-md" />
-                ) : (
-                  <Input
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                  />
-                )}
+                <label className="block mb-1 font-semibold" htmlFor="description">
+                  描述
+                </label>
+                <Input
+                  id="description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="请输入描述"
+                />
               </div>
-              <div>
-                <label className="block mb-1 font-semibold">链接 URL</label>
-                {loading ? (
-                  <Skeleton className="h-10 w-full rounded-md" />
-                ) : (
-                  <Input
-                    value={link}
-                    onChange={(e) => setLink(e.target.value)}
-                  />
-                )}
-              </div>
-              <div></div>
-              <div className="flex gap-2">
-                <Button onClick={handleSave} disabled={saving || loading}>
+
+              {/* 操作按钮 */}
+              <div className="flex gap-2 justify-start">
+                <Button onClick={handleSave} disabled={saving}>
                   {saving ? "保存中..." : "保存"}
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() => router.push("/dashboard/config/work")}
-                  disabled={saving || loading}
+                  onClick={() => router.push("/dashboard/config/link")}
+                  disabled={saving}
                 >
                   取消
                 </Button>

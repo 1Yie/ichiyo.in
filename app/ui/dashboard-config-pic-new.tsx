@@ -58,7 +58,9 @@ export default function DashboardConfigPicNew() {
       }
       router.push("/dashboard/config/pic");
     } catch (err) {
-      setErrorMessage(err instanceof Error ? err.message : "保存失败，请稍后再试");
+      setErrorMessage(
+        err instanceof Error ? err.message : "保存失败，请稍后再试"
+      );
       setShowErrorDialog(true);
     } finally {
       setSaving(false);
@@ -83,12 +85,19 @@ export default function DashboardConfigPicNew() {
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem className="cursor-pointer">
-                <BreadcrumbLink onClick={() => router.push("/dashboard/config/pic")}>
+                <BreadcrumbLink
+                  onClick={() => router.push("/dashboard/config/pic")}
+                >
                   图片
                 </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
-              <BreadcrumbItem>新建图片</BreadcrumbItem>
+              <BreadcrumbItem
+                className="cursor-pointer"
+                onClick={() => router.push("/dashboard/config/pic/new")}
+              >
+                新建图片
+              </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
         </div>
@@ -117,7 +126,9 @@ export default function DashboardConfigPicNew() {
               />
 
               <div>
-                <label className="block mb-1 font-semibold">按钮文字 (留空则不开启按钮)</label>
+                <label className="block mb-1 font-semibold">
+                  按钮文字 (留空则不开启按钮)
+                </label>
                 <Input
                   value={button}
                   onChange={(e) => setButton(e.target.value)}
@@ -158,7 +169,11 @@ export default function DashboardConfigPicNew() {
                 <Button onClick={handleSave} disabled={saving}>
                   {saving ? "保存中..." : "保存"}
                 </Button>
-                <Button variant="outline" onClick={() => router.push("/dashboard/config/pic")} disabled={saving}>
+                <Button
+                  variant="outline"
+                  onClick={() => router.push("/dashboard/config/pic")}
+                  disabled={saving}
+                >
                   取消
                 </Button>
               </div>
