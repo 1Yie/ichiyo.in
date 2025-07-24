@@ -8,7 +8,6 @@ import NextTopLoader from "nextjs-toploader";
 
 export const metadata: Metadata = {
   title: "ichiyo (@1Yie)",
-  description: "Hi! I am ichiyo",
 };
 
 const ubuntu = Ubuntu_Sans({
@@ -37,6 +36,14 @@ export default async function RootLayout({
 }) {
   return (
     <html>
+      <head>
+        <link
+          id="favicon"
+          rel="icon"
+          type="image/svg+xml"
+          href="/logo_light.svg"
+        />
+      </head>
       <body
         className={`antialiased ${ubuntu.className} ${sourceCodePro.className} ${raleway.className}`}
       >

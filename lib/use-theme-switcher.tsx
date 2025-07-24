@@ -9,6 +9,13 @@ export function useThemeSwitcher() {
   const mediaQueryRef = useRef<MediaQueryList | null>(null);
   const systemThemeListenerRef = useRef<((e: MediaQueryListEvent) => void) | null>(null);
 
+  // 切换 favicon 的函数
+  const setFavicon = (isDark: boolean) => {
+    const favicon = document.getElementById("favicon") as HTMLLinkElement | null;
+    if (!favicon) return;
+    favicon.href = isDark ? "/logo_dark.svg" : "/logo_light.svg";
+  };
+
   // 初始化逻辑
   useEffect(() => {
     const storedTheme = localStorage.getItem("theme") as Theme | null;
@@ -25,7 +32,7 @@ export function useThemeSwitcher() {
     }
 
     setTheme(initialTheme);
-    
+
     // 初始化媒体查询
     mediaQueryRef.current = window.matchMedia("(prefers-color-scheme: dark)");
 
@@ -57,22 +64,24 @@ export function useThemeSwitcher() {
     // 应用当前主题
     if (theme === "dark") {
       document.documentElement.classList.add("dark");
+      setFavicon(true);
     } else if (theme === "light") {
       document.documentElement.classList.remove("dark");
+      setFavicon(false);
     } else {
       // system模式
       const handleSystemChange = (e: MediaQueryListEvent) => {
         document.documentElement.classList.toggle("dark", e.matches);
+        setFavicon(e.matches);
       };
-      
+
       // 立即应用当前系统主题
       if (mediaQueryRef.current) {
-        document.documentElement.classList.toggle(
-          "dark",
-          mediaQueryRef.current.matches
-        );
+        const isDark = mediaQueryRef.current.matches;
+        document.documentElement.classList.toggle("dark", isDark);
+        setFavicon(isDark);
       }
-      
+
       // 添加监听器
       mediaQueryRef.current?.addEventListener("change", handleSystemChange);
       systemThemeListenerRef.current = handleSystemChange;

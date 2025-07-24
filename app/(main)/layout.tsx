@@ -41,6 +41,9 @@ export default async function RootLayout({
 }) {
   return (
     <html>
+      <head>
+        <link id="favicon" rel="icon" type="image/svg+xml" href="/logo_light.svg" />
+      </head>
       <body
         className={`antialiased ${ubuntu.className} ${sourceCodePro.className} ${raleway.className}`}
       >
