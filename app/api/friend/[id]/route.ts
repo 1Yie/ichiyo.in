@@ -4,10 +4,11 @@ import prisma from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
 
 interface Params {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
-export async function GET(request: Request, { params }: Params) {
+export async function GET(request: Request, props: Params) {
+  const params = await props.params;
   const id = Number(params.id);
   if (isNaN(id)) {
     return NextResponse.json({ error: "无效的好友ID" }, { status: 400 });
@@ -30,7 +31,8 @@ export async function GET(request: Request, { params }: Params) {
   }
 }
 
-export async function PATCH(request: Request, { params }: Params) {
+export async function PATCH(request: Request, props: Params) {
+  const params = await props.params;
   const id = Number(params.id);
   if (isNaN(id)) {
     return NextResponse.json({ error: "无效的好友ID" }, { status: 400 });
@@ -110,7 +112,8 @@ export async function PATCH(request: Request, { params }: Params) {
 }
 
 
-export async function DELETE(request: Request, { params }: Params) {
+export async function DELETE(request: Request, props: Params) {
+  const params = await props.params;
   const id = Number(params.id);
   if (isNaN(id)) {
     return NextResponse.json({ error: "无效的好友ID" }, { status: 400 });
