@@ -1,5 +1,11 @@
 import DashboardConfigPicEdit from "@/ui/dashboard-config-pic-edit";
 
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "ichiyo | 编辑图片",
+};
+
 interface PageProps {
   params: Promise<{
     id: number;
