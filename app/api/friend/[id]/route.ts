@@ -58,31 +58,47 @@ export async function PATCH(request: Request, { params }: Params) {
     const { name, image, description, pinned, socialLinks } = body;
 
     if (
-      (name && typeof name !== "string") ||
-      (image && typeof image !== "string") ||
-      (description && typeof description !== "string") ||
-      (pinned !== undefined && typeof pinned !== "boolean") ||
-      (socialLinks && !Array.isArray(socialLinks))
+      typeof name !== "string" ||
+      typeof image !== "string" ||
+      typeof description !== "string" ||
+      typeof pinned !== "boolean" ||
+      !Array.isArray(socialLinks)
     ) {
       return NextResponse.json({ error: "参数格式错误" }, { status: 400 });
     }
 
-    // 更新 friend 基本字段
-    const updatedFriend = await prisma.friend.update({
+    // 更新 Friend 基本信息
+    await prisma.friend.update({
       where: { id },
       data: {
-        ...(name !== undefined && { name }),
-        ...(image !== undefined && { image }),
-        ...(description !== undefined && { description }),
-        ...(pinned !== undefined && { pinned }),
-        // 处理 socialLinks：先删除所有旧的，再创建新的
-        ...(socialLinks && {
-          socialLinks: {
-            deleteMany: {},
-            create: socialLinks,
-          },
-        }),
+        name,
+        image,
+        description,
+        pinned,
       },
+    });
+
+    // 删除旧的 Social 记录
+    await prisma.social.deleteMany({
+      where: { friendId: id },
+    });
+
+    // 创建新的 Social 记录，确保使用正确的字段名
+    if (socialLinks.length > 0) {
+      await prisma.social.createMany({
+        data: socialLinks.map((link: { name: string; link: string; iconLight: string; iconDark: string }) => ({
+          name: link.name,
+          link: link.link,
+          iconLight: link.iconLight,
+          iconDark: link.iconDark,
+          friendId: id,
+        })),
+      });
+    }
+
+    // 返回更新后的数据
+    const updatedFriend = await prisma.friend.findUnique({
+      where: { id },
       include: { socialLinks: true },
     });
 
@@ -92,6 +108,7 @@ export async function PATCH(request: Request, { params }: Params) {
     return NextResponse.json({ error: "更新失败" }, { status: 500 });
   }
 }
+
 
 export async function DELETE(request: Request, { params }: Params) {
   const id = Number(params.id);

@@ -24,20 +24,14 @@ import {
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
 import { ImageUrlWithPreview } from "@/ui/ImageUrlWithPreview";
+import { CircleX } from "lucide-react";
 
 interface SocialLink {
-  id: number;
+  id?: number;
   name: string;
   link: string;
-}
-
-interface Friend {
-  id: number;
-  name: string;
-  image: string;
-  description: string;
-  pinned: boolean;
-  socialLinks: SocialLink[];
+  iconLight: string;
+  iconDark: string;
 }
 
 interface DashboardConfigFriendEditProps {
@@ -47,16 +41,14 @@ interface DashboardConfigFriendEditProps {
 export default function DashboardConfigFriendEdit({ id }: DashboardConfigFriendEditProps) {
   const router = useRouter();
 
-  const [, setFriend] = useState<Friend | null>(null);
-
   const [name, setName] = useState("");
   const [image, setImage] = useState("");
   const [description, setDescription] = useState("");
   const [pinned, setPinned] = useState(false);
+  const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-
   const [showErrorDialog, setShowErrorDialog] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -67,11 +59,19 @@ export default function DashboardConfigFriendEdit({ id }: DashboardConfigFriendE
         const res = await fetch(`/api/friend/${id}`, { credentials: "include" });
         if (!res.ok) throw new Error("获取好友信息失败");
         const data = await res.json();
-        setFriend(data);
         setName(data.name || "");
         setImage(data.image || "");
         setDescription(data.description || "");
         setPinned(!!data.pinned);
+        setSocialLinks(
+          (data.socialLinks || []).map((link: Partial<SocialLink>) => ({
+            id: link.id,
+            name: link.name || "",
+            link: link.link || "",
+            iconLight: link.iconLight || "",
+            iconDark: link.iconDark || "",
+          }))
+        );
       } catch (error) {
         console.error(error);
         setErrorMessage("加载失败，请稍后再试");
@@ -82,6 +82,25 @@ export default function DashboardConfigFriendEdit({ id }: DashboardConfigFriendE
     }
     fetchFriend();
   }, [id]);
+
+  function updateSocialLink(index: number, field: keyof SocialLink, value: string) {
+    setSocialLinks((prev) => {
+      const newLinks = [...prev];
+      newLinks[index] = { ...newLinks[index], [field]: value };
+      return newLinks;
+    });
+  }
+
+  function addSocialLink() {
+    setSocialLinks((prev) => [
+      ...prev,
+      { name: "", link: "", iconLight: "", iconDark: "" },
+    ]);
+  }
+
+  function removeSocialLink(index: number) {
+    setSocialLinks((prev) => prev.filter((_, i) => i !== index));
+  }
 
   async function handleSave() {
     setSaving(true);
@@ -95,6 +114,12 @@ export default function DashboardConfigFriendEdit({ id }: DashboardConfigFriendE
           image: image.trim(),
           description: description.trim(),
           pinned,
+          socialLinks: socialLinks.map((link) => ({
+            name: link.name.trim(),
+            link: link.link.trim(),
+            iconLight: link.iconLight.trim(),
+            iconDark: link.iconDark.trim(),
+          })),
         }),
       });
       if (!res.ok) {
@@ -127,9 +152,7 @@ export default function DashboardConfigFriendEdit({ id }: DashboardConfigFriendE
                 <BreadcrumbLink onClick={() => router.push("/dashboard/config/link")}>友链</BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
-              <BreadcrumbItem className="cursor-pointer">
-                <BreadcrumbLink onClick={() => router.push(`/dashboard/config/link/${id}`)}>编辑友链</BreadcrumbLink>
-              </BreadcrumbItem>
+              <BreadcrumbItem>编辑友链</BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
         </div>
@@ -141,7 +164,6 @@ export default function DashboardConfigFriendEdit({ id }: DashboardConfigFriendE
             <h1 className="text-2xl font-bold mb-4">编辑友链 #{id}</h1>
 
             <div className="space-y-4">
-              {/* 名称 */}
               <div>
                 <label htmlFor="name" className="block mb-1 font-semibold">名称</label>
                 {loading ? (
@@ -156,7 +178,6 @@ export default function DashboardConfigFriendEdit({ id }: DashboardConfigFriendE
                 )}
               </div>
 
-              {/* 头像 URL */}
               <ImageUrlWithPreview
                 labelName="图标 URL"
                 labelClassName="block mb-1 font-semibold"
@@ -165,7 +186,79 @@ export default function DashboardConfigFriendEdit({ id }: DashboardConfigFriendE
                 loading={loading}
               />
 
-              {/* 介绍 */}
+              <div>
+                <label className="block mb-2 font-semibold">社交地址</label>
+
+                {loading ? (
+                  <>
+                    {[...Array(2)].map((_, i) => (
+                      <div key={i} className="mb-3 border border-gray-300 rounded-lg p-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                          <Skeleton className="h-8 w-full rounded-md" />
+                          <Skeleton className="h-8 w-full rounded-md" />
+                          <Skeleton className="h-8 w-full rounded-md" />
+                          <Skeleton className="h-8 w-full rounded-md" />
+                        </div>
+                      </div>
+                    ))}
+                  </>
+                ) : (
+                  <>
+                    {socialLinks.map((link, index) => (
+                      <div key={index} className="mb-3 border border-gray-300 rounded-lg p-3 relative">
+                        {socialLinks.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => removeSocialLink(index)}
+                            className="absolute top-1 right-1 text-red-500 hover:text-red-700 text-2xl font-bold leading-none"
+                            aria-label="删除社交地址"
+                          >
+                            <CircleX />
+                          </button>
+                        )}
+                        <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                          <div>
+                            <label className="block mb-1 text-sm font-medium">社交平台名称</label>
+                            <Input
+                              value={link.name}
+                              onChange={(e) => updateSocialLink(index, "name", e.target.value)}
+                              placeholder="例如微博"
+                            />
+                          </div>
+                          <div>
+                            <label className="block mb-1 text-sm font-medium">链接 URL</label>
+                            <Input
+                              value={link.link}
+                              onChange={(e) => updateSocialLink(index, "link", e.target.value)}
+                              placeholder="https://example.com"
+                            />
+                          </div>
+                          <div>
+                            <label className="block mb-1 text-sm font-medium">浅色 Icon URL</label>
+                            <Input
+                              value={link.iconLight}
+                              onChange={(e) => updateSocialLink(index, "iconLight", e.target.value)}
+                              placeholder="浅色图标链接"
+                            />
+                          </div>
+                          <div>
+                            <label className="block mb-1 text-sm font-medium">深色 Icon URL</label>
+                            <Input
+                              value={link.iconDark}
+                              onChange={(e) => updateSocialLink(index, "iconDark", e.target.value)}
+                              placeholder="深色图标链接"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    <Button type="button" variant="outline" onClick={addSocialLink} size="sm">
+                      + 添加社交地址
+                    </Button>
+                  </>
+                )}
+              </div>
+
               <div>
                 <label htmlFor="description" className="block mb-1 font-semibold">介绍</label>
                 {loading ? (
@@ -181,7 +274,6 @@ export default function DashboardConfigFriendEdit({ id }: DashboardConfigFriendE
                 )}
               </div>
 
-              {/* 置顶 */}
               <div className="flex items-center space-x-2">
                 {loading ? (
                   <Skeleton className="h-6 w-6 rounded" />
@@ -201,16 +293,11 @@ export default function DashboardConfigFriendEdit({ id }: DashboardConfigFriendE
                 )}
               </div>
 
-              {/* 操作按钮 */}
               <div className="flex gap-2 justify-start">
                 <Button onClick={handleSave} disabled={saving || loading}>
                   {saving ? "保存中..." : "保存"}
                 </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => router.push("/dashboard/config/link")}
-                  disabled={saving || loading}
-                >
+                <Button variant="outline" onClick={() => router.push("/dashboard/config/link")} disabled={saving || loading}>
                   取消
                 </Button>
               </div>

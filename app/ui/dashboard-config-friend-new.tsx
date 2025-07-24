@@ -22,19 +22,47 @@ import {
   AlertDialogFooter,
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
+import { CircleX } from "lucide-react";
 import { ImageUrlWithPreview } from "@/ui/ImageUrlWithPreview";
 
 export default function DashboardConfigFriendNew() {
   const router = useRouter();
 
   const [name, setName] = useState("");
-  const [link, setLink] = useState("");
-  const [icon, setIcon] = useState("");
+  const [image, setImage] = useState("");
   const [description, setDescription] = useState("");
+  const [pinned, setPinned] = useState(false);
 
   const [saving, setSaving] = useState(false);
   const [showErrorDialog, setShowErrorDialog] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  // 这里社交链接改成和数据库字段对应的 name + link + iconLight + iconDark
+  const [socialLinks, setSocialLinks] = useState([
+    { name: "", link: "", iconLight: "", iconDark: "" },
+  ]);
+
+  function updateSocialLink(
+    index: number,
+    field: "name" | "link" | "iconLight" | "iconDark",
+    value: string
+  ) {
+    setSocialLinks((prev) => {
+      const newLinks = [...prev];
+      newLinks[index] = { ...newLinks[index], [field]: value };
+      return newLinks;
+    });
+  }
+
+  function addSocialLink() {
+    setSocialLinks((prev) => [
+      ...prev,
+      { name: "", link: "", iconLight: "", iconDark: "" },
+    ]);
+  }
+
+  function removeSocialLink(index: number) {
+    setSocialLinks((prev) => prev.filter((_, i) => i !== index));
+  }
 
   async function handleSave() {
     setSaving(true);
@@ -45,9 +73,15 @@ export default function DashboardConfigFriendNew() {
         credentials: "include",
         body: JSON.stringify({
           name: name.trim(),
-          link: link.trim(),
-          icon: icon.trim(),
+          image: image.trim(),
           description: description.trim(),
+          pinned,
+          socialLinks: socialLinks.map((link) => ({
+            name: link.name.trim(),
+            link: link.link.trim(),
+            iconLight: link.iconLight.trim(),
+            iconDark: link.iconDark.trim(),
+          })),
         }),
       });
       if (!res.ok) {
@@ -55,8 +89,10 @@ export default function DashboardConfigFriendNew() {
         throw new Error(data?.error || "保存失败，请重试");
       }
       router.push("/dashboard/config/link");
-    } catch (err) {
-      setErrorMessage(err instanceof Error ? err.message : "保存失败，请稍后再试");
+    } catch (error) {
+      const msg =
+        error instanceof Error ? error.message : "保存失败，请稍后再试";
+      setErrorMessage(msg);
       setShowErrorDialog(true);
     } finally {
       setSaving(false);
@@ -81,20 +117,20 @@ export default function DashboardConfigFriendNew() {
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem className="cursor-pointer">
-                <BreadcrumbLink onClick={() => router.push("/dashboard/config/link")}>
+                <BreadcrumbLink
+                  onClick={() => router.push("/dashboard/config/link")}
+                >
                   友链
                 </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
-              <BreadcrumbItem className="cursor-pointer">
-                新建友链
-              </BreadcrumbItem>
+              <BreadcrumbItem>新建友链</BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
         </div>
       </header>
 
-      <div className="flex flex-1 flex-col gap-4 p-4 pt-0 h-full w-full">
+      <div className="flex flex-1 flex-col gap-4 p-4 pt-0 h-full w-full min-w-0">
         <div className="bg-muted/50 flex-1 rounded-xl p-4 h-full w-full min-w-0">
           <div className="bg-white rounded-xl p-4 h-full w-full min-w-0 flex flex-col">
             <h1 className="text-2xl font-bold mb-4">新建友链</h1>
@@ -102,7 +138,7 @@ export default function DashboardConfigFriendNew() {
             <div className="space-y-4">
               {/* 名称 */}
               <div>
-                <label className="block mb-1 font-semibold" htmlFor="name">
+                <label htmlFor="name" className="block mb-1 font-semibold">
                   名称
                 </label>
                 <Input
@@ -113,39 +149,126 @@ export default function DashboardConfigFriendNew() {
                 />
               </div>
 
-              {/* 链接 */}
-              <div>
-                <label className="block mb-1 font-semibold" htmlFor="link">
-                  链接 URL
-                </label>
-                <Input
-                  id="link"
-                  value={link}
-                  onChange={(e) => setLink(e.target.value)}
-                  placeholder="请输入链接"
-                />
-              </div>
-
-              {/* 图标 */}
+              {/* 头像 URL */}
               <ImageUrlWithPreview
                 labelName="图标 URL"
                 labelClassName="block mb-1 font-semibold"
-                src={icon}
-                setSrc={setIcon}
+                src={image}
+                setSrc={setImage}
                 loading={false}
               />
 
-              {/* 描述 */}
+              {/* 社交地址 */}
               <div>
-                <label className="block mb-1 font-semibold" htmlFor="description">
-                  描述
+                <label className="block mb-2 font-semibold">社交地址</label>
+
+                {socialLinks.map((link, index) => (
+                  <div
+                    key={index}
+                    className="mb-3 border border-gray-300 rounded-lg p-3 relative"
+                  >
+                    {socialLinks.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeSocialLink(index)}
+                        className="absolute top-1 right-1 text-red-500 hover:text-red-700 text-2xl font-bold leading-none"
+                        aria-label="删除社交地址"
+                      >
+                        <CircleX />
+                      </button>
+                    )}
+                    <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                      <div>
+                        <label className="block mb-1 text-sm font-medium">
+                          社交平台名称
+                        </label>
+                        <Input
+                          value={link.name}
+                          onChange={(e) =>
+                            updateSocialLink(index, "name", e.target.value)
+                          }
+                          placeholder="例如微博"
+                        />
+                      </div>
+                      <div>
+                        <label className="block mb-1 text-sm font-medium">
+                          链接 URL
+                        </label>
+                        <Input
+                          value={link.link}
+                          onChange={(e) =>
+                            updateSocialLink(index, "link", e.target.value)
+                          }
+                          placeholder="https://example.com"
+                        />
+                      </div>
+                      <div>
+                        <label className="block mb-1 text-sm font-medium">
+                          浅色 Icon URL
+                        </label>
+                        <Input
+                          value={link.iconLight}
+                          onChange={(e) =>
+                            updateSocialLink(index, "iconLight", e.target.value)
+                          }
+                          placeholder="浅色图标链接"
+                        />
+                      </div>
+                      <div>
+                        <label className="block mb-1 text-sm font-medium">
+                          深色 Icon URL
+                        </label>
+                        <Input
+                          value={link.iconDark}
+                          onChange={(e) =>
+                            updateSocialLink(index, "iconDark", e.target.value)
+                          }
+                          placeholder="深色图标链接"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={addSocialLink}
+                  size="sm"
+                >
+                  + 添加社交地址
+                </Button>
+              </div>
+
+              {/* 介绍 */}
+              <div>
+                <label
+                  htmlFor="description"
+                  className="block mb-1 font-semibold"
+                >
+                  介绍
                 </label>
-                <Input
+                <textarea
                   id="description"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="请输入描述"
+                  placeholder="请输入介绍"
+                  className="w-full rounded-md border border-gray-300 p-2 resize-y min-h-[80px]"
                 />
+              </div>
+
+              {/* 置顶 */}
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="pinned"
+                  checked={pinned}
+                  onChange={(e) => setPinned(e.target.checked)}
+                  className="cursor-pointer"
+                />
+                <label htmlFor="pinned" className="select-none cursor-pointer">
+                  置顶
+                </label>
               </div>
 
               {/* 操作按钮 */}
