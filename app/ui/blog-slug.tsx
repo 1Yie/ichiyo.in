@@ -6,6 +6,7 @@ import { parseMarkdown } from "@/lib/markdown";
 import { Skeleton } from "@/components/ui/skeleton";
 import Comments from "@/components/ui/comment";
 import { ChevronLeft } from "lucide-react";
+import Link from "next/link";
 
 import {
   Tooltip,
@@ -18,6 +19,10 @@ interface Post {
   slug: string;
   title: string;
   content: string;
+  tags: {
+    id: number;
+    name: string;
+  }[];
   published: boolean;
   createdAt: string;
   updatedAt: string;
@@ -163,6 +168,22 @@ export default function PostPage({ params }: { params: { slug: string } }) {
           </p>
 
           {timeDiffText(post.createdAt, post.updatedAt)}
+          {post.tags && post.tags.length > 0 && (
+            <div className="mt-4 flex flex-wrap gap-2">
+              {post.tags.map((tag) => (
+                <Link
+                  key={tag.id}
+                  href={`/tags/${encodeURIComponent(tag.name)}`}
+                  className="inline-flex items-center bg-accent px-3 py-1 rounded-full text-sm font-medium text-accent-foreground cursor-pointer hover:bg-accent/80 transition"
+                >
+                  <span className="text-accent-foreground/60 mr-1 select-none">
+                    #
+                  </span>
+                  {tag.name}
+                </Link>
+              ))}
+            </div>
+          )}
         </section>
       </div>
       <div className="border-b">

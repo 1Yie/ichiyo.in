@@ -10,6 +10,10 @@ interface Post {
   id: number;
   slug: string;
   title: string;
+  tags: {
+    id: number;
+    name: string;
+  }[];
   createdAt: string;
   updatedAt: string;
   authors: {
@@ -35,7 +39,6 @@ export default function BlogMain() {
         const res = await fetch("/api/post/public?summary=true");
         if (!res.ok) throw new Error("获取文章失败");
         const data = await res.json();
-        console.log("获取到的文章数据：", data);
         setPosts(data);
       } catch (err) {
         if (err instanceof Error) {
@@ -51,24 +54,21 @@ export default function BlogMain() {
   }, []);
 
   if (loading || error) {
-    if (error) {
-      console.error("获取文章失败:", error);
-    }
+    if (error) console.error("获取文章失败:", error);
     return (
       <>
         <div className="border-b bg-diagonal-stripes-sm">
           <section className="section-base flex justify-between px-4 py-1.5">
-            <Link href="/tags" className="flex items-center gap-1 text-lg ">
+            <Link href="/tags" className="flex items-center gap-1 text-lg">
               <Tags size={19} />
               Tags
             </Link>
-            <Link href="/feed.xml" className="flex items-center gap-1 text-lg ">
+            <Link href="/feed.xml" className="flex items-center gap-1 text-lg">
               <Rss size={17} />
-              RSS
+              Rss
             </Link>
           </section>
         </div>
-
         <div className="border-b">
           <section className="section-base">
             <div className="p-4 space-y-6">
@@ -92,13 +92,13 @@ export default function BlogMain() {
     <>
       <div className="border-b bg-diagonal-stripes-sm">
         <section className="section-base flex justify-between px-4 py-1.5">
-          <Link href="/tags" className="flex items-center gap-1 text-lg ">
+          <Link href="/tags" className="flex items-center gap-1 text-lg">
             <Tags size={19} />
             Tags
           </Link>
-          <Link href="/feed.xml" className="flex items-center gap-1 text-lg ">
+          <Link href="/feed.xml" className="flex items-center gap-1 text-lg">
             <Rss size={17} />
-            RSS
+            Rss
           </Link>
         </section>
       </div>
@@ -112,40 +112,54 @@ export default function BlogMain() {
             ) : (
               <ul className="space-y-4">
                 {posts.map((post) => (
-                  <li
-                    key={post.id}
-                    className="m-0 p-0 border-b last:border-b-0"
-                  >
-                    <Link
-                      href={`/blog/${post.slug}`}
-                      className="cursor-pointer block "
-                      onClick={(e) => {
-                        e.preventDefault();
-                        router.push(`/blog/${post.slug}`);
-                      }}
-                    >
-                      <div className="p-4 hover:bg-gray-50 dark:hover:bg-black transition-colors duration-300">
+                  <li key={post.id} className="m-0 p-0 border-b last:border-b-0">
+                    <div className="p-4 hover:bg-gray-50 dark:hover:bg-black transition-colors duration-300">
+                      <Link
+                        href={`/blog/${post.slug}`}
+                        className="cursor-pointer block"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          router.push(`/blog/${post.slug}`);
+                        }}
+                      >
                         <p className="text-2xl font-semibold">{post.title}</p>
-                        <div className="flex flex-row gap-2 items-center justify-start">
+                        <div className="flex flex-row gap-2 items-center justify-start flex-wrap">
                           <p className="text-lg text-gray-500 dark:text-gray-400">
                             {post.authors.length > 0
                               ? post.authors.map((author, index) => (
-                                  <span key={index}>
+                                  <span
+                                    key={`author-${post.id}-${author.user.uid}-${index}`}
+                                  >
                                     {index > 0 && ", "}
                                     {author.user.id}
                                   </span>
                                 ))
                               : "匿名"}
                           </p>
-                          <p className="text-lg text-gray-500 dark:text-gray-600">
-                            ·
-                          </p>
+                          <p className="text-lg text-gray-500 dark:text-gray-600">·</p>
                           <p className="text-lg text-gray-500 dark:text-gray-400">
                             {new Date(post.createdAt).toLocaleDateString()}
                           </p>
                         </div>
-                      </div>
-                    </Link>
+                      </Link>
+
+                      {post.tags && post.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {post.tags.map((tag) => (
+                            <Link
+                              key={`tag-${post.id}-${tag.id}`}
+                              href={`/tags/${encodeURIComponent(tag.name)}`}
+                              className="inline-flex items-center bg-accent px-2 py-0.5 rounded-full text-sm font-medium text-accent-foreground cursor-pointer hover:bg-accent/80 transition"
+                            >
+                              <span className="text-accent-foreground/60 mr-1 select-none">
+                                #
+                              </span>
+                              {tag.name}
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </li>
                 ))}
               </ul>

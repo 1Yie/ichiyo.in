@@ -120,7 +120,7 @@ export default function Header() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
                       align="center"
-                      className="min-w-[120px] space-y-1"
+                      className="min-w-[110px] space-y-1"
                     >
                       {themeOptions.map(({ value, label, icon }) => (
                         <DropdownMenuItem
@@ -152,7 +152,7 @@ export default function Header() {
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="end"
-                className="min-w-[150px] space-y-1"
+                className="min-w-[110px] space-y-1"
               >
                 {themeOptions.map(({ value, label, icon }) => (
                   <DropdownMenuItem
@@ -177,12 +177,15 @@ export default function Header() {
               <DropdownMenuTrigger className="p-2 rounded-md hover:bg-accent hover:text-accent-foreground">
                 <RxHamburgerMenu size={20} />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="p-2 space-y-1 z-50">
+              <DropdownMenuContent
+                align="end"
+                className="min-w-[80px] space-y-1"
+              >
                 {navItems.map((item) => (
                   <DropdownMenuItem key={item.href} asChild>
                     <Link
                       href={item.href}
-                      className={`cursor-pointer ${
+                      className={`cursor-pointer flex items-center justify-center ${
                         pathname === item.href
                           ? "bg-accent text-accent-foreground font-semibold"
                           : "text-muted-foreground"

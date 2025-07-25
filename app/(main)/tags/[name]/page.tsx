@@ -6,10 +6,14 @@ interface Post {
   id: number;
   slug: string;
   title: string;
+  tags: {
+    id: number;
+    name: string;
+  }[];
   createdAt: string;
   authors: {
     user: {
-      uid: number;
+      uid: number;  
       id: string;
       email: string;
     };
@@ -21,6 +25,8 @@ interface TagData {
   posts: Post[];
 }
 
+const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
+
 export default async function TagPage({
   params,
 }: {
@@ -30,9 +36,7 @@ export default async function TagPage({
   const tagName = decodeURIComponent(name);
 
   const res = await fetch(
-    `${
-      process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
-    }/api/tags/${encodeURIComponent(tagName)}`,
+    `${baseUrl}/api/tags/${encodeURIComponent(tagName)}`,
     { cache: "no-store" }
   );
 

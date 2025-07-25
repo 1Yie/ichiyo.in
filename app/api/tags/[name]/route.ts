@@ -24,6 +24,12 @@ export async function GET(
             id: true,
             slug: true,
             title: true,
+            tags: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
             createdAt: true,
             authors: {
               select: {

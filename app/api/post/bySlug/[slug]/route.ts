@@ -12,6 +12,12 @@ export async function GET(
     where: { slug },
     select: {
       id: true,
+      tags: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
       slug: true,
       title: true,
       content: true,

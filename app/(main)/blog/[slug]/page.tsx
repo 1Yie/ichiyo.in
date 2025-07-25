@@ -17,12 +17,9 @@ interface Post {
   };
 }
 
-const baseUrl =
-  process.env.NODE_ENV === "development"
-    ? "http://localhost:3000"
-    : process.env.NEXT_PUBLIC_API_BASE_URL;
+const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,
@@ -57,11 +54,9 @@ async function getPostData(slug: string): Promise<Post | null> {
   return res.json();
 }
 
-export default async function Page(
-  props: {
-    params: Promise<{ slug: string }>;
-  }
-) {
+export default async function Page(props: {
+  params: Promise<{ slug: string }>;
+}) {
   const params = await props.params;
   const realParams = await params;
 
