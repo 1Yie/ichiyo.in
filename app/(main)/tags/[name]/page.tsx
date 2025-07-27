@@ -28,17 +28,18 @@ interface TagData {
 
 const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
 
-export async function generateMetadata(
-  props: {
-    params: Promise<{ name: string }>;
-  }
-): Promise<Metadata> {
+export async function generateMetadata(props: {
+  params: Promise<{ name: string }>;
+}): Promise<Metadata> {
   const params = await props.params;
   const tagName = decodeURIComponent(params.name);
 
-  const res = await fetch(`${baseUrl}/api/tags/${encodeURIComponent(tagName)}`, {
-    cache: "no-store",
-  });
+  const res = await fetch(
+    `${baseUrl}/api/tags/${encodeURIComponent(tagName)}`,
+    {
+      cache: "no-store",
+    }
+  );
 
   if (!res.ok) {
     return {
@@ -53,17 +54,18 @@ export async function generateMetadata(
   };
 }
 
-export default async function TagPage(
-  props: {
-    params: Promise<{ name: string }>;
-  }
-) {
+export default async function TagPage(props: {
+  params: Promise<{ name: string }>;
+}) {
   const params = await props.params;
   const tagName = decodeURIComponent(params.name);
 
-  const res = await fetch(`${baseUrl}/api/tags/${encodeURIComponent(tagName)}`, {
-    cache: "no-store",
-  });
+  const res = await fetch(
+    `${baseUrl}/api/tags/${encodeURIComponent(tagName)}`,
+    {
+      cache: "no-store",
+    }
+  );
 
   if (!res.ok) return notFound();
 
