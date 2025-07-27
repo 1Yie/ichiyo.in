@@ -259,6 +259,7 @@ export default function LinkMain() {
                         width={90}
                         height={90}
                         className="rounded-full border-2 border-gray-300 object-cover sm:w-[150px] sm:h-[150px]"
+                        unoptimized
                         priority
                       />
                       <div className="max-w-lg">
@@ -327,6 +328,7 @@ export default function LinkMain() {
                         width={60}
                         height={60}
                         className="rounded-full border-2 border-gray-300 object-cover sm:w-[90px] sm:h-[90px]"
+                        unoptimized
                         priority
                       />
                       <h4 className="mt-2 sm:mt-3 font-semibold text-base sm:text-lg">
@@ -350,6 +352,7 @@ export default function LinkMain() {
                               width={20}
                               height={20}
                               className="block dark:hidden hover:opacity-80 transition"
+                              unoptimized
                             />
                             <Image
                               src={social.icon.dark}
@@ -357,6 +360,7 @@ export default function LinkMain() {
                               width={20}
                               height={20}
                               className="hidden dark:block hover:opacity-80 transition"
+                              unoptimized
                             />
                           </a>
                         ))}

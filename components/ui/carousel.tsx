@@ -130,6 +130,7 @@ const Slide = ({ slide, index, current, handleSlideClick }: SlideProps) => {
             onLoad={imageLoaded}
             loading="eager"
             decoding="sync"
+            unoptimized
             fill
           />
           <div
@@ -239,15 +240,9 @@ export function Carousel({ slides }: CarouselProps) {
       </ul>
 
       <div className="absolute flex justify-center w-full top-[calc(100%+1rem)]">
-        <CarouselControl
-          type="previous"
-          handleClick={handlePreviousClick}
-        />
+        <CarouselControl type="previous" handleClick={handlePreviousClick} />
 
-        <CarouselControl
-          type="next"
-          handleClick={handleNextClick}
-        />
+        <CarouselControl type="next" handleClick={handleNextClick} />
       </div>
     </div>
   );

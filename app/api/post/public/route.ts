@@ -18,6 +18,7 @@ export async function GET(request: Request) {
             updatedAt: true,
             tags: {
               select: {
+                id: true,
                 name: true,
               },
             },
