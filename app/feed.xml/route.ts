@@ -2,11 +2,12 @@ import RSS from "rss";
 import prisma from "@/lib/prisma";
 
 export async function GET() {
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
   const feed = new RSS({
     title: "ichiyo | 博客",
     description: "ichiyo 的个人博客",
-    site_url: "https://ichiyo.in",
-    feed_url: "https://ichiyo.in/feed.xml",
+    site_url: baseUrl,
+    feed_url: baseUrl + "/feed.xml",
     language: "zh-CN",
     copyright: "ichiyo",
     generator: "Next.js",
@@ -27,7 +28,7 @@ export async function GET() {
     const plainText = post.content.replace(/<[^>]*>/g, "");
     feed.item({
       title: post.title,
-      url: `https://ichiyo.in/blog/${post.slug}`,
+      url: baseUrl + "/blog/" + post.slug,
       guid: post.slug,
       date: post.updatedAt,
       description: plainText.slice(0, 200) + "...",

@@ -2,6 +2,7 @@ import { type MetadataRoute } from "next";
 import prisma from "@/lib/prisma";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
   const posts = await prisma.post.findMany({
     select: {
       slug: true,
@@ -14,19 +15,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const staticRoutes: MetadataRoute.Sitemap = [
     {
-      url: "https://ichiyo.in",
+      url: baseUrl,
       lastModified: new Date(),
       changeFrequency: "yearly",
       priority: 1,
     },
     {
-      url: "https://ichiyo.in/about",
+      url: baseUrl + "/about",
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.8,
     },
     {
-      url: "https://ichiyo.in/blog",
+      url: baseUrl + "/blog",
       lastModified: new Date(),
       changeFrequency: "weekly",
       priority: 0.8,
@@ -34,7 +35,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   const dynamicRoutes: MetadataRoute.Sitemap = posts.map((post) => ({
-    url: `https://ichiyo.in/blog/${post.slug}`,
+    url: baseUrl + "/blog/" + post.slug,
     lastModified: post.updatedAt,
     changeFrequency: "weekly",
     priority: 0.7,
