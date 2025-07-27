@@ -33,6 +33,9 @@ export default function TagsMain() {
     fetchTags();
   }, []);
 
+  // 过滤出postCount >= 1的标签
+  const validTags = tags.filter(tag => tag.postCount >= 1);
+
   return (
     <div className="border-b">
       <section className="section-base p-12">
@@ -48,10 +51,10 @@ export default function TagsMain() {
 
         {!loading && !error && (
           <div className="flex flex-wrap gap-2">
-            {tags.length === 0 ? (
-              <span className="text-gray-500">暂无标签</span>
+            {validTags.length === 0 ? (
+              <span className="text-lg px-3 py-1 bg-gray-100 text-gray-700 rounded-full">暂无标签</span>
             ) : (
-              tags.filter((tag) => tag.postCount >= 1).map((tag) => (
+              validTags.map(tag => (
                 <Link
                   key={tag.id}
                   href={`/tags/${encodeURIComponent(tag.name)}`}
