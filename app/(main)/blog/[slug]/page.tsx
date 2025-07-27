@@ -39,6 +39,14 @@ export async function generateMetadata({
   const post = await res.json();
   return {
     title: post.title + " | ichiyo",
+    description: post.content.slice(0, 150) + (post.content.length > 150 ? '...' : ''),
+    keywords: post.tags.map((tag: { name: string }) => tag.name),
+    openGraph: {
+      title: post.title,
+      description: post.content.slice(0, 150) + (post.content.length > 150 ? '...' : ''),
+      type: "article",
+      url: `${baseUrl}/blog/${post.slug}`,
+    },
   };
 }
 

@@ -12,7 +12,6 @@ import Footer from "@/app/ui/footer";
 
 export const metadata: Metadata = {
   title: "ichiyo (@1Yie)",
-  description: "Hi! I am ichiyo",
 };
 
 const ubuntu = Ubuntu_Sans({

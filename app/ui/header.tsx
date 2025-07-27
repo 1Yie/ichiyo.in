@@ -97,7 +97,7 @@ export default function Header() {
                     <NavigationMenuLink asChild>
                       <Link
                         href={item.href}
-                        className={`px-4 py-2 ${
+                        className={`px-4 py-2 transition-colors duration-200 ${
                           pathname === item.href
                             ? "bg-accent text-accent-foreground"
                             : ""
@@ -120,12 +120,12 @@ export default function Header() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
                       align="center"
-                      className="min-w-[110px] space-y-1"
+                      className="min-w-[110px] mx-2 space-y-1"
                     >
                       {themeOptions.map(({ value, label, icon }) => (
                         <DropdownMenuItem
                           key={value}
-                          className={`cursor-pointer flex items-center gap-2 ${
+                          className={`cursor-pointer flex items-center gap-2 transition-colors duration-200 ${
                             theme === value
                               ? "bg-accent text-accent-foreground font-semibold"
                               : "text-muted-foreground"
@@ -151,13 +151,13 @@ export default function Header() {
                 <ThemeIcon theme={theme} />
               </DropdownMenuTrigger>
               <DropdownMenuContent
-                align="end"
-                className="min-w-[110px] space-y-1"
+                align="center"
+                className="min-w-[110px] mx-2 space-y-1"
               >
                 {themeOptions.map(({ value, label, icon }) => (
                   <DropdownMenuItem
                     key={value}
-                    className={`cursor-pointer flex items-center gap-2 ${
+                    className={`cursor-pointer flex items-center gap-2 transition-colors duration-200 ${
                       theme === value
                         ? "bg-accent text-accent-foreground font-semibold"
                         : "text-muted-foreground"
@@ -178,14 +178,14 @@ export default function Header() {
                 <RxHamburgerMenu size={20} />
               </DropdownMenuTrigger>
               <DropdownMenuContent
-                align="end"
-                className="min-w-[80px] space-y-1"
+                align="center"
+                className="min-w-[80px] mx-2  space-y-1"
               >
                 {navItems.map((item) => (
                   <DropdownMenuItem key={item.href} asChild>
                     <Link
                       href={item.href}
-                      className={`cursor-pointer flex items-center justify-center ${
+                      className={`cursor-pointer flex items-center justify-center transition-colors duration-200 ${
                         pathname === item.href
                           ? "bg-accent text-accent-foreground font-semibold"
                           : "text-muted-foreground"

@@ -5,6 +5,7 @@ import BlogMain from "@/app/ui/blog-main";
 
 export const metadata: Metadata = {
   title: "ichiyo | 博客",
+  description: "我的博客",
 };
 
 export default function Blog() {

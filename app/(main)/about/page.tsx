@@ -5,6 +5,7 @@ import AboutMain from "@/app/ui/about-main";
 
 export const metadata: Metadata = {
   title: "ichiyo | 关于",
+  description: "关于我",
 };
 
 export default function About() {
