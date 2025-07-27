@@ -48,7 +48,7 @@ export default function TagsMain() {
         )}
 
         {error && (
-          <p className="text-lg px-3 py-1 bg-red-100 text-red-700 rounded-full">{error}</p>
+          <span className="text-lg px-3 py-1 bg-red-100 text-red-700 rounded-full">{error}</span>
         )}
 
         {!loading && !error && (
