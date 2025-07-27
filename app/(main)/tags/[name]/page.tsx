@@ -28,12 +28,12 @@ interface TagData {
 
 const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
 
-// ➤ 动态设置页面 metadata
-export async function generateMetadata({
-  params,
-}: {
-  params: { name: string };
-}): Promise<Metadata> {
+export async function generateMetadata(
+  props: {
+    params: Promise<{ name: string }>;
+  }
+): Promise<Metadata> {
+  const params = await props.params;
   const tagName = decodeURIComponent(params.name);
 
   const res = await fetch(`${baseUrl}/api/tags/${encodeURIComponent(tagName)}`, {
@@ -42,7 +42,7 @@ export async function generateMetadata({
 
   if (!res.ok) {
     return {
-      title: "ichiyo | 404  ",
+      title: "ichiyo | 404",
     };
   }
 
@@ -53,11 +53,12 @@ export async function generateMetadata({
   };
 }
 
-export default async function TagPage({
-  params,
-}: {
-  params: { name: string };
-}) {
+export default async function TagPage(
+  props: {
+    params: Promise<{ name: string }>;
+  }
+) {
+  const params = await props.params;
   const tagName = decodeURIComponent(params.name);
 
   const res = await fetch(`${baseUrl}/api/tags/${encodeURIComponent(tagName)}`, {
