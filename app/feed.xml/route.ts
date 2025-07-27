@@ -19,6 +19,11 @@ export async function GET() {
     select: {
       title: true,
       slug: true,
+      tags: {
+        select: {
+          name: true,
+        },
+      },
       content: true,
       updatedAt: true,
     },
@@ -31,6 +36,7 @@ export async function GET() {
       url: baseUrl + "/blog/" + post.slug,
       guid: post.slug,
       date: post.updatedAt,
+      categories: post.tags.map((tag) => tag.name),
       description: plainText.slice(0, 200) + "...",
     });
   });
