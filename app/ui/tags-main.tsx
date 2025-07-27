@@ -47,7 +47,9 @@ export default function TagsMain() {
           </div>
         )}
 
-        {error && <p className="text-red-500">{error}</p>}
+        {error && (
+          <p className="text-lg px-3 py-1 bg-red-100 text-red-700 rounded-full">{error}</p>
+        )}
 
         {!loading && !error && (
           <div className="flex flex-wrap gap-2">
