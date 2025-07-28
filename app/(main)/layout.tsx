@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Ubuntu_Sans, Source_Code_Pro, Raleway } from "next/font/google";
 import "@/app/globals.css";
 
-import ClientThemeWrapper from "@/ui/clientTheme-wrapper";
+import ClientThemeWrapper from "@/app/ui/client-theme-wrapper";
 
 import NextTopLoader from "nextjs-toploader";
 import ImageZoom from "@/ui/img-zoom";
