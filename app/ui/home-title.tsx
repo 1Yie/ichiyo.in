@@ -2,6 +2,8 @@ import SplitText from "@/components/ui/split-text";
 import { ContainerTextFlip } from "@/components/ui/container-text-flip";
 import FadeContent from "@/components/ui/fade-content";
 
+const words = ['边缘', 'CV战士', 'AI依赖症', '程序猿', 'BUG制造者', '咖啡依赖症', '拖延症晚期', '前端小透明'];
+
 export default function Home() {
   return (
     <div className="border-b">
@@ -32,16 +34,7 @@ export default function Home() {
             className="h-[5.5vh]"
             textClassName="text-3xl sm:text-5xl leading-none m-0 text-primary"
             interval={4000}
-            words={[
-              "边缘",
-              "CV战士",
-              "AI依赖症",
-              "边缘",
-              "CV战士",
-              "AI依赖症",
-              "边缘",
-              "CV战士",
-            ]}
+            words={words}
           />
         </div>
       </section>
