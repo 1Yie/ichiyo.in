@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Highlighter, StickyNote, Send } from "lucide-react";
+import { useTheme } from "next-themes";
 
 import {
   Accordion,
@@ -164,6 +165,7 @@ function FriendPlaceholderStatic({
 }
 
 export default function LinkMain() {
+  const { resolvedTheme } = useTheme();
   const [friends, setFriends] = useState<Friend[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -214,7 +216,6 @@ export default function LinkMain() {
   const pinnedFriends = friends.filter((f) => f.pinned);
   const otherFriends = friends.filter((f) => !f.pinned);
 
-  // 是否显示虚拟占位（非加载且对应数组为空）
   const showPinnedPlaceholder = !loading && pinnedFriends.length === 0;
   const showOtherPlaceholder = !loading && otherFriends.length === 0;
 
@@ -283,18 +284,16 @@ export default function LinkMain() {
                               aria-label={social.name}
                             >
                               <Image
-                                src={social.icon.light}
+                                src={
+                                  resolvedTheme === "dark"
+                                    ? social.icon.dark
+                                    : social.icon.light
+                                }
                                 alt={social.name}
                                 width={20}
                                 height={20}
-                                className="block dark:hidden hover:opacity-80 transition"
-                              />
-                              <Image
-                                src={social.icon.dark}
-                                alt={social.name}
-                                width={20}
-                                height={20}
-                                className="hidden dark:block hover:opacity-80 transition"
+                                className="hover:opacity-80 transition"
+                                unoptimized
                               />
                             </a>
                           ))}
@@ -347,19 +346,15 @@ export default function LinkMain() {
                             aria-label={social.name}
                           >
                             <Image
-                              src={social.icon.light}
+                              src={
+                                resolvedTheme === "dark"
+                                  ? social.icon.dark
+                                  : social.icon.light
+                              }
                               alt={social.name}
                               width={20}
                               height={20}
-                              className="block dark:hidden hover:opacity-80 transition"
-                              unoptimized
-                            />
-                            <Image
-                              src={social.icon.dark}
-                              alt={social.name}
-                              width={20}
-                              height={20}
-                              className="hidden dark:block hover:opacity-80 transition"
+                              className="hover:opacity-80 transition"
                               unoptimized
                             />
                           </a>
@@ -388,7 +383,6 @@ export default function LinkMain() {
                       确保<strong>内容活跃</strong>，有足够的阅读量；
                     </li>
                     <li>
-                      {" "}
                       <strong>不轻易弃坑</strong>，保持存活与互联网之中；
                     </li>
                     <li>

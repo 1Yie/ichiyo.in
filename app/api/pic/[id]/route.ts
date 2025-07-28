@@ -103,7 +103,7 @@ export async function DELETE(request: NextRequest, props: { params: Promise<{ id
 
   try {
     await prisma.pic.delete({ where: { id } });
-    return NextResponse.json({ message: "删除成功" }, { status: 204 });
+    return NextResponse.json({ message: "删除成功" }, { status: 200 });
   } catch {
     return NextResponse.json({ error: "删除失败" }, { status: 500 });
   }

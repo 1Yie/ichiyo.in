@@ -56,12 +56,29 @@ export async function PATCH(req: Request, props: Params) {
 
   try {
     const body = await req.json();
+    const { name, description, link, iconLight, iconDark } = body;
+
+    const dataToUpdate: Partial<{
+      name: string;
+      description: string;
+      link: string;
+      iconLight: string;
+      iconDark: string;
+    }> = {};
+
+    if (name !== undefined) dataToUpdate.name = name;
+    if (description !== undefined) dataToUpdate.description = description;
+    if (link !== undefined) dataToUpdate.link = link;
+    if (iconLight !== undefined) dataToUpdate.iconLight = iconLight;
+    if (iconDark !== undefined) dataToUpdate.iconDark = iconDark;
+
     const updated = await prisma.project.update({
       where: { id: Number(id) },
-      data: body,
+      data: dataToUpdate,
     });
     return NextResponse.json(updated);
-  } catch {
+  } catch (error) {
+    console.error("修改项目失败:", error);
     return NextResponse.json({ error: "修改失败" }, { status: 500 });
   }
 }

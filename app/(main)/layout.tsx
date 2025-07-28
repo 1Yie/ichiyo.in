@@ -9,6 +9,8 @@ import ImageZoom from "@/ui/img-zoom";
 
 import Header from "@/app/ui/header";
 import Footer from "@/app/ui/footer";
+import { ThemeProvider } from "next-themes";
+import FaviconSwitcher from "@/lib/favicon-switcher";
 
 export const metadata: Metadata = {
   title: "ichiyo (@1Yie)",
@@ -40,29 +42,29 @@ export default async function RootLayout({
 }) {
   return (
     <html>
-      <head>
-        <link id="favicon" rel="icon" type="image/svg+xml" href="/logo_light.svg" />
-      </head>
       <body
         className={`antialiased ${ubuntu.className} ${sourceCodePro.className} ${raleway.className}`}
       >
         <ClientThemeWrapper>
-          <ImageZoom />
-          <NextTopLoader
-            color="var(--foreground)"
-            initialPosition={0.08}
-            crawlSpeed={200}
-            height={3}
-            crawl={true}
-            showSpinner={false}
-            zIndex={9999}
-            easing="ease"
-            speed={200}
-            shadow="0 0 10px var(--foreground),0 0 5px var(--foreground)"
-          />
-          <Header />
-          {children}
-          <Footer />
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <FaviconSwitcher />
+            <ImageZoom />
+            <NextTopLoader
+              color="var(--foreground)"
+              initialPosition={0.08}
+              crawlSpeed={200}
+              height={3}
+              crawl={true}
+              showSpinner={false}
+              zIndex={9999}
+              easing="ease"
+              speed={200}
+              shadow="0 0 10px var(--foreground),0 0 5px var(--foreground)"
+            />
+            <Header />
+            {children}
+            <Footer />
+          </ThemeProvider>
         </ClientThemeWrapper>
       </body>
     </html>

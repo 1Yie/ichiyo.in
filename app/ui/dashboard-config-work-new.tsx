@@ -31,7 +31,9 @@ export default function DashboardCreateProject() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [link, setLink] = useState("");
-  const [icon, setIcon] = useState("");
+  const [iconLight, setIconLight] = useState("");
+  const [iconDark, setIconDark] = useState("");
+
   const [saving, setSaving] = useState(false);
   const [showErrorDialog, setShowErrorDialog] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -43,7 +45,13 @@ export default function DashboardCreateProject() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ name, description, link, icon }),
+        body: JSON.stringify({
+          name,
+          description,
+          link,
+          iconLight,
+          iconDark,
+        }),
       });
       if (!res.ok) {
         const data = await res.json();
@@ -77,17 +85,13 @@ export default function DashboardCreateProject() {
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbLink
-                  onClick={() => router.push("/dashboard/config/work")}
-                >
+                <BreadcrumbLink onClick={() => router.push("/dashboard/config/work")}>
                   作品
                 </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem className="cursor-pointer">
-                <BreadcrumbLink
-                  onClick={() => router.push("/dashboard/config/work/new")}
-                >
+                <BreadcrumbLink onClick={() => router.push("/dashboard/config/work/new")}>
                   新建作品
                 </BreadcrumbLink>
               </BreadcrumbItem>
@@ -105,23 +109,34 @@ export default function DashboardCreateProject() {
                 <label className="block mb-1 font-semibold">名称</label>
                 <Input value={name} onChange={(e) => setName(e.target.value)} />
               </div>
+
+              <ImageUrlWithPreview
+                src={iconLight}
+                setSrc={setIconLight}
+                labelName="图标 URL（浅色）"
+                labelClassName="block mb-1 font-semibold"
+              />
+
+              <ImageUrlWithPreview
+                src={iconDark}
+                setSrc={setIconDark}
+                labelName="图标 URL（深色）"
+                labelClassName="block mb-1 font-semibold"
+              />
+
               <div>
-                <ImageUrlWithPreview
-                  src={icon}
-                  setSrc={setIcon}
-                  labelName="图标 URL"
-                  labelClassName="block mb-1 font-semibold"
-                />
                 <label className="block mb-1 font-semibold">描述</label>
                 <Input
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                 />
               </div>
+
               <div>
                 <label className="block mb-1 font-semibold">链接 URL</label>
                 <Input value={link} onChange={(e) => setLink(e.target.value)} />
               </div>
+
               <div className="flex gap-2">
                 <Button onClick={handleCreate} disabled={saving}>
                   {saving ? "创建中..." : "创建"}

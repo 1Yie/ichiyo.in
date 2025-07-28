@@ -40,7 +40,8 @@ interface Project {
   name: string;
   description: string;
   link: string;
-  icon: string;
+  iconLight: string;
+  iconDark: string;
 }
 
 type SortField = "id" | "name" | "description" | "link";
@@ -195,24 +196,9 @@ export default function DashboardConfigWork() {
                       ID {renderSortIcon("id")}
                     </TableHead>
                     <TableHead>图标</TableHead>
-                    <TableHead
-                      className="cursor-pointer select-none"
-                      onClick={() => handleSort("name")}
-                    >
-                      名称
-                    </TableHead>
-                    <TableHead
-                      className="cursor-pointer select-none"
-                      onClick={() => handleSort("description")}
-                    >
-                      描述
-                    </TableHead>
-                    <TableHead
-                      className="cursor-pointer select-none"
-                      onClick={() => handleSort("link")}
-                    >
-                      链接
-                    </TableHead>
+                    <TableHead>名称</TableHead>
+                    <TableHead>描述</TableHead>
+                    <TableHead>链接</TableHead>
                     <TableHead className="text-right">操作</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -255,11 +241,20 @@ export default function DashboardConfigWork() {
                         <TableCell>{project.id}</TableCell>
                         <TableCell>
                           <Image
-                            src={project.icon}
-                            alt="icon"
+                            src={project.iconLight}
+                            alt="icon light"
                             width={32}
                             height={32}
-                            className="h-12 w-auto rounded"
+                            className="h-12 w-auto rounded dark:hidden"
+                            unoptimized
+                            priority
+                          />
+                          <Image
+                            src={project.iconDark}
+                            alt="icon dark"
+                            width={32}
+                            height={32}
+                            className="hidden h-12 w-auto rounded dark:inline"
                             unoptimized
                             priority
                           />

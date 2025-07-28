@@ -201,24 +201,18 @@ export default function DashboardConfigPic() {
                     </TableHead>
                     <TableHead>预览</TableHead>
                     <TableHead
-                      className="cursor-pointer select-none"
-                      onClick={() => handleSort("title")}
                     >
                       标题
                     </TableHead>
                     <TableHead
-                      className="cursor-pointer select-none"
-                      onClick={() => handleSort("button")}
                     >
                       按钮文字
                     </TableHead>
                     <TableHead
-                      className="cursor-pointer select-none"
-                      onClick={() => handleSort("link")}
                     >
                       链接
                     </TableHead>
-                    <TableHead>标签</TableHead>
+                    <TableHead>打开方式</TableHead>
                     <TableHead className="text-right">操作</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -274,24 +268,24 @@ export default function DashboardConfigPic() {
                           />
                         </TableCell>
                         <TableCell>{pic.title}</TableCell>
-                        <TableCell>{pic.button ?? "未开启"}</TableCell>
+                        <TableCell>{pic.button ?? "-"}</TableCell>
                         <TableCell>
                           {pic.link ? (
                             <a
                               href={pic.link}
                               target={pic.newTab ? "_blank" : "_self"}
                               rel="noopener noreferrer"
-                              className="text-blue-600 underline"
+                              className="hover:underline"
                             >
                               {pic.link}
                             </a>
                           ) : (
-                            "未开启"
+                            "-"
                           )}
                         </TableCell>
                         <TableCell>
                           {pic.button === null
-                            ? "未开启"
+                            ? "-"
                             : pic.newTab
                             ? "新标签"
                             : "当前标签"}

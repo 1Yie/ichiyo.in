@@ -12,7 +12,8 @@ export async function GET() {
         name: true,
         description: true,
         link: true,
-        icon: true,
+        iconLight: true,
+        iconDark: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -44,14 +45,14 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { name, description, link, icon } = body;
+    const { name, description, link, iconLight, iconDark } = body;
 
-    if (!name || !description || !link || !icon) {
+    if (!name || !description || !link || !iconLight || !iconDark) {
       return NextResponse.json({ error: "字段不能为空" }, { status: 400 });
     }
 
     const created = await prisma.project.create({
-      data: { name, description, link, icon },
+      data: { name, description, link, iconLight, iconDark },
     });
 
     return NextResponse.json(created, { status: 201 });

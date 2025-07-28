@@ -53,7 +53,8 @@ model Project {
   name        String
   description String
   link        String
-  icon        String
+  iconLight   String   @default("")
+  iconDark    String   @default("")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }

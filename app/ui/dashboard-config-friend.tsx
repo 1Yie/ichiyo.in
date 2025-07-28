@@ -129,8 +129,16 @@ export default function DashboardConfigFriend() {
       if (sortField === "pinned") {
         // pinned 是 boolean，true > false
         return sortOrder === "asc"
-          ? (aVal === bVal ? 0 : aVal ? 1 : -1)
-          : (aVal === bVal ? 0 : aVal ? -1 : 1);
+          ? aVal === bVal
+            ? 0
+            : aVal
+            ? 1
+            : -1
+          : aVal === bVal
+          ? 0
+          : aVal
+          ? -1
+          : 1;
       }
 
       return sortOrder === "asc"
@@ -177,7 +185,9 @@ export default function DashboardConfigFriend() {
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem className="cursor-pointer">
-                <BreadcrumbLink onClick={() => router.push("/dashboard/config/link")}>
+                <BreadcrumbLink
+                  onClick={() => router.push("/dashboard/config/link")}
+                >
                   友链
                 </BreadcrumbLink>
               </BreadcrumbItem>
@@ -207,18 +217,8 @@ export default function DashboardConfigFriend() {
                       ID {renderSortIcon("id")}
                     </TableHead>
                     <TableHead>头像</TableHead>
-                    <TableHead
-                      className="cursor-pointer select-none"
-                      onClick={() => handleSort("name")}
-                    >
-                      名称 {renderSortIcon("name")}
-                    </TableHead>
-                    <TableHead
-                      className="cursor-pointer select-none"
-                      onClick={() => handleSort("description")}
-                    >
-                      介绍 {renderSortIcon("description")}
-                    </TableHead>
+                    <TableHead>名称</TableHead>
+                    <TableHead>介绍</TableHead>
                     <TableHead
                       className="cursor-pointer select-none"
                       onClick={() => handleSort("pinned")}

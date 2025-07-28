@@ -19,20 +19,11 @@ import { RxHamburgerMenu } from "react-icons/rx";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useThemeSwitcher } from "@/lib/use-theme-switcher";
+import { useTheme } from "next-themes";
 
 export default function Header() {
   const pathname = usePathname();
-  const { theme, setAppTheme } = useThemeSwitcher();
-
-  useEffect(() => {
-    const theme = localStorage.getItem("theme");
-    const systemDark = window.matchMedia(
-      "(prefers-color-scheme: dark)"
-    ).matches;
-    const enabled = theme === "dark" || (!theme && systemDark);
-    document.documentElement.classList.toggle("dark", enabled);
-  }, []);
+  const { theme, setTheme } = useTheme();
 
   const navItems = [
     { href: "/", label: "首页" },
@@ -112,7 +103,7 @@ export default function Header() {
                 <NavigationMenuItem>
                   <DropdownMenu>
                     <DropdownMenuTrigger className="px-4 py-2 hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground rounded-md transition-colors flex items-center gap-1 group">
-                      <ThemeIcon theme={theme} />
+                      <ThemeIcon theme={theme as "system" | "light" | "dark"} />
                       <IoChevronDownSharp
                         size={12}
                         className="transition-transform duration-200 group-data-[state=open]:rotate-180"
@@ -131,7 +122,7 @@ export default function Header() {
                               : "text-muted-foreground"
                           }`}
                           onClick={() =>
-                            setAppTheme(value as "system" | "light" | "dark")
+                            setTheme(value as "system" | "light" | "dark")
                           }
                         >
                           {icon}
@@ -148,7 +139,7 @@ export default function Header() {
           <nav className="sm:hidden flex items-center gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger className="p-2 rounded-md hover:bg-accent hover:text-accent-foreground">
-                <ThemeIcon theme={theme} />
+                <ThemeIcon theme={theme as "system" | "light" | "dark"} />
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="center"
@@ -163,7 +154,7 @@ export default function Header() {
                         : "text-muted-foreground"
                     }`}
                     onClick={() =>
-                      setAppTheme(value as "system" | "light" | "dark")
+                      setTheme(value as "system" | "light" | "dark")
                     }
                   >
                     {icon}

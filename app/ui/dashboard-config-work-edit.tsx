@@ -30,23 +30,25 @@ interface Project {
   name: string;
   description: string;
   link: string;
-  icon: string;
+  iconLight: string;
+  iconDark: string;
 }
 
 interface DashboardEditProjectProps {
   projectId: number;
 }
 
-export default function DashboardEditProject({
-  projectId,
-}: DashboardEditProjectProps) {
+export default function DashboardEditProject({ projectId }: DashboardEditProjectProps) {
   const router = useRouter();
   const id = projectId;
+
   const [, setProject] = useState<Project | null>(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [link, setLink] = useState("");
-  const [icon, setIcon] = useState("");
+  const [iconLight, setIconLight] = useState("");
+  const [iconDark, setIconDark] = useState("");
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [showErrorDialog, setShowErrorDialog] = useState(false);
@@ -65,7 +67,8 @@ export default function DashboardEditProject({
         setName(data.name);
         setDescription(data.description);
         setLink(data.link);
-        setIcon(data.icon);
+        setIconLight(data.iconLight);
+        setIconDark(data.iconDark);
       } catch (err) {
         console.error(err);
         setErrorMessage("加载失败，请稍后再试");
@@ -84,7 +87,13 @@ export default function DashboardEditProject({
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ name, description, link, icon }),
+        body: JSON.stringify({
+          name,
+          description,
+          link,
+          iconLight,
+          iconDark,
+        }),
       });
       if (!res.ok) {
         const data = await res.json();
@@ -118,17 +127,13 @@ export default function DashboardEditProject({
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem className="cursor-pointer">
-                <BreadcrumbLink
-                  onClick={() => router.push("/dashboard/config/work")}
-                >
+                <BreadcrumbLink onClick={() => router.push("/dashboard/config/work")}>
                   作品
                 </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem className="cursor-pointer">
-                <BreadcrumbLink
-                  onClick={() => router.push(`/dashboard/config/work/${id}`)}
-                >
+                <BreadcrumbLink onClick={() => router.push(`/dashboard/config/work/${id}`)}>
                   编辑作品
                 </BreadcrumbLink>
               </BreadcrumbItem>
@@ -147,19 +152,26 @@ export default function DashboardEditProject({
                 {loading ? (
                   <Skeleton className="h-10 w-full rounded-md" />
                 ) : (
-                  <Input
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                  />
+                  <Input value={name} onChange={(e) => setName(e.target.value)} />
                 )}
               </div>
+
               <ImageUrlWithPreview
-                labelName="图标 URL"
+                labelName="图标 URL（浅色）"
                 labelClassName="block mb-1 font-semibold"
-                src={icon}
-                setSrc={setIcon}
+                src={iconLight}
+                setSrc={setIconLight}
                 loading={loading}
               />
+
+              <ImageUrlWithPreview
+                labelName="图标 URL（深色）"
+                labelClassName="block mb-1 font-semibold"
+                src={iconDark}
+                setSrc={setIconDark}
+                loading={loading}
+              />
+
               <div>
                 <label className="block mb-1 font-semibold">描述</label>
                 {loading ? (
@@ -171,18 +183,16 @@ export default function DashboardEditProject({
                   />
                 )}
               </div>
+
               <div>
                 <label className="block mb-1 font-semibold">链接 URL</label>
                 {loading ? (
                   <Skeleton className="h-10 w-full rounded-md" />
                 ) : (
-                  <Input
-                    value={link}
-                    onChange={(e) => setLink(e.target.value)}
-                  />
+                  <Input value={link} onChange={(e) => setLink(e.target.value)} />
                 )}
               </div>
-              <div></div>
+
               <div className="flex gap-2">
                 <Button onClick={handleSave} disabled={saving || loading}>
                   {saving ? "保存中..." : "保存"}
