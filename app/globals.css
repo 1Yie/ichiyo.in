@@ -362,6 +362,15 @@ scrollbar-thumb {
 
     ol {
       font-size: 18px;
+      list-style-type: decimal;
+    }
+
+    a {
+      color: color-mix(in oklch, var(--accent-foreground), white 30%);
+    }
+    
+    a:hover {
+      text-decoration: underline;
     }
 
     #text {
@@ -391,7 +400,7 @@ scrollbar-thumb {
       font-family: 'Source Code Pro', monospace;
       padding: 20px;
       display: flex;
-      background: var(--code-pre-bg-color);
+      background: var(--code-pre-bg-color) !important;
       color: var(--code-color) !important;
       white-space: no-wrap;
       word-wrap: break-word;
