@@ -133,13 +133,17 @@ export default function DashboardConfigWork() {
         <ArrowUp
           className={cn(
             "inline-block h-4 w-4",
-            isActive && sortOrder === "asc" ? "text-black" : "text-gray-300"
+            isActive && sortOrder === "asc"
+              ? "text-foreground"
+              : "text-muted-foreground"
           )}
         />
         <ArrowDown
           className={cn(
             "inline-block h-4 w-4",
-            isActive && sortOrder === "desc" ? "text-black" : "text-gray-300"
+            isActive && sortOrder === "desc"
+              ? "text-foreground"
+              : "text-muted-foreground"
           )}
         />
       </>
@@ -153,7 +157,7 @@ export default function DashboardConfigWork() {
           <SidebarTrigger className="-ml-1" />
           <Separator
             orientation="vertical"
-            className="mr-2 data-[orientation=vertical]:h-4"
+            className="mr-2 data-[orientation=vertical]:h-4 bg-foreground/30"
           />
           <Breadcrumb>
             <BreadcrumbList>
@@ -162,7 +166,7 @@ export default function DashboardConfigWork() {
                   仪表盘
                 </BreadcrumbLink>
               </BreadcrumbItem>
-              <BreadcrumbSeparator />
+              <BreadcrumbSeparator className="text-foreground/80" />
               <BreadcrumbItem className="cursor-pointer">
                 <BreadcrumbLink
                   onClick={() => router.push("/dashboard/config/work")}
@@ -175,11 +179,11 @@ export default function DashboardConfigWork() {
         </div>
       </header>
 
-      <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-        <div className="bg-muted/50 flex-1 rounded-xl p-4">
-          <div className="w-full h-full bg-white p-4 rounded-xl">
+      <div className="flex flex-1 flex-col gap-4 p-4 pt-0 h-full w-full">
+        <div className="bg-muted/50 flex-1 rounded-xl p-4 h-full w-full min-w-0">
+          <div className="w-full h-full bg-white dark:bg-muted/50 p-4 rounded-xl">
             <div className="flex items-center justify-between mb-4 ml-2 mr-2">
-              <h1 className="text-2xl font-bold">作品列表</h1>
+              <h1 className="text-2xl font-bold text-foreground/90">作品列表</h1>
               <Button onClick={() => router.push("/dashboard/config/work/new")}>
                 <Pencil className="mr-1 h-4 w-4" />
                 新建作品
@@ -190,16 +194,18 @@ export default function DashboardConfigWork() {
                 <TableHeader>
                   <TableRow>
                     <TableHead
-                      className="cursor-pointer select-none"
+                      className="cursor-pointer select-none text-foreground/90"
                       onClick={() => handleSort("id")}
                     >
                       ID {renderSortIcon("id")}
                     </TableHead>
-                    <TableHead>图标</TableHead>
-                    <TableHead>名称</TableHead>
-                    <TableHead>描述</TableHead>
-                    <TableHead>链接</TableHead>
-                    <TableHead className="text-right">操作</TableHead>
+                    <TableHead className="text-foreground/90">图标</TableHead>
+                    <TableHead className="text-foreground/90">名称</TableHead>
+                    <TableHead className="text-foreground/90">描述</TableHead>
+                    <TableHead className="text-foreground/90">链接</TableHead>
+                    <TableHead className="text-right text-foreground/90">
+                      操作
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -238,7 +244,7 @@ export default function DashboardConfigWork() {
                   ) : (
                     sortedProjects.map((project) => (
                       <TableRow key={project.id}>
-                        <TableCell>{project.id}</TableCell>
+                        <TableCell className="text-foreground/90">{project.id}</TableCell>
                         <TableCell>
                           <Image
                             src={project.iconLight}
@@ -259,14 +265,14 @@ export default function DashboardConfigWork() {
                             priority
                           />
                         </TableCell>
-                        <TableCell>{project.name}</TableCell>
-                        <TableCell>{project.description}</TableCell>
+                        <TableCell className="text-foreground/90">{project.name}</TableCell>
+                        <TableCell className="text-foreground/90">{project.description}</TableCell>
                         <TableCell>
                           <a
                             href={project.link}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="underline"
+                            className="hover:underline text-foreground/90"
                           >
                             {project.link}
                           </a>
@@ -276,9 +282,7 @@ export default function DashboardConfigWork() {
                             size="sm"
                             variant="outline"
                             onClick={() =>
-                              router.push(
-                                `/dashboard/config/work/${project.id}`
-                              )
+                              router.push(`/dashboard/config/work/${project.id}`)
                             }
                           >
                             编辑
@@ -313,9 +317,7 @@ export default function DashboardConfigWork() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>取消</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete}>
-              确认删除
-            </AlertDialogAction>
+            <AlertDialogAction onClick={handleDelete}>确认删除</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

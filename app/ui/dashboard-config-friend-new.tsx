@@ -13,6 +13,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -24,6 +25,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { CircleX } from "lucide-react";
 import { ImageUrlWithPreview } from "@/ui/ImageUrlWithPreview";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default function DashboardConfigFriendNew() {
   const router = useRouter();
@@ -106,39 +108,42 @@ export default function DashboardConfigFriendNew() {
           <SidebarTrigger className="-ml-1" />
           <Separator
             orientation="vertical"
-            className="mr-2 data-[orientation=vertical]:h-4"
+            className="mr-2 data-[orientation=vertical]:h-4 bg-foreground/30"
           />
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem className="cursor-pointer">
                 <BreadcrumbLink onClick={() => router.push("/dashboard")}>
-                  仪表盘
+                  <span className="text-foreground/90">仪表盘</span>
                 </BreadcrumbLink>
               </BreadcrumbItem>
-              <BreadcrumbSeparator />
+              <BreadcrumbSeparator className="text-foreground/80" />
               <BreadcrumbItem className="cursor-pointer">
-                <BreadcrumbLink
-                  onClick={() => router.push("/dashboard/config/link")}
-                >
-                  友链
+                <BreadcrumbLink onClick={() => router.push("/dashboard/config/link")}>
+                  <span className="text-foreground/90">友链</span>
                 </BreadcrumbLink>
               </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>新建友链</BreadcrumbItem>
+              <BreadcrumbSeparator className="text-foreground/80" />
+              <BreadcrumbItem>
+                <span className="text-foreground/70">新建友链</span>
+              </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
         </div>
       </header>
 
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0 h-full w-full min-w-0">
-        <div className="bg-muted/50 flex-1 rounded-xl p-4 h-full w-full min-w-0">
-          <div className="bg-white rounded-xl p-4 h-full w-full min-w-0 flex flex-col">
-            <h1 className="text-2xl font-bold mb-4">新建友链</h1>
+        <div className="bg-muted/50 dark:bg-muted/50 flex-1 rounded-xl p-4 h-full w-full min-w-0">
+          <div className="bg-white dark:bg-muted/50 rounded-xl p-4 h-full w-full min-w-0 flex flex-col">
+            <h1 className="text-2xl font-bold mb-4 text-foreground/90">新建友链</h1>
 
             <div className="space-y-4">
               {/* 名称 */}
               <div>
-                <label htmlFor="name" className="block mb-1 font-semibold">
+                <label
+                  htmlFor="name"
+                  className="block mb-1 font-semibold text-foreground/90"
+                >
                   名称
                 </label>
                 <Input
@@ -152,7 +157,7 @@ export default function DashboardConfigFriendNew() {
               {/* 头像 URL */}
               <ImageUrlWithPreview
                 labelName="图标 URL"
-                labelClassName="block mb-1 font-semibold"
+                labelClassName="block mb-1 font-semibold text-foreground/90"
                 src={image}
                 setSrc={setImage}
                 loading={false}
@@ -160,7 +165,9 @@ export default function DashboardConfigFriendNew() {
 
               {/* 社交地址 */}
               <div>
-                <label className="block mb-2 font-semibold">社交地址</label>
+                <label className="block mb-2 font-semibold text-foreground/90">
+                  社交地址
+                </label>
 
                 {socialLinks.map((link, index) => (
                   <div
@@ -179,7 +186,7 @@ export default function DashboardConfigFriendNew() {
                     )}
                     <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
                       <div>
-                        <label className="block mb-1 text-sm font-medium">
+                        <label className="block mb-1 text-sm font-medium text-foreground/90">
                           社交平台名称
                         </label>
                         <Input
@@ -191,7 +198,7 @@ export default function DashboardConfigFriendNew() {
                         />
                       </div>
                       <div>
-                        <label className="block mb-1 text-sm font-medium">
+                        <label className="block mb-1 text-sm font-medium text-foreground/90">
                           链接 URL
                         </label>
                         <Input
@@ -203,7 +210,7 @@ export default function DashboardConfigFriendNew() {
                         />
                       </div>
                       <div>
-                        <label className="block mb-1 text-sm font-medium">
+                        <label className="block mb-1 text-sm font-medium text-foreground/90">
                           浅色 Icon URL
                         </label>
                         <Input
@@ -215,7 +222,7 @@ export default function DashboardConfigFriendNew() {
                         />
                       </div>
                       <div>
-                        <label className="block mb-1 text-sm font-medium">
+                        <label className="block mb-1 text-sm font-medium text-foreground/90">
                           深色 Icon URL
                         </label>
                         <Input
@@ -244,29 +251,30 @@ export default function DashboardConfigFriendNew() {
               <div>
                 <label
                   htmlFor="description"
-                  className="block mb-1 font-semibold"
+                  className="block mb-1 font-semibold text-foreground/90"
                 >
                   介绍
                 </label>
-                <textarea
+                <Textarea
                   id="description"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="请输入介绍"
-                  className="w-full rounded-md border border-gray-300 p-2 resize-y min-h-[80px]"
+                  className="text-foreground/90 bg-white dark:bg-muted/50"
                 />
               </div>
 
               {/* 置顶 */}
               <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
+                <Checkbox
                   id="pinned"
                   checked={pinned}
-                  onChange={(e) => setPinned(e.target.checked)}
-                  className="cursor-pointer"
+                  onCheckedChange={(checked) => setPinned(!!checked)}
                 />
-                <label htmlFor="pinned" className="select-none cursor-pointer">
+                <label
+                  htmlFor="pinned"
+                  className="select-none cursor-pointer text-foreground/90"
+                >
                   置顶
                 </label>
               </div>

@@ -179,13 +179,17 @@ export default function DashboardPost() {
         <ArrowUp
           className={cn(
             "inline-block h-4 w-4",
-            isActive && sortOrder === "asc" ? "text-black" : "text-gray-300"
+            isActive && sortOrder === "asc"
+              ? "text-foreground/90"
+              : "text-gray-300"
           )}
         />
         <ArrowDown
           className={cn(
             "inline-block h-4 w-4",
-            isActive && sortOrder === "desc" ? "text-black" : "text-gray-300"
+            isActive && sortOrder === "desc"
+              ? "text-foreground/90"
+              : "text-gray-300"
           )}
         />
       </>
@@ -199,22 +203,22 @@ export default function DashboardPost() {
           <SidebarTrigger className="-ml-1" />
           <Separator
             orientation="vertical"
-            className="mr-2 data-[orientation=vertical]:h-4"
+            className="mr-2 data-[orientation=vertical]:h-4 bg-foreground/30"
           />
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
                 <BreadcrumbLink
-                  className="cursor-pointer"
+                  className="cursor-pointer text-foreground/90"
                   onClick={() => router.push("/dashboard")}
                 >
                   仪表盘
                 </BreadcrumbLink>
               </BreadcrumbItem>
-              <BreadcrumbSeparator />
+              <BreadcrumbSeparator className="text-foreground/80" />
               <BreadcrumbItem>
                 <BreadcrumbLink
-                  className="cursor-pointer"
+                  className="cursor-pointer text-foreground/90"
                   onClick={() => router.push("/dashboard/post")}
                 >
                   文章管理
@@ -227,9 +231,9 @@ export default function DashboardPost() {
 
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
         <div className="bg-muted/50 flex-1 rounded-xl p-4">
-          <div className="w-full h-full bg-white p-4 rounded-xl">
+          <div className="w-full h-full bg-white dark:bg-muted/50 p-4 rounded-xl">
             <div className="flex items-center justify-between mb-4 ml-2 mr-2">
-              <h1 className="text-2xl font-bold">文章列表</h1>
+              <h1 className="text-2xl font-bold text-foreground/90">文章列表</h1>
               <Button onClick={() => router.push("/dashboard/post/new")}>
                 <Pencil className="mr-1 h-4 w-4" />
                 新建文章
@@ -241,14 +245,18 @@ export default function DashboardPost() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>ID</TableHead>
-                      <TableHead>Slug</TableHead>
-                      {currentUser?.isAdmin && <TableHead>作者</TableHead>}
-                      <TableHead>标题</TableHead>
-                      <TableHead>状态</TableHead>
-                      <TableHead>创建时间</TableHead>
-                      <TableHead>更新时间</TableHead>
-                      <TableHead className="text-right">操作</TableHead>
+                      <TableHead className="text-foreground/90">ID</TableHead>
+                      <TableHead className="text-foreground/90">Slug</TableHead>
+                      {currentUser?.isAdmin && (
+                        <TableHead className="text-foreground/90">作者</TableHead>
+                      )}
+                      <TableHead className="text-foreground/90">标题</TableHead>
+                      <TableHead className="text-foreground/90">状态</TableHead>
+                      <TableHead className="text-foreground/90">创建时间</TableHead>
+                      <TableHead className="text-foreground/90">更新时间</TableHead>
+                      <TableHead className="text-foreground/90 text-right">
+                        操作
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -289,28 +297,30 @@ export default function DashboardPost() {
                   <TableHeader>
                     <TableRow>
                       <TableHead
-                        className="cursor-pointer"
+                        className="cursor-pointer text-foreground/90"
                         onClick={() => handleSort("id")}
                       >
                         ID {renderSortIcon("id")}
                       </TableHead>
-                      <TableHead>Slug</TableHead>
-                      <TableHead>作者</TableHead>
-                      <TableHead>标题</TableHead>
-                      <TableHead>状态</TableHead>
+                      <TableHead className="text-foreground/90">Slug</TableHead>
+                      <TableHead className="text-foreground/90">作者</TableHead>
+                      <TableHead className="text-foreground/90">标题</TableHead>
+                      <TableHead className="text-foreground/90">状态</TableHead>
                       <TableHead
-                        className="cursor-pointer"
+                        className="cursor-pointer text-foreground/90"
                         onClick={() => handleSort("createdAt")}
                       >
                         创建时间 {renderSortIcon("createdAt")}
                       </TableHead>
                       <TableHead
-                        className="cursor-pointer"
+                        className="cursor-pointer text-foreground/90"
                         onClick={() => handleSort("updatedAt")}
                       >
                         更新时间 {renderSortIcon("updatedAt")}
                       </TableHead>
-                      <TableHead className="text-right">操作</TableHead>
+                      <TableHead className="text-foreground/90 text-right">
+                        操作
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -318,15 +328,11 @@ export default function DashboardPost() {
                       <TableRow key={post.id}>
                         <TableCell>{post.id}</TableCell>
                         <TableCell>{post.slug}</TableCell>
-
                         <TableCell>
                           {post.authors.length > 0
-                            ? post.authors
-                                .map((author) => author.user.id)
-                                .join(", ")
+                            ? post.authors.map((author) => author.user.id).join(", ")
                             : "匿名"}
                         </TableCell>
-
                         <TableCell>{post.title}</TableCell>
                         <TableCell>
                           <span
@@ -340,12 +346,8 @@ export default function DashboardPost() {
                             {post.published ? "已发布" : "未发布"}
                           </span>
                         </TableCell>
-                        <TableCell>
-                          {formatBeijingTime(post.createdAt)}
-                        </TableCell>
-                        <TableCell>
-                          {formatBeijingTime(post.updatedAt)}
-                        </TableCell>
+                        <TableCell>{formatBeijingTime(post.createdAt)}</TableCell>
+                        <TableCell>{formatBeijingTime(post.updatedAt)}</TableCell>
                         <TableCell className="text-right space-x-2">
                           <Button
                             size="sm"
@@ -375,38 +377,35 @@ export default function DashboardPost() {
         </div>
       </div>
 
-      {/* 删除确认弹窗 */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              <p className="text-lg">
-                确定要删除文章《{posts.find((p) => p.id === deleteId)?.title}
-                》吗？
+              <p className="text-lg text-foreground/90">
+                确定要删除文章《{posts.find((p) => p.id === deleteId)?.title}》吗？
               </p>
             </AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogDescription className="text-muted-foreground">
               删除后将无法恢复该文章，是否继续？
             </AlertDialogDescription>
-            <AlertDialogDescription>
+            <AlertDialogDescription className="text-muted-foreground">
               Tips: 建议将文章状态改为“未发布”，而不是直接删除。
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>取消</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete}>
-              确认删除
-            </AlertDialogAction>
+            <AlertDialogAction onClick={handleDelete}>确认删除</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* 错误提示弹窗 */}
       <AlertDialog open={errorDialogOpen} onOpenChange={setErrorDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>操作失败</AlertDialogTitle>
-            <AlertDialogDescription>{errorMessage}</AlertDialogDescription>
+            <AlertDialogTitle className="text-foreground/90">操作失败</AlertDialogTitle>
+            <AlertDialogDescription className="text-muted-foreground">
+              {errorMessage}
+            </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogAction onClick={() => setErrorDialogOpen(false)}>

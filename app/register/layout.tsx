@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 
 import { Ubuntu_Sans, Source_Code_Pro, Raleway } from "next/font/google";
 import "@/app/globals.css";
+import ClientThemeWrapper from "./client-theme-wrapper";
+
+import { ThemeProvider } from "next-themes";
+import FaviconSwitcher from "@/lib/favicon-switcher";
 
 export const metadata: Metadata = {
   title: "ichiyo (@1Yie)",
@@ -37,7 +41,17 @@ export default async function RootLayout({
       <body
         className={`antialiased ${ubuntu.className} ${sourceCodePro.className} ${raleway.className}`}
       >
-        {children}
+        <ClientThemeWrapper>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            enableColorScheme={false}
+          >
+            <FaviconSwitcher />
+            {children}
+          </ThemeProvider>
+        </ClientThemeWrapper>
       </body>
     </html>
   );

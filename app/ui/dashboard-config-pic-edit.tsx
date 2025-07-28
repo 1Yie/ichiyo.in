@@ -25,6 +25,7 @@ import {
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface Pic {
   id: number;
@@ -39,9 +40,7 @@ interface DashboardConfigPicEditProps {
   id: number;
 }
 
-export default function DashboardConfigPicEdit({
-  id,
-}: DashboardConfigPicEditProps) {
+export default function DashboardConfigPicEdit({ id }: DashboardConfigPicEditProps) {
   const router = useRouter();
 
   const [, setPic] = useState<Pic | null>(null);
@@ -52,7 +51,7 @@ export default function DashboardConfigPicEdit({
   const [newTab, setNewTab] = useState(false);
 
   const [saving, setSaving] = useState(false);
-  const [loading, setLoading] = useState(true); 
+  const [loading, setLoading] = useState(true);
   const [showErrorDialog, setShowErrorDialog] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -101,8 +100,7 @@ export default function DashboardConfigPicEdit({
       }
       router.push("/dashboard/config/pic");
     } catch (error) {
-      const msg =
-        error instanceof Error ? error.message : "保存失败，请稍后再试";
+      const msg = error instanceof Error ? error.message : "保存失败，请稍后再试";
       setErrorMessage(msg);
       setShowErrorDialog(true);
     } finally {
@@ -117,7 +115,7 @@ export default function DashboardConfigPicEdit({
           <SidebarTrigger className="-ml-1" />
           <Separator
             orientation="vertical"
-            className="mr-2 data-[orientation=vertical]:h-4"
+            className="mr-2 data-[orientation=vertical]:h-4 bg-foreground/30"
           />
           <Breadcrumb>
             <BreadcrumbList>
@@ -126,19 +124,15 @@ export default function DashboardConfigPicEdit({
                   仪表盘
                 </BreadcrumbLink>
               </BreadcrumbItem>
-              <BreadcrumbSeparator />
+              <BreadcrumbSeparator className="text-foreground/80" />
               <BreadcrumbItem className="cursor-pointer">
-                <BreadcrumbLink
-                  onClick={() => router.push("/dashboard/config/pic")}
-                >
+                <BreadcrumbLink onClick={() => router.push("/dashboard/config/pic")}>
                   图片
                 </BreadcrumbLink>
               </BreadcrumbItem>
-              <BreadcrumbSeparator />
+              <BreadcrumbSeparator className="text-foreground/80" />
               <BreadcrumbItem className="cursor-pointer">
-                <BreadcrumbLink
-                  onClick={() => router.push(`/dashboard/config/pic/${id}`)}
-                >
+                <BreadcrumbLink onClick={() => router.push(`/dashboard/config/pic/${id}`)}>
                   编辑图片
                 </BreadcrumbLink>
               </BreadcrumbItem>
@@ -148,14 +142,13 @@ export default function DashboardConfigPicEdit({
       </header>
 
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0 h-full w-full">
-        <div className="bg-muted/50 flex-1 rounded-xl p-4 h-full w-full min-w-0">
-          <div className="bg-white rounded-xl p-4 h-full w-full min-w-0 flex flex-col">
-            <h1 className="text-2xl font-bold mb-4">编辑图片 #{id}</h1>
+        <div className="bg-muted/50 dark:bg-muted/50 flex-1 rounded-xl p-4 h-full w-full min-w-0">
+          <div className="bg-white dark:bg-muted/50 rounded-xl p-4 h-full w-full min-w-0 flex flex-col">
+            <h1 className="text-2xl font-bold mb-4 text-foreground/90">编辑图片 #{id}</h1>
 
             <div className="space-y-4">
-              {/* 标题 */}
               <div>
-                <label className="block mb-1 font-semibold" htmlFor="title">
+                <label className="block mb-1 font-semibold text-foreground/90" htmlFor="title">
                   标题
                 </label>
                 {loading ? (
@@ -170,32 +163,16 @@ export default function DashboardConfigPicEdit({
                 )}
               </div>
 
-              {/* 图片 URL */}
-              {/* <div>
-                <label className="block mb-1 font-semibold" htmlFor="src">
-                  图片 URL
-                </label>
-                {loading ? (
-                  <Skeleton className="h-10 w-full rounded-md" />
-                ) : (
-                  <Input
-                    id="src"
-                    value={src}
-                    onChange={(e) => setSrc(e.target.value)}
-                    placeholder="请输入图片地址"
-                  />
-                )}
-              </div> */}
               <ImageUrlWithPreview
                 labelName="图片 URL"
-                labelClassName="block mb-1 font-semibold"
+                labelClassName="block mb-1 font-semibold text-foreground/90"
                 src={src}
                 setSrc={setSrc}
                 loading={loading}
               />
-              {/* 按钮文字 */}
+
               <div>
-                <label className="block mb-1 font-semibold" htmlFor="button">
+                <label className="block mb-1 font-semibold text-foreground/90" htmlFor="button">
                   按钮文字 (留空则不开启按钮)
                 </label>
                 {loading ? (
@@ -210,9 +187,8 @@ export default function DashboardConfigPicEdit({
                 )}
               </div>
 
-              {/* 链接 URL */}
               <div>
-                <label className="block mb-1 font-semibold" htmlFor="link">
+                <label className="block mb-1 font-semibold text-foreground/90" htmlFor="link">
                   链接 URL (按钮跳转链接)
                 </label>
                 {loading ? (
@@ -228,27 +204,22 @@ export default function DashboardConfigPicEdit({
                 )}
               </div>
 
-              {/* 是否新标签页 */}
               <div className="flex items-center space-x-2">
                 {loading ? (
                   <Skeleton className="h-6 w-6 rounded" />
                 ) : (
                   <>
-                    <input
+                    <Checkbox
                       id="newTab"
-                      type="checkbox"
                       checked={newTab}
-                      onChange={(e) => setNewTab(e.target.checked)}
+                      onCheckedChange={(checked) => setNewTab(!!checked)}
                       disabled={button.trim() === ""}
-                      className="cursor-pointer"
                     />
                     <label
                       htmlFor="newTab"
                       className={`select-none ${
-                        button.trim() === ""
-                          ? "opacity-50 cursor-not-allowed"
-                          : ""
-                      }`}
+                        button.trim() === "" ? "opacity-50 cursor-not-allowed" : ""
+                      } text-foreground/90`}
                     >
                       是否新标签页打开链接
                     </label>
@@ -256,7 +227,6 @@ export default function DashboardConfigPicEdit({
                 )}
               </div>
 
-              {/* 操作按钮 */}
               <div className="flex gap-2 justify-start">
                 <Button onClick={handleSave} disabled={saving || loading}>
                   {saving ? "保存中..." : "保存"}

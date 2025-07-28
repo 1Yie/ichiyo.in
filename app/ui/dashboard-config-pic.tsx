@@ -118,13 +118,17 @@ export default function DashboardConfigPic() {
         <ArrowUp
           className={cn(
             "inline-block h-4 w-4",
-            isActive && sortOrder === "asc" ? "text-black" : "text-gray-300"
+            isActive && sortOrder === "asc"
+              ? "text-foreground/90"
+              : "text-gray-300"
           )}
         />
         <ArrowDown
           className={cn(
             "inline-block h-4 w-4",
-            isActive && sortOrder === "desc" ? "text-black" : "text-gray-300"
+            isActive && sortOrder === "desc"
+              ? "text-foreground/90"
+              : "text-gray-300"
           )}
         />
       </>
@@ -142,7 +146,6 @@ export default function DashboardConfigPic() {
       fetchPics();
     } catch (err) {
       console.error(err);
-      // 这里可以扩展提示删除失败
     } finally {
       setShowDeleteDialog(false);
       setDeleteId(null);
@@ -156,7 +159,7 @@ export default function DashboardConfigPic() {
           <SidebarTrigger className="-ml-1" />
           <Separator
             orientation="vertical"
-            className="mr-2 data-[orientation=vertical]:h-4"
+            className="mr-2 data-[orientation=vertical]:h-4 bg-foreground/30"
           />
           <Breadcrumb>
             <BreadcrumbList>
@@ -165,11 +168,9 @@ export default function DashboardConfigPic() {
                   仪表盘
                 </BreadcrumbLink>
               </BreadcrumbItem>
-              <BreadcrumbSeparator />
+              <BreadcrumbSeparator className="text-foreground/80" />
               <BreadcrumbItem className="cursor-pointer">
-                <BreadcrumbLink
-                  onClick={() => router.push("/dashboard/config/pic")}
-                >
+                <BreadcrumbLink onClick={() => router.push("/dashboard/config/pic")}>
                   图片
                 </BreadcrumbLink>
               </BreadcrumbItem>
@@ -178,42 +179,33 @@ export default function DashboardConfigPic() {
         </div>
       </header>
 
-      <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-        <div className="bg-muted/50 flex-1 rounded-xl p-4">
-          <div className="w-full h-full bg-white p-4 rounded-xl">
+      <div className="flex flex-1 flex-col gap-4 p-4 pt-0 h-full w-full">
+        <div className="bg-muted/50 dark:bg-muted/50 flex-1 rounded-xl p-4 h-full w-full min-w-0">
+          <div className="w-full h-full bg-white dark:bg-muted/50 p-4 rounded-xl">
             <div className="flex items-center justify-between mb-4 ml-2 mr-2">
-              <h1 className="text-2xl font-bold">图片列表</h1>
+              <h1 className="text-2xl font-bold text-foreground/90">图片列表</h1>
               <Button onClick={() => router.push("/dashboard/config/pic/new")}>
                 <Pencil className="mr-1 h-4 w-4" />
                 新建图片
               </Button>
             </div>
 
-            <div className="rounded-xl bg-muted/50 p-4">
+            <div className="rounded-xl bg-muted/50 dark:bg-muted/50 p-4">
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead
-                      className="cursor-pointer select-none"
+                      className="cursor-pointer select-none text-foreground/90"
                       onClick={() => handleSort("id")}
                     >
                       ID {renderSortIcon("id")}
                     </TableHead>
-                    <TableHead>预览</TableHead>
-                    <TableHead
-                    >
-                      标题
-                    </TableHead>
-                    <TableHead
-                    >
-                      按钮文字
-                    </TableHead>
-                    <TableHead
-                    >
-                      链接
-                    </TableHead>
-                    <TableHead>打开方式</TableHead>
-                    <TableHead className="text-right">操作</TableHead>
+                    <TableHead className="text-foreground/90">预览</TableHead>
+                    <TableHead className="text-foreground/90">标题</TableHead>
+                    <TableHead className="text-foreground/90">按钮文字</TableHead>
+                    <TableHead className="text-foreground/90">链接</TableHead>
+                    <TableHead className="text-foreground/90">打开方式</TableHead>
+                    <TableHead className="text-right text-foreground/90">操作</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -221,25 +213,25 @@ export default function DashboardConfigPic() {
                     Array.from({ length: 3 }).map((_, i) => (
                       <TableRow key={i}>
                         <TableCell>
-                          <Skeleton className="h-4 w-6" />
+                          <Skeleton className="h-4 w-6 rounded" />
                         </TableCell>
                         <TableCell>
-                          <Skeleton className="h-12 w-20 rounded" />
+                          <Skeleton className="h-20 w-32 rounded" />
                         </TableCell>
                         <TableCell>
-                          <Skeleton className="h-4 w-24" />
+                          <Skeleton className="h-4 w-24 rounded" />
                         </TableCell>
                         <TableCell>
-                          <Skeleton className="h-4 w-24" />
+                          <Skeleton className="h-4 w-24 rounded" />
                         </TableCell>
                         <TableCell>
-                          <Skeleton className="h-4 w-24" />
+                          <Skeleton className="h-4 w-24 rounded" />
                         </TableCell>
                         <TableCell>
-                          <Skeleton className="h-4 w-24" />
+                          <Skeleton className="h-4 w-24 rounded" />
                         </TableCell>
                         <TableCell className="text-right">
-                          <Skeleton className="h-8 w-16 inline-block" />
+                          <Skeleton className="h-8 w-16 inline-block rounded" />
                         </TableCell>
                       </TableRow>
                     ))
@@ -247,7 +239,7 @@ export default function DashboardConfigPic() {
                     <TableRow>
                       <TableCell
                         colSpan={7}
-                        className="text-center text-muted-foreground"
+                        className="text-center text-muted-foreground dark:text-muted"
                       >
                         暂无图片
                       </TableCell>
@@ -255,7 +247,7 @@ export default function DashboardConfigPic() {
                   ) : (
                     sortedPics.map((pic) => (
                       <TableRow key={pic.id}>
-                        <TableCell>{pic.id}</TableCell>
+                        <TableCell className="text-foreground/90">{pic.id}</TableCell>
                         <TableCell>
                           <Image
                             src={pic.src}
@@ -267,9 +259,9 @@ export default function DashboardConfigPic() {
                             priority
                           />
                         </TableCell>
-                        <TableCell>{pic.title}</TableCell>
-                        <TableCell>{pic.button ?? "-"}</TableCell>
-                        <TableCell>
+                        <TableCell className="text-foreground/90">{pic.title}</TableCell>
+                        <TableCell className="text-foreground/90">{pic.button ?? "-"}</TableCell>
+                        <TableCell className="text-foreground/90">
                           {pic.link ? (
                             <a
                               href={pic.link}
@@ -283,12 +275,8 @@ export default function DashboardConfigPic() {
                             "-"
                           )}
                         </TableCell>
-                        <TableCell>
-                          {pic.button === null
-                            ? "-"
-                            : pic.newTab
-                            ? "新标签"
-                            : "当前标签"}
+                        <TableCell className="text-foreground/90">
+                          {pic.button === null ? "-" : pic.newTab ? "新标签" : "当前标签"}
                         </TableCell>
                         <TableCell className="text-right space-x-2">
                           <Button
@@ -321,7 +309,6 @@ export default function DashboardConfigPic() {
         </div>
       </div>
 
-      {/* 删除确认弹窗 */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -330,9 +317,7 @@ export default function DashboardConfigPic() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>取消</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete}>
-              确认删除
-            </AlertDialogAction>
+            <AlertDialogAction onClick={handleDelete}>确认删除</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

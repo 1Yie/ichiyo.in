@@ -2,8 +2,8 @@
 
 import * as React from "react";
 
-import { GalleryVerticalEnd, Cog, NotebookTabs } from "lucide-react";
-
+import { Cog, NotebookTabs } from "lucide-react";
+import { TeamLogo } from "@/app/ui/team-logo";
 
 import { NavProjects } from "@/components/nav-projects";
 import { NavMain } from "@/components/nav-main";
@@ -21,7 +21,15 @@ const data = {
   teams: [
     {
       name: "ichiyo.in",
-      logo: GalleryVerticalEnd,
+      logo: (
+        <TeamLogo
+          lightSrc="/logo_dark.svg"
+          darkSrc="/logo_light.svg"
+          alt="ichiyo.in"
+          width={24}
+          height={24}
+        />
+      ),
       plan: "仪表盘",
     },
   ],
@@ -51,7 +59,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        <TeamSwitcher teams={data.teams.map(team => ({ ...team, logo: () => team.logo }))} />
       </SidebarHeader>
       <SidebarContent>
         <NavMain label="站点" items={data.navSiteConfig} />

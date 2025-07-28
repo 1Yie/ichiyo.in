@@ -25,6 +25,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { ImageUrlWithPreview } from "@/ui/ImageUrlWithPreview";
 import { CircleX } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
 
 interface SocialLink {
   id?: number;
@@ -160,7 +162,7 @@ export default function DashboardConfigFriendEdit({ id }: DashboardConfigFriendE
 
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0 h-full w-full min-w-0">
         <div className="bg-muted/50 flex-1 rounded-xl p-4 h-full w-full min-w-0">
-          <div className="bg-white rounded-xl p-4 h-full w-full min-w-0 flex flex-col">
+          <div className="bg-white dark:bg-muted/50 rounded-xl p-4 h-full w-full min-w-0 flex flex-col">
             <h1 className="text-2xl font-bold mb-4">编辑友链 #{id}</h1>
 
             <div className="space-y-4">
@@ -264,12 +266,12 @@ export default function DashboardConfigFriendEdit({ id }: DashboardConfigFriendE
                 {loading ? (
                   <Skeleton className="h-20 w-full rounded-md" />
                 ) : (
-                  <textarea
+                  <Textarea
                     id="description"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder="请输入介绍"
-                    className="w-full rounded-md border border-gray-300 p-2 resize-y min-h-[80px]"
+                    className=""
                   />
                 )}
               </div>
@@ -279,12 +281,10 @@ export default function DashboardConfigFriendEdit({ id }: DashboardConfigFriendE
                   <Skeleton className="h-6 w-6 rounded" />
                 ) : (
                   <>
-                    <input
-                      type="checkbox"
+                    <Checkbox
                       id="pinned"
                       checked={pinned}
-                      onChange={(e) => setPinned(e.target.checked)}
-                      className="cursor-pointer"
+                      onCheckedChange={(checked) => setPinned(!!checked)}
                     />
                     <label htmlFor="pinned" className="select-none cursor-pointer">
                       置顶

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Ubuntu_Sans, Source_Code_Pro, Raleway } from "next/font/google";
 import "@/app/globals.css";
 
-import ClientThemeWrapper from "@/app/ui/client-theme-wrapper";
+import ClientThemeWrapper from "@/app/(main)/client-theme-wrapper";
 
 import NextTopLoader from "nextjs-toploader";
 import ImageZoom from "@/ui/img-zoom";
@@ -41,12 +41,12 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html>
+    <html className="scroll-smooth">
       <body
         className={`antialiased ${ubuntu.className} ${sourceCodePro.className} ${raleway.className}`}
       >
         <ClientThemeWrapper>
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem enableColorScheme={false}>
             <FaviconSwitcher />
             <ImageZoom />
             <NextTopLoader

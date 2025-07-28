@@ -34,7 +34,7 @@ export function PostContentEditor({
   return (
     <ResizablePanelGroup
       direction="horizontal"
-      className="rounded-md border mb-4 bg-gray-50 h-full w-full"
+      className="rounded-md border mb-4 bg-gray-50 dark:bg-muted/15 h-full w-full"
     >
       <ResizablePanel defaultSize={50} minSize={30} className="p-2">
         <Textarea
@@ -42,7 +42,7 @@ export function PostContentEditor({
           id="content"
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          className="h-full bg-white"
+          className="h-full bg-white dark:bg-muted"
           placeholder={placeholder}
           disabled={saving}
         />

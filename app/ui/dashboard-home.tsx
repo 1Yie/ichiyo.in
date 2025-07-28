@@ -34,7 +34,6 @@ export default function DashboardHome() {
       fetch("/api/friend").then((res) => res.json()),
     ])
       .then(([postRes, projectRes, picRes, friendRes]) => {
-        // 文章处理，确保posts是数组
         const postsArray = Array.isArray(postRes.posts) ? postRes.posts : [];
         const totalPosts = postsArray.length;
         const publishedPosts = postsArray.filter(
@@ -42,30 +41,25 @@ export default function DashboardHome() {
         ).length;
         const draftPosts = totalPosts - publishedPosts;
 
-        // 项目处理，支持直接数组或projects字段包裹
         const projectsArray = Array.isArray(projectRes.projects)
           ? projectRes.projects
           : Array.isArray(projectRes)
           ? projectRes
           : [];
 
-        // 图片处理，支持直接数组或pics字段包裹
         const picsArray = Array.isArray(picRes.pics)
           ? picRes.pics
           : Array.isArray(picRes)
           ? picRes
           : [];
 
-        // 朋友处理，支持直接数组或friends字段包裹
         const friendsArray: Friend[] = Array.isArray(friendRes.friends)
           ? friendRes.friends
           : Array.isArray(friendRes)
           ? friendRes
           : [];
 
-        const pinnedCount = friendsArray.filter(
-          (f) => f.pinned === true
-        ).length;
+        const pinnedCount = friendsArray.filter((f) => f.pinned === true).length;
         const unpinnedCount = friendsArray.length - pinnedCount;
 
         setStats({
@@ -96,7 +90,7 @@ export default function DashboardHome() {
           <SidebarTrigger className="-ml-1" />
           <Separator
             orientation="vertical"
-            className="mr-2 data-[orientation=vertical]:h-4"
+            className="mr-2 data-[orientation=vertical]:h-4 bg-foreground/30"
           />
           <Breadcrumb>
             <BreadcrumbList>
@@ -116,34 +110,34 @@ export default function DashboardHome() {
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
         {/* 文章统计 */}
         <div className="bg-muted/50 p-4 rounded-xl">
-          <h2 className="text-xl font-semibold text-gray-700 mb-2">文章统计</h2>
+          <h2 className="text-xl font-semibold text-foreground/90 mb-2">文章统计</h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="bg-white p-4 rounded-xl flex flex-col items-start">
-              <span className="text-gray-500 text-sm">总文章数</span>
+            <div className="bg-muted/50 p-4 rounded-xl flex flex-col items-start">
+              <span className="text-foreground/50 text-sm">总文章数</span>
               {loading ? (
                 <Skeleton className="h-7 w-16 mt-1" />
               ) : (
-                <span className="text-2xl font-medium text-gray-800">
+                <span className="text-2xl font-medium text-foreground/80">
                   {stats.posts.total}
                 </span>
               )}
             </div>
-            <div className="bg-white p-4 rounded-xl flex flex-col items-start">
-              <span className="text-gray-500 text-sm">已发布</span>
+            <div className="bg-muted/50 p-4 rounded-xl flex flex-col items-start">
+              <span className="text-foreground/50 text-sm">已发布</span>
               {loading ? (
                 <Skeleton className="h-7 w-16 mt-1" />
               ) : (
-                <span className="text-2xl font-medium text-gray-800">
+                <span className="text-2xl font-medium text-foreground/80">
                   {stats.posts.published}
                 </span>
               )}
             </div>
-            <div className="bg-white p-4 rounded-xl flex flex-col items-start">
-              <span className="text-gray-500 text-sm">草稿</span>
+            <div className="bg-muted/50 p-4 rounded-xl flex flex-col items-start">
+              <span className="text-foreground/50 text-sm">草稿</span>
               {loading ? (
                 <Skeleton className="h-7 w-16 mt-1" />
               ) : (
-                <span className="text-2xl font-medium text-gray-800">
+                <span className="text-2xl font-medium text-foreground/80">
                   {stats.posts.draft}
                 </span>
               )}
@@ -153,73 +147,60 @@ export default function DashboardHome() {
 
         {/* 项目统计 */}
         <div className="bg-muted/50 p-4 rounded-xl">
-          <h2 className="text-xl font-semibold text-gray-700 mb-2">项目统计</h2>
-          <div className="bg-white p-4 rounded-xl flex flex-col items-start max-w-xs">
-            <span className="text-gray-500 text-sm">项目总数</span>
+          <h2 className="text-xl font-semibold text-foreground/90 mb-2">项目统计</h2>
+          <div className="bg-muted/50 p-4 rounded-xl flex flex-col items-start max-w-xs">
+            <span className="text-foreground/50 text-sm">项目总数</span>
             {loading ? (
               <Skeleton className="h-7 w-16 mt-1" />
             ) : (
-              <span className="text-2xl font-medium text-gray-800">
-                {stats.projects}
-              </span>
+              <span className="text-2xl font-medium text-foreground/80">{stats.projects}</span>
             )}
           </div>
         </div>
 
         {/* 图片统计 */}
         <div className="bg-muted/50 p-4 rounded-xl">
-          <h2 className="text-xl font-semibold text-gray-700 mb-2">图片统计</h2>
-          <div className="bg-white p-4 rounded-xl flex flex-col items-start max-w-xs">
-            <span className="text-gray-500 text-sm">图片总数</span>
+          <h2 className="text-xl font-semibold text-foreground/90 mb-2">图片统计</h2>
+          <div className="bg-muted/50 p-4 rounded-xl flex flex-col items-start max-w-xs">
+            <span className="text-foreground/50 text-sm">图片总数</span>
             {loading ? (
               <Skeleton className="h-7 w-16 mt-1" />
             ) : (
-              <span className="text-2xl font-medium text-gray-800">
-                {stats.pics}
-              </span>
+              <span className="text-2xl font-medium text-foreground/80">{stats.pics}</span>
             )}
           </div>
         </div>
 
         {/* 友链统计 */}
         <div className="bg-muted/50 p-4 rounded-xl">
-          <h2 className="text-xl font-semibold text-gray-700 mb-2">友链统计</h2>
+          <h2 className="text-xl font-semibold text-foreground/90 mb-2">友链统计</h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="bg-white p-4 rounded-xl flex flex-col items-start">
-              <span className="text-gray-500 text-sm">友链总数</span>
+            <div className="bg-muted/50 p-4 rounded-xl flex flex-col items-start">
+              <span className="text-foreground/50 text-sm">友链总数</span>
               {loading ? (
                 <Skeleton className="h-7 w-16 mt-1" />
               ) : (
-                <span className="text-2xl font-medium text-gray-800">
-                  {stats.friends.total}
-                </span>
+                <span className="text-2xl font-medium text-foreground/80">{stats.friends.total}</span>
               )}
             </div>
-            <div className="bg-white p-4 rounded-xl flex flex-col items-start">
-              <span className="text-gray-500 text-sm">置顶人数</span>
+            <div className="bg-muted/50 p-4 rounded-xl flex flex-col items-start">
+              <span className="text-foreground/50 text-sm">置顶人数</span>
               {loading ? (
                 <Skeleton className="h-7 w-16 mt-1" />
               ) : (
-                <span className="text-2xl font-medium text-gray-800">
-                  {stats.friends.pinned}
-                </span>
+                <span className="text-2xl font-medium text-foreground/80">{stats.friends.pinned}</span>
               )}
             </div>
-            <div className="bg-white p-4 rounded-xl flex flex-col items-start">
-              <span className="text-gray-500 text-sm">未置顶人数</span>
+            <div className="bg-muted/50 p-4 rounded-xl flex flex-col items-start">
+              <span className="text-foreground/50 text-sm">未置顶人数</span>
               {loading ? (
                 <Skeleton className="h-7 w-16 mt-1" />
               ) : (
-                <span className="text-2xl font-medium text-gray-800">
-                  {stats.friends.unpinned}
-                </span>
+                <span className="text-2xl font-medium text-foreground/80">{stats.friends.unpinned}</span>
               )}
             </div>
           </div>
         </div>
-
-        {/* 预留空白区域 */}
-        {/* <div className="bg-muted/50 min-h-[100vh] flex-1 rounded-xl md:min-h-min" /> */}
       </div>
     </SidebarInset>
   );

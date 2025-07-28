@@ -174,7 +174,7 @@ export default function DashboardConfigFriend() {
           <SidebarTrigger className="-ml-1" />
           <Separator
             orientation="vertical"
-            className="mr-2 data-[orientation=vertical]:h-4"
+            className="mr-2 data-[orientation=vertical]:h-4 bg-foreground/30"
           />
           <Breadcrumb>
             <BreadcrumbList>
@@ -183,7 +183,7 @@ export default function DashboardConfigFriend() {
                   仪表盘
                 </BreadcrumbLink>
               </BreadcrumbItem>
-              <BreadcrumbSeparator />
+              <BreadcrumbSeparator className="text-foreground/80" />
               <BreadcrumbItem className="cursor-pointer">
                 <BreadcrumbLink
                   onClick={() => router.push("/dashboard/config/link")}
@@ -196,37 +196,43 @@ export default function DashboardConfigFriend() {
         </div>
       </header>
 
-      <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-        <div className="bg-muted/50 flex-1 rounded-xl p-4">
-          <div className="w-full h-full bg-white p-4 rounded-xl">
+      <div className="flex flex-1 flex-col gap-4 p-4 pt-0 h-full w-full">
+        <div className="bg-muted/50 dark:bg-muted/50 flex-1 rounded-xl p-4 h-full w-full min-w-0">
+          <div className="w-full h-full bg-white dark:bg-muted/50 p-4 rounded-xl">
             <div className="flex items-center justify-between mb-4 ml-2 mr-2">
-              <h1 className="text-2xl font-bold">友链列表</h1>
+              <h1 className="text-2xl font-bold text-foreground/90">
+                友链列表
+              </h1>
               <Button onClick={() => router.push("/dashboard/config/link/new")}>
                 <Pencil className="mr-1 h-4 w-4" />
                 新建友链
               </Button>
             </div>
-            <div className="rounded-xl bg-muted/50 p-4 overflow-auto">
+            <div className="rounded-xl bg-muted/50 dark:bg-muted/50 p-4 overflow-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead
-                      className="cursor-pointer select-none"
+                      className="cursor-pointer select-none text-foreground/90"
                       onClick={() => handleSort("id")}
                     >
                       ID {renderSortIcon("id")}
                     </TableHead>
-                    <TableHead>头像</TableHead>
-                    <TableHead>名称</TableHead>
-                    <TableHead>介绍</TableHead>
+                    <TableHead className="text-foreground/90">头像</TableHead>
+                    <TableHead className="text-foreground/90">名称</TableHead>
+                    <TableHead className="text-foreground/90">介绍</TableHead>
                     <TableHead
-                      className="cursor-pointer select-none"
+                      className="cursor-pointer select-none text-foreground/90"
                       onClick={() => handleSort("pinned")}
                     >
                       置顶 {renderSortIcon("pinned")}
                     </TableHead>
-                    <TableHead>社交链接数</TableHead>
-                    <TableHead className="text-right">操作</TableHead>
+                    <TableHead className="text-foreground/90">
+                      社交链接数
+                    </TableHead>
+                    <TableHead className="text-right text-foreground/90">
+                      操作
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -234,25 +240,25 @@ export default function DashboardConfigFriend() {
                     Array.from({ length: 3 }).map((_, i) => (
                       <TableRow key={i}>
                         <TableCell>
-                          <Skeleton className="h-4 w-6" />
+                          <Skeleton className="h-4 w-6 rounded" />
                         </TableCell>
                         <TableCell>
                           <Skeleton className="h-8 w-8 rounded-full" />
                         </TableCell>
                         <TableCell>
-                          <Skeleton className="h-4 w-24" />
+                          <Skeleton className="h-4 w-24 rounded" />
                         </TableCell>
                         <TableCell>
-                          <Skeleton className="h-4 w-48" />
+                          <Skeleton className="h-4 w-48 rounded" />
                         </TableCell>
                         <TableCell>
-                          <Skeleton className="h-4 w-10" />
+                          <Skeleton className="h-4 w-10 rounded" />
                         </TableCell>
                         <TableCell>
-                          <Skeleton className="h-4 w-10" />
+                          <Skeleton className="h-4 w-10 rounded" />
                         </TableCell>
                         <TableCell className="text-right">
-                          <Skeleton className="h-8 w-16 inline-block" />
+                          <Skeleton className="h-8 w-16 inline-block rounded" />
                         </TableCell>
                       </TableRow>
                     ))
@@ -260,7 +266,7 @@ export default function DashboardConfigFriend() {
                     <TableRow>
                       <TableCell
                         colSpan={7}
-                        className="text-center text-muted-foreground"
+                        className="text-center text-muted-foreground dark:text-muted"
                       >
                         暂无友链
                       </TableCell>
@@ -268,7 +274,9 @@ export default function DashboardConfigFriend() {
                   ) : (
                     sortedFriends.map((friend) => (
                       <TableRow key={friend.id}>
-                        <TableCell>{friend.id}</TableCell>
+                        <TableCell className="text-foreground/90">
+                          {friend.id}
+                        </TableCell>
                         <TableCell>
                           <Image
                             src={friend.image}
@@ -280,10 +288,18 @@ export default function DashboardConfigFriend() {
                             priority
                           />
                         </TableCell>
-                        <TableCell>{friend.name}</TableCell>
-                        <TableCell>{friend.description}</TableCell>
-                        <TableCell>{friend.pinned ? "是" : "否"}</TableCell>
-                        <TableCell>{friend.socialLinks.length}</TableCell>
+                        <TableCell className="text-foreground/90">
+                          {friend.name}
+                        </TableCell>
+                        <TableCell className="text-foreground/90">
+                          {friend.description}
+                        </TableCell>
+                        <TableCell className="text-foreground/90">
+                          {friend.pinned ? "是" : "否"}
+                        </TableCell>
+                        <TableCell className="text-foreground/90">
+                          {friend.socialLinks.length}
+                        </TableCell>
                         <TableCell className="text-right space-x-2">
                           <Button
                             size="sm"
@@ -315,7 +331,6 @@ export default function DashboardConfigFriend() {
         </div>
       </div>
 
-      {/* 删除确认弹窗 */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>

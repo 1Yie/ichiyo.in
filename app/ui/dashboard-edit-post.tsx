@@ -49,6 +49,7 @@ interface Post {
   authors: {
     user: { uid: number; id: string; email: string; name?: string };
   }[];
+  tags?: { name: string }[];
 }
 
 interface User {
@@ -101,15 +102,10 @@ export default function DashboardEditPost({ postId }: DashboardEditPostProps) {
         setContent(postData.content);
         setPublished(postData.published);
         setSlug(postData.slug || "");
-        setSelectedTags(
-          postData.tags?.map((t: { name: string }) => t.name) || []
-        );
-        // 默认选中文章的作者 uid
-        setSelectedAuthors(
-          postData.authors.map((a: { user: User }) => a.user.uid)
-        );
+        setSelectedTags(postData.tags?.map((t: { name: string }) => t.name) || []);
+        setSelectedAuthors(postData.authors.map((a: { user: User }) => a.user.uid));
 
-        // 2. 获取当前登录用户信息和所有用户列表
+        // 获取当前登录用户和所有用户列表
         const [meRes, usersRes] = await Promise.all([
           fetch("/api/me", { credentials: "include" }),
           fetch("/api/users", { credentials: "include" }),
@@ -123,12 +119,10 @@ export default function DashboardEditPost({ postId }: DashboardEditPostProps) {
         setCurrentUserUid(meData.user.uid);
         setAllUsers(usersData.users);
 
-        // 确保自己在作者中（如果接口没返回，也可以加）
+        // 确保自己在作者中（自己必选且不可移除）
         if (
           meData.user.uid &&
-          !postData.authors.some(
-            (a: { user: User }) => a.user.uid === meData.user.uid
-          )
+          !postData.authors.some((a: { user: User }) => a.user.uid === meData.user.uid)
         ) {
           setSelectedAuthors((prev) => [...prev, meData.user.uid]);
         }
@@ -143,14 +137,12 @@ export default function DashboardEditPost({ postId }: DashboardEditPostProps) {
     fetchPostAndUsers();
   }, [postId]);
 
-  // 添加作者，防止重复和添加自己（自己已默认且不可删）
   const handleAddAuthor = (uid: number) => {
     if (uid === currentUserUid) return;
     if (selectedAuthors.includes(uid)) return;
     setSelectedAuthors([...selectedAuthors, uid]);
   };
 
-  // 移除作者（不可移除自己）
   const handleRemoveAuthor = (uid: number) => {
     if (uid === currentUserUid) return;
     setSelectedAuthors(selectedAuthors.filter((id) => id !== uid));
@@ -206,36 +198,37 @@ export default function DashboardEditPost({ postId }: DashboardEditPostProps) {
 
   return (
     <SidebarInset>
+      {/* 头部导航 */}
       <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
         <div className="flex items-center gap-2 px-4">
           <SidebarTrigger className="-ml-1" />
           <Separator
             orientation="vertical"
-            className="mr-2 data-[orientation=vertical]:h-4"
+            className="mr-2 data-[orientation=vertical]:h-4 bg-foreground/30"
           />
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
                 <BreadcrumbLink
-                  className="cursor-pointer"
+                  className="cursor-pointer text-foreground/90"
                   onClick={() => router.push("/dashboard")}
                 >
                   仪表盘
                 </BreadcrumbLink>
               </BreadcrumbItem>
-              <BreadcrumbSeparator />
+              <BreadcrumbSeparator className="text-foreground/80" />
               <BreadcrumbItem>
                 <BreadcrumbLink
-                  className="cursor-pointer"
+                  className="cursor-pointer text-foreground/90"
                   onClick={() => router.push("/dashboard/post")}
                 >
                   文章管理
                 </BreadcrumbLink>
               </BreadcrumbItem>
-              <BreadcrumbSeparator />
+              <BreadcrumbSeparator className="text-foreground/80" />
               <BreadcrumbItem>
                 <BreadcrumbLink
-                  className="cursor-pointer"
+                  className="cursor-pointer text-foreground/90"
                   onClick={() => router.push(`/dashboard/post/${post?.id}`)}
                 >
                   编辑文章
@@ -245,9 +238,11 @@ export default function DashboardEditPost({ postId }: DashboardEditPostProps) {
           </Breadcrumb>
         </div>
       </header>
+
+      {/* 内容主体 */}
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0 h-full w-full">
         <div className="bg-muted/50 flex-1 rounded-xl p-4 h-full w-full min-w-0">
-          <div className="bg-white rounded-xl p-4 h-full w-full min-w-0 flex flex-col">
+          <div className="bg-white dark:bg-muted/50 rounded-xl p-4 h-full w-full min-w-0 flex flex-col">
             {loading ? (
               <div className="space-y-4">
                 <Skeleton className="h-8 w-1/2" />
@@ -270,10 +265,11 @@ export default function DashboardEditPost({ postId }: DashboardEditPostProps) {
               <p className="text-muted-foreground">文章未找到</p>
             ) : (
               <>
-                <h1 className="text-2xl font-bold mb-4">编辑文章 #{postId}</h1>
+                <h1 className="text-2xl font-bold mb-4 text-foreground/90">编辑文章 #{postId}</h1>
 
+                {/* 标题 */}
                 <div className="mb-4">
-                  <label htmlFor="title" className="block mb-1 font-semibold">
+                  <label htmlFor="title" className="block mb-1 font-semibold text-foreground/90">
                     标题
                   </label>
                   <Input
@@ -285,8 +281,10 @@ export default function DashboardEditPost({ postId }: DashboardEditPostProps) {
                     disabled={saving}
                   />
                 </div>
+
+                {/* Slug */}
                 <div className="mb-4">
-                  <label htmlFor="slug" className="block mb-1 font-semibold">
+                  <label htmlFor="slug" className="block mb-1 font-semibold text-foreground/90">
                     自定义 URL Slug（可留空）
                   </label>
                   <Input
@@ -301,8 +299,8 @@ export default function DashboardEditPost({ postId }: DashboardEditPostProps) {
 
                 {/* 作者选择 */}
                 <div className="mb-4">
-                  <label className="block mb-1 font-semibold">作者</label>
-                  <p className="mb-2 text-sm text-gray-500">
+                  <label className="block mb-1 font-semibold text-foreground/90">作者</label>
+                  <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
                     多作者文章可添加多个作者，自己为必选且不可移除
                   </p>
 
@@ -384,7 +382,7 @@ export default function DashboardEditPost({ postId }: DashboardEditPostProps) {
 
                 {/* 标签输入与显示 */}
                 <div className="mb-4">
-                  <label htmlFor="tags" className="block mb-1 font-semibold">
+                  <label htmlFor="tags" className="block mb-1 font-semibold text-foreground/90">
                     标签（可选）
                   </label>
                   <div className="flex gap-2">
@@ -411,10 +409,10 @@ export default function DashboardEditPost({ postId }: DashboardEditPostProps) {
                     </Button>
                   </div>
 
-                  {/* 标签输入 */}
+                  {/* 标签显示 */}
                   <div className="mt-2 flex flex-wrap gap-2">
                     {selectedTags.length === 0 ? (
-                      <div className="text-sm text-gray-400">
+                      <div className="text-sm text-gray-500 dark:text-gray-400">
                         暂无标签，可添加标签
                       </div>
                     ) : (
@@ -440,7 +438,7 @@ export default function DashboardEditPost({ postId }: DashboardEditPostProps) {
 
                 {/* 样式按钮 */}
                 <div className="mb-2">
-                  <label htmlFor="content" className="block mb-1 font-semibold">
+                  <label htmlFor="content" className="block mb-1 font-semibold text-foreground/90">
                     内容
                   </label>
                   <FontStyleToggleGroup
@@ -459,6 +457,7 @@ export default function DashboardEditPost({ postId }: DashboardEditPostProps) {
                   saving={saving}
                   placeholder="请输入内容"
                 />
+
                 <div className="mb-4 flex items-center gap-2">
                   <Checkbox
                     id="published"
@@ -466,8 +465,11 @@ export default function DashboardEditPost({ postId }: DashboardEditPostProps) {
                     onCheckedChange={(checked) => setPublished(!!checked)}
                     disabled={saving}
                   />
-                  <label htmlFor="published">已发布</label>
+                  <label htmlFor="published" className="text-foreground/90">
+                    已发布
+                  </label>
                 </div>
+
                 <div className="flex gap-2">
                   <Button
                     onClick={handleSave}
@@ -490,6 +492,7 @@ export default function DashboardEditPost({ postId }: DashboardEditPostProps) {
           </div>
         </div>
       </div>
+
       <AlertDialog open={showErrorDialog} onOpenChange={setShowErrorDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>

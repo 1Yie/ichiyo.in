@@ -74,7 +74,7 @@ export default function DashboardCreateProject() {
           <SidebarTrigger className="-ml-1" />
           <Separator
             orientation="vertical"
-            className="mr-2 data-[orientation=vertical]:h-4"
+            className="mr-2 data-[orientation=vertical]:h-4 bg-foreground/30"
           />
           <Breadcrumb>
             <BreadcrumbList>
@@ -83,13 +83,13 @@ export default function DashboardCreateProject() {
                   仪表盘
                 </BreadcrumbLink>
               </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
+              <BreadcrumbSeparator className="text-foreground/80" />
+              <BreadcrumbItem className="cursor-pointer">
                 <BreadcrumbLink onClick={() => router.push("/dashboard/config/work")}>
                   作品
                 </BreadcrumbLink>
               </BreadcrumbItem>
-              <BreadcrumbSeparator />
+              <BreadcrumbSeparator className="text-foreground/80" />
               <BreadcrumbItem className="cursor-pointer">
                 <BreadcrumbLink onClick={() => router.push("/dashboard/config/work/new")}>
                   新建作品
@@ -101,12 +101,12 @@ export default function DashboardCreateProject() {
       </header>
 
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0 h-full w-full">
-        <div className="bg-muted/50 flex-1 rounded-xl p-4 h-full w-full min-w-0">
-          <div className="bg-white rounded-xl p-4 h-full w-full min-w-0 flex flex-col">
-            <h1 className="text-2xl font-bold mb-4">新建作品</h1>
+        <div className="bg-muted/50 dark:bg-muted/50 flex-1 rounded-xl p-4 h-full w-full min-w-0">
+          <div className="bg-white dark:bg-muted/50 rounded-xl p-4 h-full w-full min-w-0 flex flex-col">
+            <h1 className="text-2xl font-bold mb-4 text-foreground/90">新建作品</h1>
             <div className="space-y-4">
               <div>
-                <label className="block mb-1 font-semibold">名称</label>
+                <label className="block mb-1 font-semibold text-foreground/90">名称</label>
                 <Input value={name} onChange={(e) => setName(e.target.value)} />
               </div>
 
@@ -114,18 +114,18 @@ export default function DashboardCreateProject() {
                 src={iconLight}
                 setSrc={setIconLight}
                 labelName="图标 URL（浅色）"
-                labelClassName="block mb-1 font-semibold"
+                labelClassName="block mb-1 font-semibold text-foreground/90"
               />
 
               <ImageUrlWithPreview
                 src={iconDark}
                 setSrc={setIconDark}
                 labelName="图标 URL（深色）"
-                labelClassName="block mb-1 font-semibold"
+                labelClassName="block mb-1 font-semibold text-foreground/90"
               />
 
               <div>
-                <label className="block mb-1 font-semibold">描述</label>
+                <label className="block mb-1 font-semibold text-foreground/90">描述</label>
                 <Input
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
@@ -133,7 +133,7 @@ export default function DashboardCreateProject() {
               </div>
 
               <div>
-                <label className="block mb-1 font-semibold">链接 URL</label>
+                <label className="block mb-1 font-semibold text-foreground/90">链接 URL</label>
                 <Input value={link} onChange={(e) => setLink(e.target.value)} />
               </div>
 

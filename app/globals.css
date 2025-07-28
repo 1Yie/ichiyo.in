@@ -169,10 +169,6 @@
   z-index: 1001;
 }
 
-html {
-  scroll-behavior: smooth;
-}
-
 code:not(pre code) {
   font-family: 'Source Code Pro', monospace;
   padding: 0px 4px;

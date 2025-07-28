@@ -23,6 +23,7 @@ import {
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
 import { ImageUrlWithPreview } from "@/ui/ImageUrlWithPreview";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default function DashboardConfigPicNew() {
   const router = useRouter();
@@ -74,7 +75,7 @@ export default function DashboardConfigPicNew() {
           <SidebarTrigger className="-ml-1" />
           <Separator
             orientation="vertical"
-            className="mr-2 data-[orientation=vertical]:h-4"
+            className="mr-2 data-[orientation=vertical]:h-4 bg-foreground/30"
           />
           <Breadcrumb>
             <BreadcrumbList>
@@ -83,15 +84,13 @@ export default function DashboardConfigPicNew() {
                   仪表盘
                 </BreadcrumbLink>
               </BreadcrumbItem>
-              <BreadcrumbSeparator />
+              <BreadcrumbSeparator className="text-foreground/80" />
               <BreadcrumbItem className="cursor-pointer">
-                <BreadcrumbLink
-                  onClick={() => router.push("/dashboard/config/pic")}
-                >
+                <BreadcrumbLink onClick={() => router.push("/dashboard/config/pic")}>
                   图片
                 </BreadcrumbLink>
               </BreadcrumbItem>
-              <BreadcrumbSeparator />
+              <BreadcrumbSeparator className="text-foreground/80" />
               <BreadcrumbItem
                 className="cursor-pointer"
                 onClick={() => router.push("/dashboard/config/pic/new")}
@@ -104,13 +103,17 @@ export default function DashboardConfigPicNew() {
       </header>
 
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0 h-full w-full">
-        <div className="bg-muted/50 flex-1 rounded-xl p-4 h-full w-full min-w-0">
-          <div className="bg-white rounded-xl p-4 h-full w-full min-w-0 flex flex-col">
-            <h1 className="text-2xl font-bold mb-4">新建图片</h1>
+        <div className="bg-muted/50 dark:bg-muted/50 flex-1 rounded-xl p-4 h-full w-full min-w-0">
+          <div className="bg-white dark:bg-muted/50 rounded-xl p-4 h-full w-full min-w-0 flex flex-col">
+            <h1 className="text-2xl font-bold mb-4 text-foreground/90">
+              新建图片
+            </h1>
 
             <div className="space-y-4">
               <div>
-                <label className="block mb-1 font-semibold">标题</label>
+                <label className="block mb-1 font-semibold text-foreground/90">
+                  标题
+                </label>
                 <Input
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
@@ -122,11 +125,11 @@ export default function DashboardConfigPicNew() {
                 src={src}
                 setSrc={setSrc}
                 labelName="图片链接"
-                labelClassName="block mb-1 font-semibold"
+                labelClassName="block mb-1 font-semibold text-foreground/90"
               />
 
               <div>
-                <label className="block mb-1 font-semibold">
+                <label className="block mb-1 font-semibold text-foreground/90">
                   按钮文字 (留空则不开启按钮)
                 </label>
                 <Input
@@ -137,7 +140,9 @@ export default function DashboardConfigPicNew() {
               </div>
 
               <div>
-                <label className="block mb-1 font-semibold">链接 URL</label>
+                <label className="block mb-1 font-semibold text-foreground/90">
+                  链接 URL
+                </label>
                 <Input
                   value={link}
                   onChange={(e) => setLink(e.target.value)}
@@ -147,17 +152,15 @@ export default function DashboardConfigPicNew() {
               </div>
 
               <div className="flex items-center space-x-2">
-                <input
+                <Checkbox
                   id="newTab"
-                  type="checkbox"
                   checked={newTab}
-                  onChange={(e) => setNewTab(e.target.checked)}
+                  onCheckedChange={(checked) => setNewTab(!!checked)}
                   disabled={button.trim() === ""}
-                  className="cursor-pointer"
                 />
                 <label
                   htmlFor="newTab"
-                  className={`select-none ${
+                  className={`select-none text-foreground/90 ${
                     button.trim() === "" ? "opacity-50 cursor-not-allowed" : ""
                   }`}
                 >

@@ -25,13 +25,14 @@ import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-  SelectGroup
+  SelectGroup,
 } from "@/components/ui/select";
 
 import { FontStyleToggleGroup } from "@/ui/font-style-toggle-group";
@@ -60,7 +61,6 @@ export default function DashboardNewPost() {
   >([]);
   const [selectedAuthors, setSelectedAuthors] = useState<string[]>([]);
 
-  // 获取当前用户
   useEffect(() => {
     fetch("/api/me", { credentials: "include" })
       .then((res) => res.json())
@@ -73,7 +73,6 @@ export default function DashboardNewPost() {
       });
   }, []);
 
-  // 获取所有用户
   useEffect(() => {
     fetch("/api/users", { credentials: "include" })
       .then((res) => res.json())
@@ -152,31 +151,31 @@ export default function DashboardNewPost() {
           <SidebarTrigger className="-ml-1" />
           <Separator
             orientation="vertical"
-            className="mr-2 data-[orientation=vertical]:h-4"
+            className="mr-2 data-[orientation=vertical]:h-4 bg-foreground/30"
           />
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
                 <BreadcrumbLink
-                  className="cursor-pointer"
+                  className="cursor-pointer text-foreground/90"
                   onClick={() => router.push("/dashboard")}
                 >
                   仪表盘
                 </BreadcrumbLink>
               </BreadcrumbItem>
-              <BreadcrumbSeparator />
+              <BreadcrumbSeparator className="text-foreground/80" />
               <BreadcrumbItem>
                 <BreadcrumbLink
-                  className="cursor-pointer"
+                  className="cursor-pointer text-foreground/90"
                   onClick={() => router.push("/dashboard/post")}
                 >
                   文章管理
                 </BreadcrumbLink>
               </BreadcrumbItem>
-              <BreadcrumbSeparator />
+              <BreadcrumbSeparator className="text-foreground/80" />
               <BreadcrumbItem>
                 <BreadcrumbLink
-                  className="cursor-pointer"
+                  className="cursor-pointer text-foreground/90"
                   onClick={() => router.push(`/dashboard/post/new`)}
                 >
                   新建文章
@@ -187,15 +186,18 @@ export default function DashboardNewPost() {
         </div>
       </header>
 
-      {/* 内容主体 */}
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0 h-full w-full">
         <div className="bg-muted/50 flex-1 rounded-xl p-4 h-full w-full min-w-0">
-          <div className="bg-white rounded-xl p-4 h-full w-full min-w-0 flex flex-col">
-            <h1 className="text-2xl font-bold mb-4">新建文章</h1>
+          <div className="bg-white dark:bg-muted/50 rounded-xl p-4 h-full w-full min-w-0 flex flex-col">
+            <h1 className="text-2xl font-bold mb-4 text-foreground/90">
+              新建文章
+            </h1>
 
-            {/* 标题 */}
             <div className="mb-4">
-              <label htmlFor="title" className="block mb-1 font-semibold">
+              <label
+                htmlFor="title"
+                className="block mb-1 font-semibold text-foreground/90"
+              >
                 标题
               </label>
               <Input
@@ -207,9 +209,11 @@ export default function DashboardNewPost() {
               />
             </div>
 
-            {/* Slug */}
             <div className="mb-4">
-              <label htmlFor="slug" className="block mb-1 font-semibold">
+              <label
+                htmlFor="slug"
+                className="block mb-1 font-semibold text-foreground/90"
+              >
                 自定义 URL Slug（可留空）
               </label>
               <Input
@@ -221,45 +225,46 @@ export default function DashboardNewPost() {
               />
             </div>
 
-            {/* 作者 */}
             <div className="mb-4">
-              <label htmlFor="authors" className="block mb-1 font-semibold">
+              <label
+                htmlFor="authors"
+                className="block mb-1 font-semibold text-foreground/90"
+              >
                 作者
               </label>
-              <p className="mb-2 text-sm text-gray-500">
+              <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
                 多作者文章可添加多个作者，自己为必选且不可移除
               </p>
-              <Select  onValueChange={(val) => handleAddAuthor(val)} value="">
-                <SelectTrigger  className="w-[200px]">
+              <Select onValueChange={(val) => handleAddAuthor(val)} value="">
+                <SelectTrigger className="w-[200px]" aria-label="选择作者添加">
                   <SelectValue placeholder="添加作者" />
                 </SelectTrigger>
-               <SelectContent>
+                <SelectContent>
                   <SelectGroup>
-                  {allUsers
-                    .filter(
+                    {allUsers
+                      .filter(
+                        (u) =>
+                          String(u.uid) !== myUid &&
+                          !selectedAuthors.includes(String(u.uid))
+                      )
+                      .map((user) => (
+                        <SelectItem key={user.uid} value={String(user.uid)}>
+                          {user.id} ({user.email})
+                        </SelectItem>
+                      ))}
+                    {allUsers.filter(
                       (u) =>
                         String(u.uid) !== myUid &&
                         !selectedAuthors.includes(String(u.uid))
-                    )
-                    .map((user) => (
-                      <SelectItem key={user.uid} value={String(user.uid)}>
-                        {user.id} ({user.email})
-                      </SelectItem>
-                    ))}
-                  {allUsers.filter(
-                    (u) =>
-                      String(u.uid) !== myUid &&
-                      !selectedAuthors.includes(String(u.uid))
-                  ).length === 0 && (
-                    <div className="p-2 text-sm text-gray-400">
-                      无更多作者可添加
-                    </div>
-                  )}
+                    ).length === 0 && (
+                      <div className="p-2 text-sm text-gray-400 dark:text-gray-500">
+                        无更多作者可添加
+                      </div>
+                    )}
                   </SelectGroup>
                 </SelectContent>
               </Select>
 
-              {/* 已选作者 */}
               <div className="mt-2 flex flex-wrap gap-2">
                 {selectedAuthors.map((uid) => {
                   const user = allUsers.find((u) => String(u.uid) === uid);
@@ -291,9 +296,11 @@ export default function DashboardNewPost() {
               </div>
             </div>
 
-            {/* 标签输入 */}
             <div className="mb-4">
-              <label htmlFor="tags" className="block mb-1 font-semibold">
+              <label
+                htmlFor="tags"
+                className="block mb-1 font-semibold text-foreground/90"
+              >
                 标签（可选）
               </label>
               <div className="flex gap-2">
@@ -316,10 +323,11 @@ export default function DashboardNewPost() {
                 </Button>
               </div>
 
-              {/* 已选标签展示 */}
               <div className="mt-2 flex flex-wrap gap-2">
                 {tags.length === 0 ? (
-                  <div className="text-sm text-gray-400">暂无标签，可添加标签</div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                    暂无标签，可添加标签
+                  </div>
                 ) : (
                   tags.map((tag) => (
                     <div
@@ -341,9 +349,11 @@ export default function DashboardNewPost() {
               </div>
             </div>
 
-            {/* 样式按钮 */}
             <div className="mb-2">
-              <label htmlFor="content" className="block mb-1 font-semibold">
+              <label
+                htmlFor="content"
+                className="block mb-1 font-semibold text-foreground/90"
+              >
                 内容
               </label>
               <FontStyleToggleGroup
@@ -355,7 +365,6 @@ export default function DashboardNewPost() {
               />
             </div>
 
-            {/* 内容编辑器 */}
             <PostContentEditor
               content={content}
               setContent={setContent}
@@ -364,7 +373,6 @@ export default function DashboardNewPost() {
               placeholder="请输入内容"
             />
 
-            {/* 发布 */}
             <div className="mb-4 flex items-center gap-2">
               <Checkbox
                 id="published"
@@ -372,18 +380,24 @@ export default function DashboardNewPost() {
                 onCheckedChange={(c) => setPublished(!!c)}
                 disabled={saving}
               />
-              <label htmlFor="published">立即发布</label>
+              <label htmlFor="published" className="text-foreground/90">
+                立即发布
+              </label>
             </div>
 
-            {/* 按钮 */}
             <div className="flex gap-2">
-              <Button onClick={handleCreate} disabled={saving}>
+              <Button
+                onClick={handleCreate}
+                disabled={saving}
+                className="disabled:opacity-50"
+              >
                 {saving ? "创建中..." : "创建"}
               </Button>
               <Button
                 onClick={handleCancel}
                 variant="outline"
                 disabled={saving}
+                className="disabled:opacity-50"
               >
                 取消
               </Button>
@@ -392,7 +406,6 @@ export default function DashboardNewPost() {
         </div>
       </div>
 
-      {/* 错误弹窗 */}
       <AlertDialog open={showErrorDialog} onOpenChange={setShowErrorDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>

@@ -48,19 +48,19 @@ export default function TagsMain() {
         )}
 
         {error && (
-          <span className="text-lg px-3 py-1 bg-red-100 text-red-700 rounded-full">{error}</span>
+          <span className="text-lg px-3 py-1 bg-accent text-accent-foreground rounded-full">{error}</span>
         )}
 
         {!loading && !error && (
           <div className="flex flex-wrap gap-2">
             {validTags.length === 0 ? (
-              <span className="text-lg px-3 py-1 bg-gray-100 text-gray-700 rounded-full">暂无标签</span>
+              <span className="text-lg px-3 py-1 bg-accent text-accent-foreground rounded-full">暂无标签</span>
             ) : (
               validTags.map(tag => (
                 <Link
                   key={tag.id}
                   href={`/tags/${encodeURIComponent(tag.name)}`}
-                  className="text-lg px-3 py-1 bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-colors duration-300"
+                  className="text-lg px-3 py-1 bg-accent text-accent-foreground rounded-full hover:bg-accent/80 transition-colors duration-300"
                 >
                   {tag.name} ({tag.postCount})
                 </Link>

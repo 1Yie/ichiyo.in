@@ -21,9 +21,14 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import md5 from "md5";
 
+import { useTheme } from "next-themes";
+import { IoDesktopOutline } from "react-icons/io5";
+import { MdOutlineDarkMode, MdOutlineLightMode } from "react-icons/md";
+
 export function NavUser() {
   const { isMobile } = useSidebar();
   const router = useRouter();
+  const { theme, setTheme } = useTheme();
 
   const [userInfo, setUserInfo] = React.useState<{
     name: string;
@@ -35,6 +40,7 @@ export function NavUser() {
     email: "",
     avatar: "",
   });
+
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
@@ -47,7 +53,7 @@ export function NavUser() {
             const email = data.user.email || "unknown@example.com";
             const name = data.user.id || "用户";
             const emailHash = md5(email.trim().toLowerCase());
-            const gravatarUrl = `https://www.gravatar.com/avatar/${emailHash}?d=identicon`;
+            const gravatarUrl = `https://dn-qiniu-avatar.qbox.me/avatar/${emailHash}?d=identicon`;
             setUserInfo({
               name,
               email,
@@ -78,7 +84,6 @@ export function NavUser() {
     router.replace("/login");
   };
 
-  // 提取管理员标识 JSX
   const adminFlag = userInfo.isAdmin ? (
     <span className="text-xs font-semibold text-red-600 bg-red-100 px-1 rounded">
       管理员
@@ -88,6 +93,24 @@ export function NavUser() {
       成员
     </span>
   );
+
+  const themeOptions = [
+    {
+      value: "system",
+      label: "跟随系统",
+      icon: <IoDesktopOutline size={20} />,
+    },
+    {
+      value: "light",
+      label: "浅色模式",
+      icon: <MdOutlineLightMode size={20} />,
+    },
+    {
+      value: "dark",
+      label: "深色模式",
+      icon: <MdOutlineDarkMode size={20} />,
+    },
+  ];
 
   return (
     <SidebarMenu>
@@ -127,6 +150,7 @@ export function NavUser() {
               )}
             </SidebarMenuButton>
           </DropdownMenuTrigger>
+
           <DropdownMenuContent
             className="min-w-[224px] rounded-lg"
             side={isMobile ? "bottom" : "right"}
@@ -160,9 +184,33 @@ export function NavUser() {
                 </div>
               )}
             </DropdownMenuLabel>
+
             {!loading && (
               <>
                 <DropdownMenuSeparator />
+
+                {/* 横排三图标 */}
+                <div className="flex justify-center gap-2">
+                  {themeOptions.map(({ value, icon }) => (
+                    <button
+                      key={value}
+                      title={value}
+                      onClick={() =>
+                        setTheme(value as "system" | "light" | "dark")
+                      }
+                      className={`p-1.5 rounded-md transition-colors ${
+                        theme === value
+                          ? "bg-accent text-accent-foreground"
+                          : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                      }`}
+                    >
+                      {icon}
+                    </button>
+                  ))}
+                </div>
+
+                <DropdownMenuSeparator />
+
                 <DropdownMenuItem onSelect={handleLogout}>
                   <LogOut />
                   退出登录
