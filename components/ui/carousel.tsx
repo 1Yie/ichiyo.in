@@ -129,7 +129,7 @@ const Slide = ({ slide, index, current, handleSlideClick }: SlideProps) => {
             src={src}
             onLoad={imageLoaded}
             loading="eager"
-            decoding="sync"
+            decoding="async"
             unoptimized
             fill
           />
