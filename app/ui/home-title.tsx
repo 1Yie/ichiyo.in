@@ -7,7 +7,7 @@ const words = ['边缘', 'CV战士', 'AI依赖症', '程序猿', 'BUG制造者',
 export default function Home() {
   return (
     <div className="border-b">
-      <section className="section-base p-3 bg-squares h-[40vh] sm:h-[60vh]">
+      <section className="section-base p-3 bg-squares h-[60vh] sm:h-[80vh]">
         <div className="flex flex-col justify-center items-center min-h-full text-center font-bold font-kinghwa">
           <SplitText
             text={"存活于二十一世纪互联网"}
