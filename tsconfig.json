@@ -20,7 +20,8 @@
     ],
     "paths": {
       "@/*": ["./*"],
-      "@/ui/*": ["./app/ui/*"]
+      "@/ui/*": ["./app/ui/*"],
+      "@/context/*": ["./context/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/api/login/[...nextauth].js", "app/ui/tags-params-title.tsx"],

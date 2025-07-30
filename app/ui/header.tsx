@@ -25,6 +25,7 @@ import {
 import { RxHamburgerMenu } from "react-icons/rx";
 import { FaRegUser } from "react-icons/fa";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
@@ -36,24 +37,19 @@ export default function Header() {
   const { theme, setTheme } = useTheme();
 
   const [user, setUser] = useState<null | { email: string; id: string }>(null);
-  const [, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchUser() {
       try {
         const res = await fetch("/api/me", { credentials: "include" });
-
-        // 明确处理401状态码
         if (res.status === 401) {
           setUser(null);
           return;
         }
-
-        // 其他错误情况
         if (!res.ok) {
           throw new Error("Failed to fetch user");
         }
-
         const data = await res.json();
         if (data.authenticated && data.user) {
           setUser(data.user);
@@ -112,7 +108,7 @@ export default function Header() {
 
   const emailHash = user?.email ? md5(user.email.trim().toLowerCase()) : "";
   const avatarUrl = user?.email
-    ? `https://dn-qiniu-avatar.qbox.me/avatar/${emailHash}?d=identicon&t=${Date.now()}`
+    ? `https://dn-qiniu-avatar.qbox.me/avatar/${emailHash}?d=identicon`
     : "";
 
   const handleLogout = async () => {
@@ -121,7 +117,6 @@ export default function Header() {
         method: "POST",
         credentials: "include",
       });
-
       if (res.ok) {
         setUser(null);
         router.refresh();
@@ -160,6 +155,7 @@ export default function Header() {
                     </NavigationMenuLink>
                   </NavigationMenuItem>
                 ))}
+
                 <NavigationMenuItem>
                   <DropdownMenu>
                     <DropdownMenuTrigger className="px-2 py-2.5 cursor-pointer hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground rounded-md transition-colors flex items-center gap-1 group">
@@ -192,24 +188,28 @@ export default function Header() {
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </NavigationMenuItem>
-                {/* 头像菜单 */}
+
                 <NavigationMenuItem>
                   <DropdownMenu>
                     <DropdownMenuTrigger className="px-2 py-1 hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground rounded-md transition-colors flex items-center gap-1 group cursor-pointer">
-                      <Avatar key={user ? user.id : "logged-out"}>
-                        {user ? (
-                          <AvatarImage
-                            src={avatarUrl}
-                            alt="User Avatar"
-                            onError={() => {
-                              // 如果头像加载失败，强制显示fallback
-                            }}
-                          />
-                        ) : null}
-                        <AvatarFallback>
-                          <FaRegUser className="text-muted-foreground" />
-                        </AvatarFallback>
-                      </Avatar>
+                      {loading ? (
+                        <Skeleton className="w-8 h-8 rounded-full" />
+                      ) : (
+                        <Avatar key={user ? user.id : "logged-out"}>
+                          {user ? (
+                            <AvatarImage
+                              src={avatarUrl}
+                              alt="User Avatar"
+                              onError={() => {
+                                /* 头像加载失败显示 fallback */
+                              }}
+                            />
+                          ) : null}
+                          <AvatarFallback>
+                            <FaRegUser className="text-muted-foreground" />
+                          </AvatarFallback>
+                        </Avatar>
+                      )}
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
                       align="center"
@@ -279,20 +279,24 @@ export default function Header() {
 
             <DropdownMenu>
               <DropdownMenuTrigger className="p-1.5 rounded-md hover:bg-accent hover:text-accent-foreground cursor-pointer transition-colors">
-                <Avatar className="w-6 h-6" key={user ? user.id : "logged-out"}>
-                  {user ? (
-                    <AvatarImage
-                      src={avatarUrl}
-                      alt="User Avatar"
-                      onError={() => {
-                        // 如果头像加载失败，强制显示fallback
-                      }}
-                    />
-                  ) : null}
-                  <AvatarFallback>
-                    <FaRegUser className="text-muted-foreground text-sm" />
-                  </AvatarFallback>
-                </Avatar>
+                {loading ? (
+                  <Skeleton className="w-6 h-6 rounded-full" />
+                ) : (
+                  <Avatar className="w-6 h-6" key={user ? user.id : "logged-out"}>
+                    {user ? (
+                      <AvatarImage
+                        src={avatarUrl}
+                        alt="User Avatar"
+                        onError={() => {
+                          /* 头像加载失败显示 fallback */
+                        }}
+                      />
+                    ) : null}
+                    <AvatarFallback>
+                      <FaRegUser className="text-muted-foreground text-sm" />
+                    </AvatarFallback>
+                  </Avatar>
+                )}
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="center"
