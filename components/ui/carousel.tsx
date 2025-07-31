@@ -7,8 +7,8 @@ interface SlideData {
   title: string;
   button?: string;
   src: string;
-  link?: string; // New optional link property
-  newTab?: boolean; // Whether to open link in new tab
+  link?: string;
+  newTab?: boolean;
 }
 
 interface SlideProps {
@@ -20,11 +20,11 @@ interface SlideProps {
 
 const Slide = ({ slide, index, current, handleSlideClick }: SlideProps) => {
   const slideRef = useRef<HTMLLIElement>(null);
-
   const xRef = useRef(0);
   const yRef = useRef(0);
   const frameRef = useRef<number>(0);
-  const [isExiting, setIsExiting] = useState(false);
+  const [isTouching, setIsTouching] = useState(false);
+  const [showContent, setShowContent] = useState(current === index);
 
   useEffect(() => {
     const animate = () => {
@@ -42,22 +42,47 @@ const Slide = ({ slide, index, current, handleSlideClick }: SlideProps) => {
     frameRef.current = requestAnimationFrame(animate);
 
     return () => {
-      if (frameRef.current) {
-        cancelAnimationFrame(frameRef.current);
-      }
+      if (frameRef.current) cancelAnimationFrame(frameRef.current);
     };
   }, []);
 
+  // 控制内容显示与隐藏，配合淡入淡出动画
+  useEffect(() => {
+    if (current === index) {
+      setShowContent(true);
+    } else {
+      const timer = setTimeout(() => setShowContent(false), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [current, index]);
+
   const handleMouseMove = (event: React.MouseEvent) => {
+    if (isTouching) return; // 触摸时忽略鼠标事件，避免冲突
     const el = slideRef.current;
     if (!el) return;
-
     const r = el.getBoundingClientRect();
-    xRef.current = event.clientX - (r.left + Math.floor(r.width / 2));
-    yRef.current = event.clientY - (r.top + Math.floor(r.height / 2));
+    xRef.current = event.clientX - (r.left + r.width / 2);
+    yRef.current = event.clientY - (r.top + r.height / 2);
   };
 
   const handleMouseLeave = () => {
+    if (isTouching) return;
+    xRef.current = 0;
+    yRef.current = 0;
+  };
+
+  const handleTouchMove = (event: React.TouchEvent) => {
+    setIsTouching(true);
+    const el = slideRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const touch = event.touches[0];
+    xRef.current = touch.clientX - (r.left + r.width / 2);
+    yRef.current = touch.clientY - (r.top + r.height / 2);
+  };
+
+  const handleTouchEnd = () => {
+    setIsTouching(false);
     xRef.current = 0;
     yRef.current = 0;
   };
@@ -79,25 +104,16 @@ const Slide = ({ slide, index, current, handleSlideClick }: SlideProps) => {
 
   const { src, button, title } = slide;
 
-  // Track when the slide is changing to trigger fade out
-  useEffect(() => {
-    if (current !== index) {
-      setIsExiting(true);
-      const timer = setTimeout(() => {
-        setIsExiting(false);
-      }, 300); // Match this with your transition duration
-      return () => clearTimeout(timer);
-    }
-  }, [current, index]);
-
   return (
     <div className="[perspective:1200px] [transform-style:preserve-3d]">
       <li
         ref={slideRef}
-        className="flex flex-1 flex-col items-center justify-center relative text-center text-white opacity-100 transition-all duration-300 ease-in-out w-[70vmin] h-[70vmin] mx-[4vmin] z-10 "
+        className="flex flex-1 flex-col items-center justify-center relative text-center text-white opacity-100 transition-all duration-300 ease-in-out w-[70vmin] h-[70vmin] mx-[4vmin] z-10"
         onClick={() => handleSlideClick(index)}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
         style={{
           transform: current !== index ? "scale(0.9)" : "scale(1)",
           transition: "transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
@@ -140,29 +156,29 @@ const Slide = ({ slide, index, current, handleSlideClick }: SlideProps) => {
           />
         </div>
 
-        <article
-          className={`relative p-[4vmin] z-100 transition-opacity duration-300 ease-in-out ${
-            current === index
-              ? "opacity-100 visible"
-              : isExiting
-              ? "opacity-0 visible"
-              : "opacity-0 invisible"
-          }`}
-        >
-          <h2 className="text-lg md:text-2xl lg:text-4xl font-semibold relative">
-            {title}
-          </h2>
-          {button && (
-            <div className="flex justify-center">
-              <button
-                className="cursor-pointer select-none mt-6 px-4 py-2 w-fit mx-auto sm:text-sm text-black bg-white hover:bg-gray-200  h-12 border border-transparent text-xs flex justify-center items-center rounded-2xl hover:shadow-lg transition duration-200 shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)]"
-                onClick={handleContentClick}
-              >
-                {button}
-              </button>
-            </div>
-          )}
-        </article>
+        {showContent && (
+          <article
+            className={`relative p-[4vmin] z-50 transition-opacity duration-300 ease-in-out ${
+              current === index
+                ? "opacity-100 pointer-events-auto"
+                : "opacity-0 pointer-events-none"
+            }`}
+          >
+            <h2 className="text-lg md:text-2xl lg:text-4xl font-semibold relative">
+              {title}
+            </h2>
+            {button && (
+              <div className="flex justify-center">
+                <button
+                  className="cursor-pointer select-none mt-6 px-4 py-2 w-fit mx-auto sm:text-sm text-black bg-white hover:bg-gray-200 h-12 border border-transparent text-xs flex justify-center items-center rounded-2xl hover:shadow-lg transition duration-200 shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)]"
+                  onClick={handleContentClick}
+                >
+                  {button}
+                </button>
+              </div>
+            )}
+          </article>
+        )}
       </li>
     </div>
   );
@@ -181,7 +197,7 @@ const CarouselControl = ({
 }: CarouselControlProps) => {
   return (
     <button
-      className={`w-10 h-10 flex items-center mx-2 justify-center bg-neutral-200 dark:bg-neutral-800 border-3 border-transparent rounded-full focus:border-[#6D64F7] focus:outline-none hover:-translate-y-0.5 active:translate-y-0.5 transition duration-200 ${
+      className={`cursor-pointer w-18 h-10 flex items-center mx-2 justify-center bg-neutral-200 dark:bg-neutral-800 border-3 border-transparent rounded-full focus:border-[var(--foreground)] focus:outline-none hover:-translate-y-0.5 active:translate-y-0.5 transition duration-200 ${
         type === "previous" ? "rotate-180" : ""
       }`}
       title={title}
@@ -198,6 +214,7 @@ interface CarouselProps {
 
 export function Carousel({ slides }: CarouselProps) {
   const [current, setCurrent] = useState(0);
+  const id = useId();
 
   const handlePreviousClick = () => {
     const previous = current - 1;
@@ -214,8 +231,6 @@ export function Carousel({ slides }: CarouselProps) {
       setCurrent(index);
     }
   };
-
-  const id = useId();
 
   return (
     <div
@@ -241,7 +256,6 @@ export function Carousel({ slides }: CarouselProps) {
 
       <div className="absolute flex justify-center w-full top-[calc(100%+1rem)]">
         <CarouselControl type="previous" handleClick={handlePreviousClick} />
-
         <CarouselControl type="next" handleClick={handleNextClick} />
       </div>
     </div>
