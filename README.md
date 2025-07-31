@@ -63,7 +63,31 @@ NEXT_PUBLIC_API_BASE_URL=http://localhost:3000
 
 #### **prisma/schema.prisma**
 
-数据库字段
+**数据库迁移**
+
+```bash
+# bun
+bun prisma migrate deploy
+# npm
+npm prisma migrate deploy
+# yarn
+yarn prisma migrate deploy
+# pnpm
+pnpm prisma migrate deploy
+```
+
+**生成数据库**
+
+```bash
+# bun
+bunx prisma generate
+# npm
+npmx prisma generate
+# yarn
+yarnx prisma generate
+# pnpm
+pnpmx prisma generate
+```
 
 ### 构建
 
