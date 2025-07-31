@@ -3,13 +3,13 @@ import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";
 import remarkRehype from "remark-rehype";
 import remarkAlerts from "remark-alerts";
+import remarkMath from "remark-math";
+import remarkDirective from "remark-directive";
+import rehypeKatex from "rehype-katex";
 import rehypeHighlight from "rehype-highlight";
 import rehypeStringify from "rehype-stringify";
-import remarkMath from "remark-math";
-import rehypeKatex from "rehype-katex";
-
 import { visit } from "unist-util-visit";
-import { Element as HastElement, Text as HastText } from "hast";
+import { Element as HastElement, Text as HastText, Root } from "hast";
 
 export async function parseMarkdown(markdown: string): Promise<string> {
   return processMarkdown(markdown, { withAnchors: true });
@@ -24,7 +24,11 @@ async function processMarkdown(
   options: { withAnchors: boolean }
 ): Promise<string> {
   try {
-    const processor = unified().use(remarkParse).use(remarkGfm);
+    const processor = unified()
+      .use(remarkParse)
+      .use(remarkGfm)
+      .use(remarkDirective)
+      .use(transformCenterDirective);
 
     if (options.withAnchors) {
       processor
@@ -48,8 +52,39 @@ async function processMarkdown(
   }
 }
 
+/*
+ 
+  自定义语法: 居中
+
+  示例:
+
+  :::center
+  你好！！！
+  :::
+
+ */
+function transformCenterDirective() {
+  return (tree: Root) => {
+    visit(
+      tree,
+      "containerDirective",
+      (node: {
+        type: string;
+        name: string;
+        data?: { hName?: string; hProperties?: { class: string } };
+      }) => {
+        if (node.type === "containerDirective" && node.name === "center") {
+          const data = node.data || (node.data = {});
+          data.hName = "div";
+          data.hProperties = { class: "text-center" };
+        }
+      }
+    );
+  };
+}
+
 function addHeadingAnchors() {
-  return (tree: import("hast").Root) => {
+  return (tree: Root) => {
     visit(tree, "element", (node: HastElement) => {
       if (/^h[1-6]$/.test(node.tagName)) {
         const text = node.children
