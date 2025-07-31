@@ -176,11 +176,11 @@
 code:not(pre code) {
   font-family: 'Source Code Pro', monospace;
   padding: 0px 4px;
-  background-color: var(--code-bg-color);
+  
   white-space: pre-wrap;
   word-wrap: break-word;
-
-  color: var(--code-color);
+  background: var(--accent) !important;
+  color: var(--accent-foreground) !important;
 }
 
 @layer base {
@@ -382,15 +382,15 @@ scrollbar-thumb {
     }
 
     blockquote {
-      background: linear-gradient(to top, var(--blockquote-color), var(--blockquote-to-color));
-      border-left: 5px solid var(--border-color);
+      background: linear-gradient(to left, var(--blockquote-color), var(--accent));
+      border-left: 5px solid var(--accent-foreground);
       padding-left: 10px;
       padding: 0.25rem 0 0.25rem 1rem;
       font-size: 18px;
       margin: 20px 10px;
 
       p {
-        color: var(--code-color);
+        color: var(--text-color);
       }
     }
 
@@ -404,8 +404,8 @@ scrollbar-thumb {
       font-family: 'Source Code Pro', monospace;
       padding: 20px;
       display: flex;
-      background: var(--code-pre-bg-color) !important;
-      color: var(--code-color) !important;
+      background: var(--accent) !important;
+      color: var(--accent-foreground) !important;
       white-space: no-wrap;
       word-wrap: break-word;
     }
@@ -507,6 +507,15 @@ scrollbar-thumb {
 
     }
 
+    .contains-task-list {
+      .task-list-item {
+        input {
+          background-color: var(--accent);
+          width: 16px;
+          height: 16px;
+        }
+      }
+    }
     
     kbd {
       background-color: var(--kbd-bg-color);
