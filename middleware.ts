@@ -1,13 +1,10 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { jwtVerify } from "jose";
-
-const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_key";
-const secret = new TextEncoder().encode(JWT_SECRET);
+import { verifyToken } from "@/lib/auth";
 
 async function isValidToken(token: string): Promise<boolean> {
   try {
-    await jwtVerify(token, secret);
+    await verifyToken(token);
     return true;
   } catch {
     return false;

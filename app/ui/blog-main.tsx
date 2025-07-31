@@ -5,7 +5,7 @@ import { useRouter } from "nextjs-toploader/app";
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 import { Tags, Rss } from "lucide-react";
-import BlogSearch from "./blog-search";
+import BlogSearch from "@/ui/blog-search";
 import {
   Pagination,
   PaginationContent,

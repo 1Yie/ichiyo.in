@@ -103,14 +103,15 @@ export function SecretInput({
           !webkitSupported && !show && "mask-char",
           className
         )}
-        style={
-          webkitSupported
-            ? ({
-                ...(style || {}),
-                WebkitTextSecurity: show ? "none" : "disc",
-              } as React.CSSProperties)
-            : style || {}
-        }
+        style={{
+          paddingRight: "2rem",
+          ...(webkitSupported
+            ? {
+              WebkitTextSecurity: show ? "none" : "disc",
+              ...(style || {}),
+            }
+            : style || {}),
+        }}
         value={webkitSupported ? value || "" : show ? realValue : maskedValue}
         onChange={handleChange}
         onPaste={webkitSupported ? props.onPaste : handlePaste}

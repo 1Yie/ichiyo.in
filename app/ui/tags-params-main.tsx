@@ -1,7 +1,19 @@
 "use client";
 
+import { useState, useMemo } from "react";
 import { useRouter } from "nextjs-toploader/app";
 import Link from "next/link";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import { Tags, Rss } from "lucide-react";
+import BlogSearch from "@/ui/blog-search";
 
 interface Post {
   id: number;
@@ -26,33 +38,64 @@ interface TagData {
   posts: Post[];
 }
 
+const postsPerPage = 6;
+
 export default function TagParams({ data }: { data: TagData }) {
   const router = useRouter();
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const sortedPosts = useMemo(() => {
+    return [...data.posts].sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+  }, [data.posts]);
+
+  const totalPosts = sortedPosts.length;
+  const totalPages = Math.ceil(totalPosts / postsPerPage);
+
+  const currentPosts = useMemo(() => {
+    const start = (currentPage - 1) * postsPerPage;
+    const end = start + postsPerPage;
+    return sortedPosts.slice(start, end);
+  }, [sortedPosts, currentPage]);
 
   return (
-    <div className="border-b">
-      <section className="section-base">
-        {data.posts.length === 0 ? (
-          <p className="p-4 text-center text-gray-500 dark:text-gray-400">
-            暂无相关文章
-          </p>
-        ) : (
-          <ul className="space-y-4">
-            {[...data.posts]
-              .sort(
-                (a, b) =>
-                  new Date(b.createdAt).getTime() -
-                  new Date(a.createdAt).getTime()
-              )
-              .map((post) => (
+    <>
+      <div className="border-b bg-diagonal-stripes-sm">
+        <section className="section-base flex flex-col sm:flex-row sm:justify-between px-4 py-3 sm:py-1.5 gap-3 sm:gap-0">
+          <div className="flex items-center justify-between sm:justify-start gap-4">
+            <Link href="/tags" className="flex items-center gap-1 text-lg">
+              <Tags size={19} />
+              Tags
+            </Link>
+            <Link href="/feed.xml" className="flex items-center gap-1 text-lg">
+              <Rss size={17} />
+              Rss
+            </Link>
+          </div>
+          <div className="w-full sm:w-auto sm:max-w-xs">
+            <BlogSearch />
+          </div>
+        </section>
+      </div>
+      <div className="border-b">
+        <section className="section-base">
+          {currentPosts.length === 0 ? (
+            <p className="p-4 text-center text-gray-500 dark:text-gray-400">
+              暂无相关文章
+            </p>
+          ) : (
+            <ul className="space-y-4">
+              {currentPosts.map((post) => (
                 <li key={post.id} className="m-0 p-0 border-b last:border-b-0">
-                  <div className="p-4 hover:bg-gray-50 dark:hover:bg-black transition-colors duration-300 cursor-pointer"
+                  <div
+                    className="p-4 hover:bg-gray-50 dark:hover:bg-black transition-colors duration-300 cursor-pointer"
                     onClick={() => router.push(`/blog/${post.slug}`)}
                   >
                     <p className="text-2xl font-semibold">
                       {post.title || post.slug}
                     </p>
-
                     <div className="flex flex-row gap-2 items-center justify-start flex-wrap">
                       {post.authors.length > 0 && (
                         <p className="text-lg text-gray-500 dark:text-gray-400">
@@ -69,7 +112,6 @@ export default function TagParams({ data }: { data: TagData }) {
                         {new Date(post.createdAt).toLocaleDateString()}
                       </p>
                     </div>
-
                     {post.tags.length > 0 && (
                       <div className="flex flex-wrap gap-2 mt-2">
                         {post.tags.map((tag) => (
@@ -88,9 +130,87 @@ export default function TagParams({ data }: { data: TagData }) {
                   </div>
                 </li>
               ))}
-          </ul>
+            </ul>
+          )}
+        </section>
+
+        {/* 分页器 */}
+        {totalPages > 1 && (
+          <div className="border-t">
+            <section className="section-base p-3">
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                      className={
+                        currentPage === 1
+                          ? "pointer-events-none opacity-50"
+                          : "cursor-pointer"
+                      }
+                    />
+                  </PaginationItem>
+
+                  {Array.from({ length: Math.min(5, totalPages) }).map((_, i) => {
+                    let pageNum: number;
+
+                    if (totalPages <= 5) {
+                      pageNum = i + 1;
+                    } else if (currentPage <= 3) {
+                      pageNum = i + 1;
+                    } else if (currentPage >= totalPages - 2) {
+                      pageNum = totalPages - 4 + i;
+                    } else {
+                      pageNum = currentPage - 2 + i;
+                    }
+
+                    return (
+                      <PaginationItem key={pageNum}>
+                        <PaginationLink
+                          onClick={() => setCurrentPage(pageNum)}
+                          isActive={currentPage === pageNum}
+                          className="cursor-pointer"
+                        >
+                          {pageNum}
+                        </PaginationLink>
+                      </PaginationItem>
+                    );
+                  })}
+
+                  {totalPages > 5 && currentPage < totalPages - 2 && (
+                    <>
+                      <PaginationItem>
+                        <PaginationEllipsis />
+                      </PaginationItem>
+                      <PaginationItem>
+                        <PaginationLink
+                          onClick={() => setCurrentPage(totalPages)}
+                          className="cursor-pointer"
+                        >
+                          {totalPages}
+                        </PaginationLink>
+                      </PaginationItem>
+                    </>
+                  )}
+
+                  <PaginationItem>
+                    <PaginationNext
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                      }
+                      className={
+                        currentPage === totalPages
+                          ? "pointer-events-none opacity-50"
+                          : "cursor-pointer"
+                      }
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </section>
+          </div>
         )}
-      </section>
-    </div>
+      </div>
+    </>
   );
 }
