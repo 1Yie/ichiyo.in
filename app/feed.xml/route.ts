@@ -1,8 +1,11 @@
 import RSS from "rss";
 import prisma from "@/lib/prisma";
+import { parseMarkdownForFeed } from "@/lib/markdown";
 
 export async function GET() {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
+  const baseUrl =
+    process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
+
   const feed = new RSS({
     title: "ichiyo | 博客",
     description: "ichiyo 的个人博客",
@@ -29,17 +32,18 @@ export async function GET() {
     },
   });
 
-  posts.forEach((post) => {
-    const plainText = post.content.replace(/<[^>]*>/g, "");
+  for (const post of posts) {
+    const html = await parseMarkdownForFeed(post.content);
+
     feed.item({
       title: post.title,
-      url: baseUrl + "/blog/" + post.slug,
+      url: `${baseUrl}/blog/${post.slug}`,
       guid: post.slug,
       date: post.updatedAt,
       categories: post.tags.map((tag) => tag.name),
-      description: plainText.slice(0, 200) + "...",
+      description: html,
     });
-  });
+  }
 
   return new Response(feed.xml(), {
     headers: { "content-type": "application/xml" },

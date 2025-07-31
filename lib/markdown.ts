@@ -9,15 +9,31 @@ import { visit } from "unist-util-visit";
 import { Element as HastElement, Text as HastText } from "hast";
 
 export async function parseMarkdown(markdown: string): Promise<string> {
+  return processMarkdown(markdown, { withAnchors: true });
+}
+
+export async function parseMarkdownForFeed(markdown: string): Promise<string> {
+  return processMarkdown(markdown, { withAnchors: false });
+}
+
+async function processMarkdown(
+  markdown: string,
+  options: { withAnchors: boolean }
+): Promise<string> {
   try {
-    const processor = unified()
-      .use(remarkParse)
-      .use(remarkGfm)
-      .use(remarkAlerts)
-      .use(remarkRehype, { allowDangerousHtml: true })
-      .use(rehypeHighlight)
-      .use(addHeadingAnchors)
-      .use(rehypeStringify, { allowDangerousHtml: true });
+    const processor = unified().use(remarkParse).use(remarkGfm);
+
+    if (options.withAnchors) {
+      processor
+        .use(remarkAlerts)
+        .use(remarkRehype, { allowDangerousHtml: true })
+        .use(rehypeHighlight)
+        .use(addHeadingAnchors);
+    } else {
+      processor.use(remarkRehype, { allowDangerousHtml: true });
+    }
+
+    processor.use(rehypeStringify, { allowDangerousHtml: true });
 
     const result = await processor.process(markdown);
     return result.toString();
