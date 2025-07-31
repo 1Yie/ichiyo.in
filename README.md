@@ -1,36 +1,136 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 个人主页
 
-## Getting Started
+基于 Next.js + Tailwind CSS 构建的个人主页
 
-First, run the development server:
+[[在线预览]](https://ichiyo.in)
+
+## 技术栈
+
+- Next.js
+- React
+- Tailwind CSS
+- TypeScript
+- Prisma
+
+## 部署
+
+### 本地部署
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
+git clone https://github.com/1Yie/ichiyo.in.git
+cd ichiyo.in
+# bun
+bun install
 bun dev
+# npm
+npm install
+npm run dev
+# yarn
+yarn install
+yarn dev
+# pnpm
+pnpm install
+pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+**配置文件**
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- `.env`
+- `.env.local`
+- `prisma/schema.prisma`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+#### **.env**
 
-## Learn More
+```env
+DATABASE_URL=""
+JWT_SECRET=""
+JWT_EXPIRES_IN=""
+REGISTER_KEY=""
+```
 
-To learn more about Next.js, take a look at the following resources:
+- `DATABASE_URL` 数据库地址
+- `JWT_SECRET` JWT 加密密钥
+- `JWT_EXPIRES_IN` JWT 过期时间
+- `REGISTER_KEY` 注册密钥
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+#### **.env.local**
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```env
+NEXT_PUBLIC_API_BASE_URL=http://localhost:3000
+```
 
-## Deploy on Vercel
+- `NEXT_PUBLIC_API_BASE_URL` 接口地址
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+#### **prisma/schema.prisma**
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+数据库字段
+
+### 构建
+
+```bash
+# bun
+bun run build
+# npm
+npm run build
+# yarn
+yarn build
+# pnpm
+pnpm build
+```
+
+### 启动
+
+```bash
+# bun
+bun run start
+# npm
+npm run start
+# yarn
+yarn start
+# pnpm
+pnpm start
+```
+
+#### 使用 `pm2` 启动
+
+**命令行**
+
+```bash
+# 安装 pm2
+npm install -g pm2
+# 启动项目
+pm2 start npm --name "ichiyo.in" -- start
+# 重启项目
+pm2 restart "ichiyo.in"
+# 停止项目
+pm2 stop "ichiyo.in"
+# 删除项目
+pm2 delete "ichiyo.in"
+```
+
+**ecosystem.config.js**
+
+```js
+module.exports = {
+  apps: [
+    {
+      name: "ichiyo.in",
+      script: "npm",
+      args: "start",
+      cwd: "/opt/ichiyo.in",
+      env: {
+        // NODE_ENV: "production",
+        DATABASE_URL: "file:./prod.db",
+        PORT: "3000",
+      },
+    },
+  ],
+};
+```
+
+**加载**
+
+```bash
+# 加载配置文件
+pm2 start ecosystem.config.js
+```

@@ -45,3 +45,7 @@ next-env.d.ts
 prisma/*.db
 prisma/prob.db
 prisma/dev.db
+
+# other
+
+commit.md
