@@ -5,6 +5,9 @@ import remarkRehype from "remark-rehype";
 import remarkAlerts from "remark-alerts";
 import rehypeHighlight from "rehype-highlight";
 import rehypeStringify from "rehype-stringify";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
+
 import { visit } from "unist-util-visit";
 import { Element as HastElement, Text as HastText } from "hast";
 
@@ -26,7 +29,9 @@ async function processMarkdown(
     if (options.withAnchors) {
       processor
         .use(remarkAlerts)
-        .use(remarkRehype, { allowDangerousHtml: true })
+        .use(remarkMath)
+        .use(remarkRehype, { allowDangerousHtml: true, math: true })
+        .use(rehypeKatex)
         .use(rehypeHighlight)
         .use(addHeadingAnchors);
     } else {

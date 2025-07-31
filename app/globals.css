@@ -65,13 +65,14 @@
   --blockquote-to-color: oklch(0.965 0 0);
   --code-pre-bg-color: oklch(0.965 0.002 255.4);
 
+  --kbd-bg-color: oklch(0.925 0.002 255.4);
+  --kbd-bg-border-color: oklch(0.785 0.002 255.4);
+
   --alert-warning-color: oklch(0.96 0.03 88);
   --alert-note-color: oklch(0.93 0.02 205);
   --alert-tip-color: oklch(0.93 0.01 135);
-  --alert-important-color: oklch(0.94 0.02 340);
-  --alert-caution-color: oklch(0.83 0.08 345);
-
-
+  --alert-important-color: oklch(0.94 0.05 15);
+  --alert-caution-color: oklch(0.83 0.15 15);
 
   --radius: 0.625rem;
   --background: oklch(1 0 0);
@@ -116,11 +117,14 @@
   --blockquote-to-color: oklch(0.205 0 0);
   --code-pre-bg-color: oklch(0.18 0.002 255.4);
 
-  --alert-warning-color: oklch(0.25 0.05 88);
-  --alert-note-color: oklch(0.20 0.03 205);
-  --alert-tip-color: oklch(0.20 0.02 135);
-  --alert-important-color: oklch(0.22 0.03 340);
-  --alert-caution-color: oklch(0.15 0.10 345);
+  --kbd-bg-color: oklch(0.35 0.002 255.4);
+  --kbd-bg-border-color: oklch(0.55 0.002 255.4);
+
+  --alert-warning-color: oklch(0.45 0.09 88);
+  --alert-note-color: oklch(0.48 0.05 205);
+  --alert-tip-color: oklch(0.45 0.04 135);
+  --alert-important-color: oklch(0.6 0.12 15);
+  --alert-caution-color: oklch(0.35 0.18 15);
 
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
@@ -230,7 +234,7 @@ scrollbar-thumb {
         transparent 20px);
   }
 
-  
+
   .bg-diagonal-stripes-sm {
     background-size: 100%;
     background-image: repeating-linear-gradient(45deg,
@@ -245,7 +249,7 @@ scrollbar-thumb {
   }
 
   .artalk {
-    
+
     border-radius: 0 !important;
 
     .atk-main-editor {
@@ -368,7 +372,7 @@ scrollbar-thumb {
     a {
       color: color-mix(in oklch, var(--accent-foreground), white 30%);
     }
-    
+
     a:hover {
       text-decoration: underline;
     }
@@ -414,15 +418,15 @@ scrollbar-thumb {
     }
 
     table {
-      color: var(--text-color);
-      background-color: var(--bg-border-color);
+      color: var(--accent-foreground);
+      background-color: var(--accent);
       width: 100%;
       border-collapse: collapse;
     }
 
     th,
     td {
-      border: 1px solid var(--border-color);
+      border: 1px solid var(--border);
       padding: 8px;
       text-align: left;
     }
@@ -499,10 +503,30 @@ scrollbar-thumb {
       p {
         font-size: 16px;
       }
+
+
+    }
+
+    
+    kbd {
+      background-color: var(--kbd-bg-color);
+      padding: 2px 4px;
+      border-radius: 4px;
+      font-size: 16px;
+
+      font-family: 'Source Code Pro', monospace;
+
+      border-bottom: 2px solid var(--kbd-bg-border-color);
+    }
+
+    .katex-html {
+      display: none;
+    }
+
+    math {
+      margin: 16px 0;
     }
   }
-
-
 }
 
 @layer components {
