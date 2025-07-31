@@ -352,19 +352,22 @@ scrollbar-thumb {
     }
 
     ul {
+      margin-bottom: 12px;
       font-size: 18px;
       list-style-type: disc !important;
     }
 
+
     li {
       margin-left: 25px;
     }
-
+`
     li::marker {
       color: var(--accent-foreground);
     }
 
     ol {
+      margin-bottom: 12px;
       font-size: 18px;
       list-style-type: decimal;
     }
