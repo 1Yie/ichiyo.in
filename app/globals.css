@@ -195,6 +195,11 @@ code:not(pre code) {
   }
 }
 
+* {
+  
+  scrollbar-color: var(--foreground) var(--accent);
+}
+
 ::-webkit-scrollbar,
 scrollbar {
   max-width: 10px;
@@ -361,7 +366,7 @@ scrollbar-thumb {
     li {
       margin-left: 25px;
     }
-`
+
     li::marker {
       color: var(--accent-foreground);
     }
