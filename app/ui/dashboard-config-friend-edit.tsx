@@ -136,7 +136,7 @@ function FriendForm({ friendPromise, id }: { friendPromise: Promise<Friend>; id:
         <div>
           <label className="block mb-2 font-semibold">社交地址</label>
           {socialLinks.map((link, index) => (
-            <div key={index} className="mb-3 border border-gray-300 rounded-lg p-3 relative">
+            <div key={index} className="mb-3 border border-foreground/20 shadow-xs rounded-lg p-3 relative transition-border duration-200 focus-within:border-foreground/50">
               {socialLinks.length > 1 && (
                 <button
                   type="button"
@@ -282,7 +282,7 @@ export default function DashboardConfigFriendEdit({ id }: DashboardConfigFriendE
 
                   {[...Array(1)].map((_, i) => (
                     <div key={`skeleton-${i}`}>
-                      <div className="mb-3 border border-gray-300 rounded-lg p-3 relative">
+                      <div className="mb-3 border border-foreground/20 shadow-xs rounded-lg p-3 relative transition-border duration-200 focus-within:border-foreground/50">
                         <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
                           <div>
                             <Skeleton className="h-5 w-18 mb-2" />
@@ -290,7 +290,7 @@ export default function DashboardConfigFriendEdit({ id }: DashboardConfigFriendE
                           </div>
                           <div>
                             <Skeleton className="h-5 w-18 mb-2" />
-                            <Skeleton className="h-8 flex-1 rounded-md" />
+                            <Skeleton className="h-8 flex-1 rounded-md" />  
                           </div>
                           <div>
                             <Skeleton className="h-5 w-18 mb-2" />

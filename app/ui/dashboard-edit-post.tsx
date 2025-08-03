@@ -65,19 +65,16 @@ async function fetchPostData(postId: number): Promise<PostData> {
       }),
     ]);
 
-    // 验证文章数据
     if (!postRes?.id) {
       toast.error("文章数据不完整或不存在");
       throw new Error("文章数据不完整或不存在");
     }
 
-    // 验证当前用户数据
     if (!meRes?.authenticated || !meRes.user?.uid) {
       toast.error("未获取到有效的用户信息，请重新登录");
       throw new Error("未获取到有效的用户信息，请重新登录");
     }
 
-    // 验证用户列表数据
     if (!usersRes?.users || !Array.isArray(usersRes.users)) {
       toast.error("用户列表数据格式不正确");
       throw new Error("用户列表数据格式不正确");
@@ -110,45 +107,38 @@ function DashboardEditPostInner({
 
   const { post, me, users } = use(postData);
 
-  // 状态初始化
   const [title, setTitle] = useState(post.title);
   const [slug, setSlug] = useState(post.slug || "");
   const [content, setContent] = useState(post.content);
   const [published, setPublished] = useState(post.published);
   const [saving, setSaving] = useState(false);
 
-  // 作者管理，确保当前用户必选且不可删除
   const [selectedAuthors, setSelectedAuthors] = useState<number[]>(() => {
     const authorsUid = post.authors.map((a) => a.user.uid);
     if (!authorsUid.includes(me.uid)) authorsUid.push(me.uid);
     return authorsUid;
   });
 
-  // 标签管理
   const [selectedTags, setSelectedTags] = useState<string[]>(post.tags?.map((t) => t.name) || []);
   const [tagInput, setTagInput] = useState("");
 
-  // 错误提示弹窗
   const [showErrorDialog, setShowErrorDialog] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [headingLevel, setHeadingLevel] = useState<string>("");
 
-  // 添加作者
   const handleAddAuthor = (uid: number) => {
     if (uid === me.uid) return;
     if (selectedAuthors.includes(uid)) return;
     setSelectedAuthors([...selectedAuthors, uid]);
   };
 
-  // 移除作者（不可移除自己）
   const handleRemoveAuthor = (uid: number) => {
     if (uid === me.uid) return;
     setSelectedAuthors(selectedAuthors.filter((id) => id !== uid));
   };
 
-  // 添加标签
   const handleAddTag = () => {
     const newTag = tagInput.trim();
     if (newTag && !selectedTags.includes(newTag)) {
@@ -157,12 +147,10 @@ function DashboardEditPostInner({
     setTagInput("");
   };
 
-  // 移除标签
   const handleRemoveTag = (tag: string) => {
     setSelectedTags(selectedTags.filter((t) => t !== tag));
   };
 
-  // 保存接口
   const handleSave = async () => {
     setSaving(true);
     try {

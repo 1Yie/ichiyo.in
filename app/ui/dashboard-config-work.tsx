@@ -37,15 +37,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { request } from "@/hooks/use-request";
+import type { Project } from "@/types/config";
 
-interface Project {
-  id: number;
-  name: string;
-  description: string;
-  link: string;
-  iconLight: string;
-  iconDark: string;
-}
 
 type SortField = "id" | "name" | "description" | "link" | "none";
 type SortOrder = "asc" | "desc";

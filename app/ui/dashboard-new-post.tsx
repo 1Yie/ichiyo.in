@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "nextjs-toploader/app";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 
@@ -36,7 +36,7 @@ import { FontStyleToggleGroup } from "@/ui/font-style-toggle-group";
 import { PostContentEditor } from "@/ui/post-content-editor";
 import { toast } from "sonner";
 import { request } from "@/hooks/use-request";
-import { Me, Users } from "@/types/user";
+import { Me, UsersResponse } from "@/types/user";
 
 export default function DashboardNewPost() {
   const router = useRouter();
@@ -62,36 +62,35 @@ export default function DashboardNewPost() {
   const [selectedAuthors, setSelectedAuthors] = useState<string[]>([]);
   const [usersLoaded, setUsersLoaded] = useState(false);
 
-  const loadUserData = async () => {
-    if (usersLoaded) return;
+  useEffect(() => {
+    const loadUserData = async () => {
+      if (usersLoaded) return;
 
-    try {
-      const meRes = await request<Me>("/api/me", { credentials: "include" });
-      const meData = meRes;
+      try {
+        const meRes = await request<Me>("/api/me", { credentials: "include" });
+        const meData = meRes;
 
-      if (meData?.authenticated && meData.user?.uid != null) {
-        const uid = String(meData.user.uid);
-        setMyUid(uid);
-        setSelectedAuthors([uid]);
+        if (meData?.authenticated && meData.user?.uid != null) {
+          const uid = String(meData.user.uid);
+          setMyUid(uid);
+          setSelectedAuthors([uid]);
+        }
+
+        const usersRes = await request<UsersResponse>("/api/users", { credentials: "include" });
+
+        if (usersRes && usersRes.users) {
+          setAllUsers(usersRes.users);
+        }
+
+        setUsersLoaded(true);
+      } catch (error) {
+        toast.error("加载用户数据失败");
+        console.error("加载用户数据失败:", error);
       }
+    };
 
-      const usersRes = await request<Users>("/api/users", { credentials: "include" });
-      const usersData = usersRes;
-
-      if (usersData) {
-        setAllUsers([usersData]);
-      }
-
-      setUsersLoaded(true);
-    } catch (error) {
-      toast.error("加载用户数据失败");
-      console.error("加载用户数据失败:", error);
-    }
-  };
-
-  const handleSelectOpen = () => {
     loadUserData();
-  };
+  }, [usersLoaded]);
 
   const handleAddAuthor = (uid: string) => {
     if (!selectedAuthors.includes(uid)) {
@@ -399,7 +398,7 @@ export default function DashboardNewPost() {
                 {saving ? "创建中..." : "创建"}
               </Button>
               <Button
-                onClick={handleSelectOpen}
+                onClick={() => router.push("/dashboard/post")}
                 variant="outline"
                 disabled={saving}
                 className="disabled:opacity-50"

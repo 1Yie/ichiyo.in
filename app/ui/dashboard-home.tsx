@@ -13,10 +13,7 @@ import { useRouter } from "nextjs-toploader/app";
 import { Suspense } from "react";
 import { use } from "react";
 import { toast } from "sonner";
-
-interface Friend {
-  pinned?: boolean;
-}
+import { Friend } from "@/types/config";
 
 async function fetchStats() {
   const [postRes, projectRes, picRes, friendRes] = await Promise.all([

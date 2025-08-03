@@ -35,3 +35,9 @@ export interface PostData {
   me: User;
   users: User[];
 }
+
+export interface CurrentUser {
+  uid: number;
+  email: string;
+  isAdmin: boolean;
+}

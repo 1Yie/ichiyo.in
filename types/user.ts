@@ -9,7 +9,15 @@ export interface Me {
 }
 
 export interface Users {
+  uid: number;
+  id: string;
+  email: string;
+}
+
+export interface UsersResponse {
+  users: {
     uid: number;
     id: string;
     email: string;
+  }[];
 }

@@ -36,31 +36,8 @@ import {
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
+import type { Post, CurrentUser } from "@/types/post";
 import { request } from "@/hooks/use-request";
-
-interface Post {
-  id: number;
-  slug: string;
-  title: string;
-  content?: string;
-  published: boolean;
-  createdAt: string;
-  updatedAt: string;
-
-  authors: {
-    user: {
-      id: string;
-      email: string;
-      uid: number;
-    };
-  }[];
-}
-
-interface CurrentUser {
-  uid: number;
-  email: string;
-  isAdmin: boolean;
-}
 
 interface PostsResponse {
   posts: Post[];
@@ -237,7 +214,7 @@ function PostList({ postsPromise }: { postsPromise: Promise<PostsResponse> }) {
                 {currentUser.isAdmin && (
                   <TableCell>
                     {post.authors.length > 0
-                      ? post.authors.map((author) => author.user.id).join(", ")
+                      ? post.authors.map((author) => author.id).join(", ")
                       : "匿名"}
                   </TableCell>
                 )}
