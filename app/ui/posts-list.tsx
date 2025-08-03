@@ -44,6 +44,7 @@ export default function PostsList({
 
   return (
     <>
+    <div className="border-b">
       <section className="section-base">
         {paginatedPosts.length === 0 ? (
           <p className="p-4 text-center text-gray-500 dark:text-gray-400">暂无文章</p>
@@ -92,9 +93,10 @@ export default function PostsList({
           </ul>
         )}
       </section>
+      </div>
 
       {totalPosts > postsPerPage && (
-        <div className="border-t">
+        <div className="border-b">
           <section className="section-base p-3">
             <Pagination>
               <PaginationContent>
