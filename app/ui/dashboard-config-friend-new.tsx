@@ -24,7 +24,7 @@ import {
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
 import { CircleX } from "lucide-react";
-import { ImageUrlWithPreview } from "@/ui/ImageUrlWithPreview";
+import { ImageUrlWithPreview } from "@/app/ui/image-url-with-preview";
 import { Checkbox } from "@/components/ui/checkbox";
 import { request } from "@/hooks/use-request";
 import type { Friend } from "@/types/config";
@@ -177,7 +177,7 @@ export default function DashboardConfigFriendNew() {
                 {socialLinks.map((link, index) => (
                   <div
                     key={index}
-                    className="mb-3 border border-gray-300 rounded-lg p-3 relative"
+                    className="mb-3 border border-foreground/20 shadow-xs rounded-lg p-3 relative transition-border duration-200 focus-within:border-foreground/50"
                   >
                     {socialLinks.length > 1 && (
                       <button

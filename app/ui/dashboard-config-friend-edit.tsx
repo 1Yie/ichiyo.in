@@ -24,7 +24,7 @@ import {
   AlertDialogFooter,
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
-import { ImageUrlWithPreview } from "@/ui/ImageUrlWithPreview";
+import { ImageUrlWithPreview } from "@/app/ui/image-url-with-preview";
 import { CircleX } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";

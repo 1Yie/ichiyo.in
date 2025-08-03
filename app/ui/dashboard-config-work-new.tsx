@@ -23,7 +23,7 @@ import {
   AlertDialogFooter,
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
-import { ImageUrlWithPreview } from "@/ui/ImageUrlWithPreview";
+import { ImageUrlWithPreview } from "@/app/ui/image-url-with-preview";
 import { toast } from "sonner";
 import { request } from "@/hooks/use-request";
 

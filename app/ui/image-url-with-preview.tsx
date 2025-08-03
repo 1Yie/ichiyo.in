@@ -20,6 +20,7 @@ export function ImageUrlWithPreview({
   const [imageLoaded, setImageLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
 
+  const hasPreview = preview.trim() !== "";
   // 防抖更新 preview
   useEffect(() => {
     setImageLoaded(false);
@@ -61,7 +62,7 @@ export function ImageUrlWithPreview({
       </div>
 
       {/* 图片预览区域 */}
-      <div className="w-48 h-32 relative flex items-center justify-center rounded-lg border border-gray-200 overflow-hidden bg-white">
+      <div className="bg-muted w-48 h-32 relative flex items-center justify-center rounded-lg border border-foreground/20 overflow-hidden">
         {/* 正常显示图片 */}
         {!loading && preview && !hasError && (
           <Image
@@ -79,7 +80,7 @@ export function ImageUrlWithPreview({
         )}
 
         {/* 骨架屏遮罩 */}
-        {(loading || (!imageLoaded && !hasError)) && (
+        {(loading || (hasPreview && !imageLoaded && !hasError)) && (
           <div className="absolute inset-0">
             <Skeleton className="w-full h-full" />
           </div>
@@ -93,8 +94,8 @@ export function ImageUrlWithPreview({
         )}
 
         {/* 无图片预览时 */}
-        {!src.trim() && !loading && (
-          <span className="text-xs text-gray-400 absolute">无预览</span>
+        {!hasPreview && !loading && (
+          <span className="text-xs text-muted-foreground absolute">无预览</span>
         )}
       </div>
     </div>

@@ -4,7 +4,7 @@ import { Suspense, use } from "react";
 import { useState } from "react";
 import { useRouter } from "nextjs-toploader/app";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
-import { ImageUrlWithPreview } from "@/ui/ImageUrlWithPreview";
+import { ImageUrlWithPreview } from "@/app/ui/image-url-with-preview";
 
 import {
   Breadcrumb,
