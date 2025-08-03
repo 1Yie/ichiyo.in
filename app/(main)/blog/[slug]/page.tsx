@@ -14,7 +14,6 @@ export async function generateMetadata({
   const realParams = await params;
 
   const res = request<Post>(`/api/post/bySlug/${realParams.slug}`, {
-    next: { revalidate: 60 },
   });
 
 

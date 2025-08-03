@@ -55,6 +55,7 @@ async function fetchPostsData(): Promise<PostsResponse> {
     params: { summary: true },
   });
 }
+
 function PostList({ postsPromise }: { postsPromise: Promise<PostsResponse> }) {
   const { posts: initialPosts, currentUser } = use(postsPromise);
 

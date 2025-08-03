@@ -11,6 +11,7 @@ import Header from "@/app/ui/header";
 import Footer from "@/app/ui/footer";
 import { ThemeProvider } from "next-themes";
 import FaviconSwitcher from "@/lib/favicon-switcher";
+import { UserProvider } from "@/contexts/user-context";
 
 export const metadata: Metadata = {
   title: "ichiyo (@1Yie)",
@@ -47,23 +48,25 @@ export default async function RootLayout({
       >
         <ClientThemeWrapper>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem enableColorScheme={false}>
-            <FaviconSwitcher />
-            <ImageZoom />
-            <NextTopLoader
-              color="var(--foreground)"
-              initialPosition={0.08}
-              crawlSpeed={200}
-              height={3}
-              crawl={true}
-              showSpinner={false}
-              zIndex={9999}
-              easing="ease"
-              speed={200}
-              shadow="0 0 10px var(--foreground),0 0 5px var(--foreground)"
-            />
-            <Header />
-            {children}
-            <Footer />
+            <UserProvider>
+              <FaviconSwitcher />
+              <ImageZoom />
+              <NextTopLoader
+                color="var(--foreground)"
+                initialPosition={0.08}
+                crawlSpeed={200}
+                height={3}
+                crawl={true}
+                showSpinner={false}
+                zIndex={9999}
+                easing="ease"
+                speed={200}
+                shadow="0 0 10px var(--foreground),0 0 5px var(--foreground)"
+              />
+              <Header />
+              {children}
+              <Footer />
+            </UserProvider>
           </ThemeProvider>
         </ClientThemeWrapper>
       </body>

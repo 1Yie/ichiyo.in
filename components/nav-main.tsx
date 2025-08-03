@@ -48,7 +48,7 @@ export function NavMain({
             className="group/collapsible"
           >
             <SidebarMenuItem>
-              <CollapsibleTrigger asChild>
+              <CollapsibleTrigger asChild className="cursor-pointer">
                 <SidebarMenuButton tooltip={item.title}>
                   {item.icon && <item.icon />}
                   <span>{item.title}</span>
@@ -60,7 +60,7 @@ export function NavMain({
                   {item.items?.map((subItem) => (
                     <SidebarMenuSubItem key={subItem.title}>
                       <SidebarMenuSubButton asChild>
-                        <button className="flex w-full" onClick={() => router.push(subItem.url)}>
+                        <button className="flex w-full cursor-pointer" onClick={() => router.push(subItem.url)}>
                           <span>{subItem.title}</span>
                         </button>
                       </SidebarMenuSubButton>

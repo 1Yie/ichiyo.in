@@ -7,7 +7,7 @@ import { AppSidebar } from "@/ui/app-sidebar";
 import { Toaster } from "@/components/ui/sonner"
 import NextTopLoader from "nextjs-toploader";
 import ClientThemeWrapper from "./client-theme-wrapper";
-
+import { UserProvider } from "@/contexts/user-context";
 import { ThemeProvider } from "next-themes";
 import FaviconSwitcher from "@/lib/favicon-switcher";
 
@@ -51,24 +51,26 @@ export default async function RootLayout({
             enableSystem
             enableColorScheme={false}
           >
-            <FaviconSwitcher />
-            <SidebarProvider>
-              <NextTopLoader
-                color="var(--foreground)"
-                initialPosition={0.08}
-                crawlSpeed={200}
-                height={3}
-                crawl={true}
-                showSpinner={false}
-                zIndex={9999}
-                easing="ease"
-                speed={200}
-                shadow="0 0 10px var(--foreground),0 0 5px var(--foreground)"
-              />
-              <AppSidebar />
-              <Toaster richColors position="top-center" />
-              {children}
-            </SidebarProvider>
+            <UserProvider>
+              <FaviconSwitcher />
+              <SidebarProvider>
+                <NextTopLoader
+                  color="var(--foreground)"
+                  initialPosition={0.08}
+                  crawlSpeed={200}
+                  height={3}
+                  crawl={true}
+                  showSpinner={false}
+                  zIndex={9999}
+                  easing="ease"
+                  speed={200}
+                  shadow="0 0 10px var(--foreground),0 0 5px var(--foreground)"
+                />
+                <AppSidebar />
+                <Toaster richColors position="top-center" />
+                {children}
+              </SidebarProvider>
+            </UserProvider>
           </ThemeProvider>
         </ClientThemeWrapper>
       </body>

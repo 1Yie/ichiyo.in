@@ -233,15 +233,21 @@ function DashboardEditPostInner({
 
           <SelectContent>
             <SelectGroup>
-              {users.length > 0 ? (
-                users.map(user => (
-                  <SelectItem key={user.uid} value={user.uid.toString()}>
-                    {user.id} ({user.email})
-                  </SelectItem>
-                ))
+              {users.filter(
+                (user) => user.uid !== me.uid && !selectedAuthors.includes(user.uid)
+              ).length > 0 ? (
+                users
+                  .filter(
+                    (user) => user.uid !== me.uid && !selectedAuthors.includes(user.uid)
+                  )
+                  .map((user) => (
+                    <SelectItem key={user.uid} value={user.uid.toString()}>
+                      {user.id} ({user.email})
+                    </SelectItem>
+                  ))
               ) : (
                 <div className="p-1 text-sm text-gray-500">
-                  {users.length === 0 ? "用户列表为空" : "无更多作者可添加"}
+                  无更多作者可添加
                 </div>
               )}
             </SelectGroup>

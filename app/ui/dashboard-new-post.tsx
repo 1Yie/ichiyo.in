@@ -249,7 +249,7 @@ export default function DashboardNewPost() {
                     {allUsers
                       .filter(
                         (u) =>
-                          String(u.uid) !== myUid &&
+                          String(u.uid) != myUid &&
                           !selectedAuthors.includes(String(u.uid))
                       )
                       .map((user) => (

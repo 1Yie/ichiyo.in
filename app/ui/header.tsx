@@ -29,41 +29,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
-import md5 from "md5";
+import { useUser } from "@/contexts/user-context";
 
 export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const { theme, setTheme } = useTheme();
 
-  const [user, setUser] = useState<null | { email: string; id: string }>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchUser() {
-      try {
-        const res = await fetch("/api/me", { credentials: "include" });
-        if (res.status === 401) {
-          setUser(null);
-          return;
-        }
-        if (!res.ok) {
-          throw new Error("Failed to fetch user");
-        }
-        const data = await res.json();
-        if (data.authenticated && data.user) {
-          setUser(data.user);
-        } else {
-          setUser(null);
-        }
-      } catch {
-        setUser(null);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchUser();
-  }, []);
+  const { userInfo, loading, logout, isAuthenticated } = useUser();
 
   const navItems = [
     { href: "/", label: "首页" },
@@ -106,24 +79,69 @@ export default function Header() {
     { value: "dark", label: "深色模式", icon: <MdOutlineDarkMode size={18} /> },
   ];
 
-  const emailHash = user?.email ? md5(user.email.trim().toLowerCase()) : "";
-  const avatarUrl = user?.email
-    ? `https://dn-qiniu-avatar.qbox.me/avatar/${emailHash}?d=identicon`
-    : "";
+  const avatarUrl = userInfo?.avatar || "";
 
   const handleLogout = async () => {
     try {
-      const res = await fetch("/api/logout", {
-        method: "POST",
-        credentials: "include",
-      });
-      if (res.ok) {
-        setUser(null);
-        router.refresh();
-      }
+      await logout();
     } catch (error) {
       console.error("Logout failed:", error);
     }
+  };
+
+  const UserAvatar = ({ size = "default" }: { size?: "default" | "small" }) => {
+    const avatarClass = size === "small" ? "w-6 h-6" : "w-8 h-8";
+    const iconClass = size === "small" ? "text-sm" : "";
+
+    return (
+      <Avatar className={avatarClass} key={isAuthenticated ? userInfo?.email : "logged-out"}>
+        {isAuthenticated && userInfo ? (
+          <AvatarImage
+            src={avatarUrl}
+            alt={userInfo.name}
+            onError={() => {
+              /* 头像加载失败显示 fallback */
+            }}
+          />
+        ) : null}
+        <AvatarFallback>
+          <FaRegUser className={`text-muted-foreground ${iconClass}`} />
+        </AvatarFallback>
+      </Avatar>
+    );
+  };
+
+  const UserMenuItems = () => {
+    if (isAuthenticated && userInfo) {
+      return (
+        <>
+          <DropdownMenuItem
+            onClick={() => router.push("/dashboard")}
+            className="text-muted-foreground cursor-pointer transition-colors duration-200 hover:bg-accent hover:text-accent-foreground flex items-center gap-2"
+          >
+            <RiDashboard3Line size={18} />
+            仪表盘
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={handleLogout}
+            className="text-muted-foreground cursor-pointer transition-colors duration-200 hover:bg-accent hover:text-accent-foreground flex items-center gap-2"
+          >
+            <MdOutlineLogout size={18} />
+            退出登录
+          </DropdownMenuItem>
+        </>
+      );
+    }
+
+    return (
+      <DropdownMenuItem
+        onClick={() => router.push("/login")}
+        className="text-muted-foreground cursor-pointer transition-colors duration-200 hover:bg-accent hover:text-accent-foreground flex items-center gap-2"
+      >
+        <MdOutlineLogin size={18} />
+        登录
+      </DropdownMenuItem>
+    );
   };
 
   return (
@@ -144,11 +162,10 @@ export default function Header() {
                     <NavigationMenuLink asChild>
                       <Link
                         href={item.href}
-                        className={`px-4 py-2 transition-colors duration-200 ${
-                          pathname === item.href
+                        className={`px-4 py-2 transition-colors duration-200 ${pathname === item.href
                             ? "bg-accent text-accent-foreground"
                             : ""
-                        }`}
+                          }`}
                       >
                         {item.label}
                       </Link>
@@ -172,11 +189,10 @@ export default function Header() {
                       {themeOptions.map(({ value, label, icon }) => (
                         <DropdownMenuItem
                           key={value}
-                          className={`cursor-pointer flex items-center gap-2 transition-colors duration-200 ${
-                            theme === value
+                          className={`cursor-pointer flex items-center gap-2 transition-colors duration-200 ${theme === value
                               ? "bg-accent text-accent-foreground font-semibold"
                               : "text-muted-foreground"
-                          }`}
+                            }`}
                           onClick={() =>
                             setTheme(value as "system" | "light" | "dark")
                           }
@@ -195,51 +211,20 @@ export default function Header() {
                       {loading ? (
                         <Skeleton className="w-8 h-8 rounded-full" />
                       ) : (
-                        <Avatar key={user ? user.id : "logged-out"}>
-                          {user ? (
-                            <AvatarImage
-                              src={avatarUrl}
-                              alt="User Avatar"
-                              onError={() => {
-                                /* 头像加载失败显示 fallback */
-                              }}
-                            />
-                          ) : null}
-                          <AvatarFallback>
-                            <FaRegUser className="text-muted-foreground" />
-                          </AvatarFallback>
-                        </Avatar>
+                        <UserAvatar />
                       )}
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
                       align="center"
                       className="min-w-[110px] mx-2 space-y-1"
                     >
-                      {user ? (
-                        <>
-                          <DropdownMenuItem
-                            onClick={() => router.push("/dashboard")}
-                            className="text-muted-foreground cursor-pointer transition-colors duration-200 hover:bg-accent hover:text-accent-foreground flex items-center gap-2"
-                          >
-                            <RiDashboard3Line size={18} />
-                            仪表盘
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={handleLogout}
-                            className="text-muted-foreground cursor-pointer transition-colors duration-200 hover:bg-accent hover:text-accent-foreground flex items-center gap-2"
-                          >
-                            <MdOutlineLogout size={18} />
-                            退出登录
-                          </DropdownMenuItem>
-                        </>
+                      {loading ? (
+                        <div className="p-2">
+                          <Skeleton className="h-4 w-16 mb-2" />
+                          <Skeleton className="h-4 w-20" />
+                        </div>
                       ) : (
-                        <DropdownMenuItem
-                          onClick={() => router.push("/login")}
-                          className="text-muted-foreground cursor-pointer transition-colors duration-200 hover:bg-accent hover:text-accent-foreground"
-                        >
-                          <MdOutlineLogin size={18} />
-                          登录
-                        </DropdownMenuItem>
+                        <UserMenuItems />
                       )}
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -248,7 +233,6 @@ export default function Header() {
             </NavigationMenu>
           </nav>
 
-          {/* 移动端 */}
           <nav className="sm:hidden flex items-center gap-1">
             <DropdownMenu>
               <DropdownMenuTrigger className="p-2 rounded-md hover:bg-accent hover:text-accent-foreground cursor-pointer transition-colors">
@@ -261,11 +245,10 @@ export default function Header() {
                 {themeOptions.map(({ value, label, icon }) => (
                   <DropdownMenuItem
                     key={value}
-                    className={`cursor-pointer flex items-center gap-2 transition-colors duration-200 ${
-                      theme === value
+                    className={`cursor-pointer flex items-center gap-2 transition-colors duration-200 ${theme === value
                         ? "bg-accent text-accent-foreground font-semibold"
                         : "text-muted-foreground"
-                    }`}
+                      }`}
                     onClick={() =>
                       setTheme(value as "system" | "light" | "dark")
                     }
@@ -282,51 +265,20 @@ export default function Header() {
                 {loading ? (
                   <Skeleton className="w-6 h-6 rounded-full" />
                 ) : (
-                  <Avatar className="w-6 h-6" key={user ? user.id : "logged-out"}>
-                    {user ? (
-                      <AvatarImage
-                        src={avatarUrl}
-                        alt="User Avatar"
-                        onError={() => {
-                          /* 头像加载失败显示 fallback */
-                        }}
-                      />
-                    ) : null}
-                    <AvatarFallback>
-                      <FaRegUser className="text-muted-foreground text-sm" />
-                    </AvatarFallback>
-                  </Avatar>
+                  <UserAvatar size="small" />
                 )}
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="center"
                 className="min-w-[110px] mx-2 space-y-1"
               >
-                {user ? (
-                  <>
-                    <DropdownMenuItem
-                      onClick={() => router.push("/dashboard")}
-                      className="text-muted-foreground cursor-pointer transition-colors duration-200 hover:bg-accent hover:text-accent-foreground flex items-center gap-2"
-                    >
-                      <RiDashboard3Line size={18} />
-                      仪表盘
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={handleLogout}
-                      className="text-muted-foreground cursor-pointer transition-colors duration-200 hover:bg-accent hover:text-accent-foreground flex items-center gap-2"
-                    >
-                      <MdOutlineLogout size={18} />
-                      退出登录
-                    </DropdownMenuItem>
-                  </>
+                {loading ? (
+                  <div className="p-2">
+                    <Skeleton className="h-4 w-16 mb-2" />
+                    <Skeleton className="h-4 w-20" />
+                  </div>
                 ) : (
-                  <DropdownMenuItem
-                    onClick={() => router.push("/login")}
-                    className="text-muted-foreground cursor-pointer transition-colors duration-200 hover:bg-accent hover:text-accent-foreground flex items-center gap-2"
-                  >
-                    <MdOutlineLogin size={18} />
-                    登录
-                  </DropdownMenuItem>
+                  <UserMenuItems />
                 )}
               </DropdownMenuContent>
             </DropdownMenu>
@@ -343,11 +295,10 @@ export default function Header() {
                   <DropdownMenuItem key={item.href} asChild>
                     <Link
                       href={item.href}
-                      className={`cursor-pointer flex items-center justify-center transition-colors duration-200 ${
-                        pathname === item.href
+                      className={`cursor-pointer flex items-center justify-center transition-colors duration-200 ${pathname === item.href
                           ? "bg-accent text-accent-foreground font-semibold"
                           : "text-muted-foreground"
-                      }`}
+                        }`}
                     >
                       {item.label}
                     </Link>

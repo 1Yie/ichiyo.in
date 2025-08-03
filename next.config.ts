@@ -9,6 +9,9 @@ const nextConfig: NextConfig = {
       "iph.href.lu"
     ],
   },
+  experimental: {
+    reactCompiler: true
+  },
   async rewrites() {
     return [
       {

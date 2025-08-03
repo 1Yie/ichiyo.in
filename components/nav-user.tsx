@@ -1,7 +1,3 @@
-"use client";
-
-import * as React from "react";
-import { useRouter } from "next/navigation";
 import { ChevronsUpDown, LogOut } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -19,72 +15,35 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
-import md5 from "md5";
-
 import { useTheme } from "next-themes";
 import { IoDesktopOutline } from "react-icons/io5";
 import { MdOutlineDarkMode, MdOutlineLightMode } from "react-icons/md";
+import { useUser } from "@/contexts/user-context";
 
 export function NavUser() {
   const { isMobile } = useSidebar();
-  const router = useRouter();
   const { theme, setTheme } = useTheme();
+  const { userInfo, loading, logout, error, refreshUser } = useUser();
 
-  const [userInfo, setUserInfo] = React.useState<{
-    name: string;
-    email: string;
-    avatar: string;
-    isAdmin?: boolean;
-  }>({
-    name: "",
-    email: "",
-    avatar: "",
-  });
+  if (error && !userInfo) {
+    return (
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <div className="p-4 text-center">
+            <p className="text-sm text-red-600 mb-2">加载失败</p>
+            <button
+              onClick={refreshUser}
+              className="text-xs text-blue-600 hover:underline"
+            >
+              重试
+            </button>
+          </div>
+        </SidebarMenuItem>
+      </SidebarMenu>
+    );
+  }
 
-  const [loading, setLoading] = React.useState(true);
-
-  React.useEffect(() => {
-    async function fetchUser() {
-      try {
-        const res = await fetch("/api/me", { credentials: "include" });
-        if (res.ok) {
-          const data = await res.json();
-          if (data.authenticated) {
-            const email = data.user.email || "unknown@example.com";
-            const name = data.user.id || "用户";
-            const emailHash = md5(email.trim().toLowerCase());
-            const gravatarUrl = `https://dn-qiniu-avatar.qbox.me/avatar/${emailHash}?d=identicon`;
-            setUserInfo({
-              name,
-              email,
-              avatar: gravatarUrl,
-              isAdmin: data.user.isAdmin,
-            });
-          } else {
-            router.replace("/login");
-          }
-        } else {
-          router.replace("/login");
-        }
-      } catch {
-        router.replace("/login");
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchUser();
-  }, [router]);
-
-  const handleLogout = async () => {
-    await fetch("/api/logout", {
-      method: "POST",
-      credentials: "include",
-    });
-    router.replace("/login");
-  };
-
-  const adminFlag = userInfo.isAdmin ? (
+  const adminFlag = userInfo?.isAdmin ? (
     <span className="text-xs font-semibold text-red-600 bg-red-100 px-1 rounded">
       管理员
     </span>
@@ -131,22 +90,24 @@ export function NavUser() {
                   <Skeleton className="h-4 w-4 ml-auto" />
                 </>
               ) : (
-                <>
-                  <Avatar className="h-8 w-8 rounded-lg">
-                    <AvatarImage src={userInfo.avatar} alt={userInfo.name} />
-                    <AvatarFallback className="rounded-lg">
-                      {userInfo.name.charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="grid flex-1 text-left text-sm leading-tight px-2">
-                    <span className="truncate font-medium flex items-center gap-1">
-                      {userInfo.name}
-                      {adminFlag}
-                    </span>
-                    <span className="truncate text-xs">{userInfo.email}</span>
-                  </div>
-                  <ChevronsUpDown className="ml-auto size-4" />
-                </>
+                userInfo && (
+                  <>
+                    <Avatar className="h-8 w-8 rounded-lg">
+                      <AvatarImage src={userInfo.avatar} alt={userInfo.name} />
+                      <AvatarFallback className="rounded-lg">
+                        {userInfo.name.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="grid flex-1 text-left text-sm leading-tight px-2">
+                      <span className="truncate font-medium flex items-center gap-1">
+                        {userInfo.name}
+                        {adminFlag}
+                      </span>
+                      <span className="truncate text-xs">{userInfo.email}</span>
+                    </div>
+                    <ChevronsUpDown className="ml-auto size-4" />
+                  </>
+                )
               )}
             </SidebarMenuButton>
           </DropdownMenuTrigger>
@@ -167,30 +128,32 @@ export function NavUser() {
                   </div>
                 </div>
               ) : (
-                <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                  <Avatar className="h-8 w-8 rounded-lg">
-                    <AvatarImage src={userInfo.avatar} alt={userInfo.name} />
-                    <AvatarFallback className="rounded-lg">
-                      {userInfo.name.charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-medium flex items-center gap-1">
-                      {userInfo.name}
-                      {adminFlag}
-                    </span>
-                    <span className="truncate text-xs">{userInfo.email}</span>
+                userInfo && (
+                  <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                    <Avatar className="h-8 w-8 rounded-lg">
+                      <AvatarImage src={userInfo.avatar} alt={userInfo.name} />
+                      <AvatarFallback className="rounded-lg">
+                        {userInfo.name.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="grid flex-1 text-left text-sm leading-tight">
+                      <span className="truncate font-medium flex items-center gap-1">
+                        {userInfo.name}
+                        {adminFlag}
+                      </span>
+                      <span className="truncate text-xs">{userInfo.email}</span>
+                    </div>
                   </div>
-                </div>
+                )
               )}
             </DropdownMenuLabel>
 
-            {!loading && (
+            {!loading && userInfo && (
               <>
                 <DropdownMenuSeparator />
 
                 {/* 横排三图标 */}
-                <div className="flex justify-center gap-2">
+                <div className="flex justify-center gap-2 py-2">
                   {themeOptions.map(({ value, icon }) => (
                     <button
                       key={value}
@@ -211,7 +174,7 @@ export function NavUser() {
 
                 <DropdownMenuSeparator />
 
-                <DropdownMenuItem onSelect={handleLogout}>
+                <DropdownMenuItem onSelect={logout}>
                   <LogOut />
                   退出登录
                 </DropdownMenuItem>

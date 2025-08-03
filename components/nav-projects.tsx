@@ -34,7 +34,7 @@ export function NavProjects({
               tooltip={item.name}
             >
               <button
-                className="flex w-full"
+                className="flex w-full cursor-pointer"
                 onClick={() => router.push(item.url)}
               >
                 <item.icon />
