@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { Suspense, use } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "nextjs-toploader/app";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import {
@@ -20,11 +21,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import Image from "next/image";
 import { Pencil, ArrowUp, ArrowDown } from "lucide-react";
-import { cn } from "@/lib/utils";
-
 import {
   AlertDialog,
   AlertDialogContent,
@@ -35,51 +32,62 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
-
-interface Pic {
-  id: number;
-  title: string;
-  src: string;
-  button?: string | null;
-  link?: string | null;
-  newTab?: boolean;
-}
+import { toast } from "sonner";
+import { Skeleton } from "@/components/ui/skeleton";
+import Image from "next/image";
+import { cn } from "@/lib/utils";
+import { request } from "@/hooks/use-request";
+import type { Pic } from "@/types/config";
 
 type SortField = "id" | "title" | "button" | "link" | "none";
 type SortOrder = "asc" | "desc";
 
-export default function DashboardConfigPic() {
-  const router = useRouter();
+async function fetchPicsData(): Promise<Pic[]> {
+  const res = await request("/api/pic", {
+    method: "GET",
+    credentials: "include",
+    cache: "no-store",
+  });
+  if (!res) throw new Error("获取图片失败");
+  const data = res;
+  return Array.isArray(data) ? data : [];
+}
 
-  const [pics, setPics] = useState<Pic[] | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [deleteId, setDeleteId] = useState<number | null>(null);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+function PicList({ picsPromise }: { picsPromise: Promise<Pic[]> }) {
+  const initialPics = use(picsPromise);
+  const [pics, setPics] = useState(initialPics);
+
+  const router = useRouter();
 
   const [sortField, setSortField] = useState<SortField>("id");
   const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
+  const [deleteId, setDeleteId] = useState<number | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
-  const fetchPics = async () => {
+  const handleDelete = async () => {
+    if (deleteId === null) return;
+    setDeleting(true);
     try {
-      setLoading(true);
-      const res = await fetch("/api/pic", {
-        method: "GET",
+      const res = await request(`/api/pic/${deleteId}`, {
+        method: "DELETE",
         credentials: "include",
+        cache: "no-store",
       });
-      if (!res.ok) throw new Error("获取图片失败");
-      const data = await res.json();
-      setPics(Array.isArray(data) ? data : []);
+      if (!res) throw new Error("删除失败");
+
+      setPics(prev => prev.filter(pic => pic.id !== deleteId));
+
+      toast.success(`ID 为 ${deleteId} 的图片已被删除`);
     } catch (err) {
       console.error(err);
-      setPics([]);
+      toast.error("服务器未能成功响应删除请求");
     } finally {
-      setLoading(false);
+      setDeleting(false);
+      setShowDeleteDialog(false);
+      setDeleteId(null);
     }
   };
-
-  useEffect(() => {
-    fetchPics();
-  }, []);
 
   const handleSort = (field: SortField) => {
     if (field === sortField) {
@@ -91,7 +99,6 @@ export default function DashboardConfigPic() {
   };
 
   const sortedPics = useMemo(() => {
-    if (!pics) return [];
     if (sortField === "none") return pics;
 
     return [...pics].sort((a, b) => {
@@ -135,22 +142,127 @@ export default function DashboardConfigPic() {
     );
   };
 
-  const handleDelete = async () => {
-    if (deleteId === null) return;
-    try {
-      const res = await fetch(`/api/pic/${deleteId}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
-      if (!res.ok) throw new Error("删除失败");
-      fetchPics();
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setShowDeleteDialog(false);
-      setDeleteId(null);
-    }
-  };
+  return (
+    <>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead
+              className="cursor-pointer select-none text-foreground/90"
+              onClick={() => handleSort("id")}
+            >
+              ID {renderSortIcon("id")}
+            </TableHead>
+            <TableHead className="text-foreground/90">预览</TableHead>
+            <TableHead
+              className="cursor-pointer select-none text-foreground/90"
+              onClick={() => handleSort("title")}
+            >
+              标题 {renderSortIcon("title")}
+            </TableHead>
+            <TableHead
+              className="cursor-pointer select-none text-foreground/90"
+              onClick={() => handleSort("button")}
+            >
+              按钮文字 {renderSortIcon("button")}
+            </TableHead>
+            <TableHead
+              className="cursor-pointer select-none text-foreground/90"
+              onClick={() => handleSort("link")}
+            >
+              链接 {renderSortIcon("link")}
+            </TableHead>
+            <TableHead className="text-foreground/90">打开方式</TableHead>
+            <TableHead className="text-right text-foreground/90">操作</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {sortedPics.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={7} className="text-center text-muted-foreground dark:text-muted">
+                暂无图片
+              </TableCell>
+            </TableRow>
+          ) : (
+            sortedPics.map((pic) => (
+              <TableRow key={pic.id}>
+                <TableCell className="text-foreground/90">{pic.id}</TableCell>
+                <TableCell>
+                  <Image
+                    src={pic.src}
+                    alt={pic.title}
+                    width={80}
+                    height={48}
+                    className="h-20 object-cover w-auto rounded"
+                    unoptimized
+                    priority
+                  />
+                </TableCell>
+                <TableCell className="text-foreground/90">{pic.title}</TableCell>
+                <TableCell className="text-foreground/90">{pic.button ?? "-"}</TableCell>
+                <TableCell className="text-foreground/90">
+                  {pic.link ? (
+                    <a
+                      href={pic.link}
+                      target={pic.newTab ? "_blank" : "_self"}
+                      rel="noopener noreferrer"
+                      className="hover:underline"
+                    >
+                      {pic.link}
+                    </a>
+                  ) : (
+                    "-"
+                  )}
+                </TableCell>
+                <TableCell className="text-foreground/90">
+                  {pic.button === null ? "-" : pic.newTab ? "新标签" : "当前标签"}
+                </TableCell>
+                <TableCell className="text-right space-x-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => router.push(`/dashboard/config/pic/${pic.id}`)}
+                  >
+                    编辑
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={() => {
+                      setDeleteId(pic.id);
+                      setShowDeleteDialog(true);
+                    }}
+                  >
+                    删除
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))
+          )}
+        </TableBody>
+      </Table>
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>确定要删除这张图片？</AlertDialogTitle>
+            <AlertDialogDescription>删除后将无法恢复。</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>取消</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} disabled={deleting}>
+              {deleting ? "删除中..." : "确认删除"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  );
+}
+
+export default function DashboardConfigPicSuspenseWrapper() {
+  const picsPromise = fetchPicsData();
+  const router = useRouter();
 
   return (
     <SidebarInset>
@@ -191,136 +303,61 @@ export default function DashboardConfigPic() {
             </div>
 
             <div className="rounded-xl bg-muted/50 dark:bg-muted/50 p-4">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead
-                      className="cursor-pointer select-none text-foreground/90"
-                      onClick={() => handleSort("id")}
-                    >
-                      ID {renderSortIcon("id")}
-                    </TableHead>
-                    <TableHead className="text-foreground/90">预览</TableHead>
-                    <TableHead className="text-foreground/90">标题</TableHead>
-                    <TableHead className="text-foreground/90">按钮文字</TableHead>
-                    <TableHead className="text-foreground/90">链接</TableHead>
-                    <TableHead className="text-foreground/90">打开方式</TableHead>
-                    <TableHead className="text-right text-foreground/90">操作</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {loading ? (
-                    Array.from({ length: 3 }).map((_, i) => (
-                      <TableRow key={i}>
-                        <TableCell>
-                          <Skeleton className="h-4 w-6 rounded" />
-                        </TableCell>
-                        <TableCell>
-                          <Skeleton className="h-20 w-32 rounded" />
-                        </TableCell>
-                        <TableCell>
-                          <Skeleton className="h-4 w-24 rounded" />
-                        </TableCell>
-                        <TableCell>
-                          <Skeleton className="h-4 w-24 rounded" />
-                        </TableCell>
-                        <TableCell>
-                          <Skeleton className="h-4 w-24 rounded" />
-                        </TableCell>
-                        <TableCell>
-                          <Skeleton className="h-4 w-24 rounded" />
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <Skeleton className="h-8 w-16 inline-block rounded" />
-                        </TableCell>
+              <Suspense
+                fallback={
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead
+                          className="cursor-pointer select-none text-foreground/90"
+                        >
+                          ID
+                        </TableHead>
+                        <TableHead className="text-foreground/90">预览</TableHead>
+                        <TableHead className="text-foreground/90">标题</TableHead>
+                        <TableHead className="text-foreground/90">按钮文字</TableHead>
+                        <TableHead className="text-foreground/90">链接</TableHead>
+                        <TableHead className="text-foreground/90">打开方式</TableHead>
+                        <TableHead className="text-right text-foreground/90">操作</TableHead>
                       </TableRow>
-                    ))
-                  ) : pics && pics.length === 0 ? (
-                    <TableRow>
-                      <TableCell
-                        colSpan={7}
-                        className="text-center text-muted-foreground dark:text-muted"
-                      >
-                        暂无图片
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    sortedPics.map((pic) => (
-                      <TableRow key={pic.id}>
-                        <TableCell className="text-foreground/90">{pic.id}</TableCell>
-                        <TableCell>
-                          <Image
-                            src={pic.src}
-                            alt={pic.title}
-                            width={80}
-                            height={48}
-                            className="h-20 object-cover w-auto rounded"
-                            unoptimized
-                            priority
-                          />
-                        </TableCell>
-                        <TableCell className="text-foreground/90">{pic.title}</TableCell>
-                        <TableCell className="text-foreground/90">{pic.button ?? "-"}</TableCell>
-                        <TableCell className="text-foreground/90">
-                          {pic.link ? (
-                            <a
-                              href={pic.link}
-                              target={pic.newTab ? "_blank" : "_self"}
-                              rel="noopener noreferrer"
-                              className="hover:underline"
-                            >
-                              {pic.link}
-                            </a>
-                          ) : (
-                            "-"
-                          )}
-                        </TableCell>
-                        <TableCell className="text-foreground/90">
-                          {pic.button === null ? "-" : pic.newTab ? "新标签" : "当前标签"}
-                        </TableCell>
-                        <TableCell className="text-right space-x-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() =>
-                              router.push(`/dashboard/config/pic/${pic.id}`)
-                            }
-                          >
-                            编辑
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() => {
-                              setDeleteId(pic.id);
-                              setShowDeleteDialog(true);
-                            }}
-                          >
-                            删除
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {Array.from({ length: 3 }).map((_, i) => (
+                        <TableRow key={i}>
+                          <TableCell>
+                            <Skeleton className="h-4 w-6 rounded" />
+                          </TableCell>
+                          <TableCell>
+                            <Skeleton className="h-20 w-32 rounded" />
+                          </TableCell>
+                          <TableCell>
+                            <Skeleton className="h-4 w-24 rounded" />
+                          </TableCell>
+                          <TableCell>
+                            <Skeleton className="h-4 w-24 rounded" />
+                          </TableCell>
+                          <TableCell>
+                            <Skeleton className="h-4 w-24 rounded" />
+                          </TableCell>
+                          <TableCell>
+                            <Skeleton className="h-4 w-24 rounded" />
+                          </TableCell>
+                          <TableCell className="text-right space-x-2">
+                            <Skeleton className="inline-block h-8 w-12 rounded" />
+                            <Skeleton className="inline-block h-8 w-12 rounded" />
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                }
+              >
+                <PicList picsPromise={picsPromise} />
+              </Suspense>
             </div>
           </div>
         </div>
       </div>
-
-      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>确定要删除这张图片？</AlertDialogTitle>
-            <AlertDialogDescription>删除后将无法恢复。</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>取消</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete}>确认删除</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </SidebarInset>
   );
 }

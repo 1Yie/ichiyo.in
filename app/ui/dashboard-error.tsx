@@ -9,6 +9,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { useRouter } from "nextjs-toploader/app";
+import { Ban } from "lucide-react";
 
 export default function DashboardError() {
   const router = useRouter();
@@ -38,9 +39,13 @@ export default function DashboardError() {
       </header>
 
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-        <div className="bg-muted/50 flex-1 rounded-xl p-4">
-          <div className="w-full h-full bg-muted/50 p-4 rounded-xl flex justify-center items-center">
-            <h2 className="text-lg text-foreground/90">404 Not Found</h2>
+        <div className="bg-muted/50 flex-1 rounded-xl p-4 bg-diagonal-stripes">
+          <div className="w-full h-full rounded-xl flex justify-center items-center">
+            <div className="flex flex-col items-center justify-center gap-2">
+              <Ban className="w-18 h-18 text-foreground/90" />
+              <h1 className="text-lg text-foreground/90">访问的路径不存在</h1>
+              <p className="text-sm text-foreground/90">请检查路径是否正确，或者联系管理员。</p>
+            </div>
           </div>
         </div>
       </div>

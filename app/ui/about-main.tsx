@@ -1,9 +1,10 @@
 "use client";
 
+import { use, Suspense } from "react";
 import { Carousel } from "@/components/ui/carousel";
 import TiltedCard from "@/components/ui/tilted-card";
-import { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { request } from "@/hooks/use-request";
 
 interface SlideData {
   title: string;
@@ -12,29 +13,19 @@ interface SlideData {
   link?: string;
 }
 
+const getSlides = request<SlideData[]>("/api/pic");
+
+function SlidesLoader() {
+  const slides = use(getSlides);
+
+  return (
+    <div className="relative overflow-hidden w-full h-full py-20 min-h-[400px] flex items-center justify-center">
+      <Carousel slides={slides} />
+    </div>
+  );
+}
+
 export default function AboutMain() {
-  const [slides, setSlides] = useState<SlideData[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-
-  useEffect(() => {
-    const loadSlides = async () => {
-      try {
-        const res = await fetch("/api/pic");
-        if (!res.ok) throw new Error("请求失败");
-        const data = await res.json();
-        setSlides(data);
-      } catch (err) {
-        console.error("加载幻灯片数据失败:", err);
-        setError(true);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadSlides();
-  }, []);
-
   return (
     <>
       <div className="border-b">
@@ -66,21 +57,20 @@ export default function AboutMain() {
 
       <div className="border-b">
         <section className="section-base">
-          <div className="relative overflow-hidden w-full h-full py-20 min-h-[400px] flex items-center justify-center">
-            {loading ? (
-              <div className="w-[70vmin] h-[70vmin]">
-                <Skeleton className="w-full h-full rounded-xl" />
+          <Suspense
+            fallback={
+              <div className="relative overflow-hidden w-full h-full py-20 min-h-[400px] flex items-center justify-center">
+                <div className="w-[70vmin] h-[70vmin]">
+                  <Skeleton className="w-full h-full rounded-xl" />
+                </div>
               </div>
-            ) : error ? (
-              <div className="text-center text-lg">
-                Ops! Not found img data :(
-              </div>
-            ) : (
-              <Carousel slides={slides} />
-            )}
-          </div>
+            }
+          >
+            <SlidesLoader />
+          </Suspense>
         </section>
       </div>
+
     </>
   );
 }

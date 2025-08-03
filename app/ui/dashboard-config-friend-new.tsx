@@ -26,6 +26,9 @@ import {
 import { CircleX } from "lucide-react";
 import { ImageUrlWithPreview } from "@/ui/ImageUrlWithPreview";
 import { Checkbox } from "@/components/ui/checkbox";
+import { request } from "@/hooks/use-request";
+import type { Friend } from "@/types/config";
+import { toast } from "sonner";
 
 export default function DashboardConfigFriendNew() {
   const router = useRouter();
@@ -38,7 +41,6 @@ export default function DashboardConfigFriendNew() {
   const [saving, setSaving] = useState(false);
   const [showErrorDialog, setShowErrorDialog] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  // 这里社交链接改成和数据库字段对应的 name + link + iconLight + iconDark
   const [socialLinks, setSocialLinks] = useState([
     { name: "", link: "", iconLight: "", iconDark: "" },
   ]);
@@ -69,27 +71,31 @@ export default function DashboardConfigFriendNew() {
   async function handleSave() {
     setSaving(true);
     try {
-      const res = await fetch("/api/friend", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          name: name.trim(),
-          image: image.trim(),
-          description: description.trim(),
-          pinned,
-          socialLinks: socialLinks.map((link) => ({
-            name: link.name.trim(),
-            link: link.link.trim(),
-            iconLight: link.iconLight.trim(),
-            iconDark: link.iconDark.trim(),
-          })),
-        }),
-      });
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data?.error || "保存失败，请重试");
+      const res = await request<Friend>(
+        "/api/friend",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            name: name.trim(),
+            image: image.trim(),
+            description: description.trim(),
+            pinned,
+            socialLinks: socialLinks.map((link) => ({
+              name: link.name.trim(),
+              link: link.link.trim(),
+              iconLight: link.iconLight.trim(),
+              iconDark: link.iconDark.trim(),
+            })),
+          }),
+        }
+      );
+      if (!res) {
+        toast.error("保存失败，请重试");
+        throw new Error("保存失败，请重试");
       }
+      toast.success("保存成功");
       router.push("/dashboard/config/link");
     } catch (error) {
       const msg =
@@ -131,7 +137,6 @@ export default function DashboardConfigFriendNew() {
           </Breadcrumb>
         </div>
       </header>
-
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0 h-full w-full min-w-0">
         <div className="bg-muted/50 dark:bg-muted/50 flex-1 rounded-xl p-4 h-full w-full min-w-0">
           <div className="bg-white dark:bg-muted/50 rounded-xl p-4 h-full w-full min-w-0 flex flex-col">

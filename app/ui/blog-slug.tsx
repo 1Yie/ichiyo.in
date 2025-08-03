@@ -1,37 +1,19 @@
 "use client";
 
-import { notFound } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, use } from "react";
 import { parseMarkdown } from "@/lib/markdown";
 import { Skeleton } from "@/components/ui/skeleton";
 import Comments from "@/components/ui/comment";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
-
+import { request } from "@/hooks/use-request";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-
-interface Post {
-  id: number;
-  slug: string;
-  title: string;
-  content: string;
-  tags: {
-    id: number;
-    name: string;
-  }[];
-  published: boolean;
-  createdAt: string;
-  updatedAt: string;
-  authors: {
-    uid: number;
-    id: string;
-    email: string;
-  }[];
-}
+import ErrorBoundary from "@/ui/error-boundary";
+import type { Post } from "@/types/post";
 
 function dayDiff(d1: Date, d2: Date) {
   const date1 = new Date(d1.getFullYear(), d1.getMonth(), d1.getDate());
@@ -91,58 +73,15 @@ function timeDiffText(createdAt: string, updatedAt: string) {
   );
 }
 
-export default function PostPage({ params }: { params: { slug: string } }) {
-  const [post, setPost] = useState<Post | null>(null);
-  const [htmlContent, setHtmlContent] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+async function fetchPostData(slug: string) {
+  const post = await request<Post>(`/api/post/bySlug/${slug}`);
+  if (!post) throw new Error("Post not found");
+  const htmlContent = await parseMarkdown(post.content);
+  return { post, htmlContent };
+}
 
-  useEffect(() => {
-    const fetchPost = async () => {
-      try {
-        const res = await fetch(`/api/post/bySlug/${params.slug}`);
-        if (!res.ok) {
-          setError(true);
-          return;
-        }
-        const postData: Post = await res.json();
-        setPost(postData);
-        const html = await parseMarkdown(postData.content);
-        setHtmlContent(html);
-      } catch {
-        setError(true);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPost();
-  }, [params.slug]);
-
-  if (error) {
-    notFound();
-  }
-
-  if (loading || !post) {
-    return (
-      <div className="border-b">
-        <section className="section-base p-12">
-          <div className="space-y-4">
-            <Skeleton className="h-10 w-3/4" />
-            <Skeleton className="h-6 w-1/4" />
-            <Skeleton className="h-5 w-1/6" />
-          </div>
-        </section>
-        <section className="section-base px-[120px] py-[20px] max-[768px]:px-[20px] max-[768px]:py-[30px]">
-          <div className="space-y-3">
-            {Array.from({ length: 10 }).map((_, i) => (
-              <Skeleton key={i} className="h-4 w-full" />
-            ))}
-          </div>
-        </section>
-      </div>
-    );
-  }
+function PostContent({ postPromise }: { postPromise: Promise<{ post: Post; htmlContent: string }> }) {
+  const { post, htmlContent } = use(postPromise);
 
   return (
     <>
@@ -202,5 +141,39 @@ export default function PostPage({ params }: { params: { slug: string } }) {
         </section>
       </div>
     </>
+  );
+}
+
+function LoadingSkeleton() {
+  return (
+    <div className="border-b">
+      <section className="section-base p-12">
+        <div className="space-y-4">
+          <Skeleton className="h-10 w-3/4" />
+          <Skeleton className="h-6 w-1/4" />
+          <Skeleton className="h-5 w-1/6" />
+        </div>
+      </section>
+      <section className="section-base px-[120px] py-[20px] max-[768px]:px-[20px] max-[768px]:py-[30px]">
+        <div className="space-y-3">
+          {Array.from({ length: 10 }).map((_, i) => (
+            <Skeleton key={i} className="h-4 w-full" />
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+
+export default function PostPage({ params }: { params: { slug: string } }) {
+  const postPromise = fetchPostData(params.slug);
+  return (
+    <Suspense fallback={<LoadingSkeleton />}>
+      <ErrorBoundary fallback={null}
+      >
+        <PostContent postPromise={postPromise} />
+      </ErrorBoundary>
+    </Suspense>
   );
 }

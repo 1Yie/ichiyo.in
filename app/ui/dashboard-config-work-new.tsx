@@ -24,6 +24,8 @@ import {
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
 import { ImageUrlWithPreview } from "@/ui/ImageUrlWithPreview";
+import { toast } from "sonner";
+import { request } from "@/hooks/use-request";
 
 export default function DashboardCreateProject() {
   const router = useRouter();
@@ -41,7 +43,7 @@ export default function DashboardCreateProject() {
   const handleCreate = async () => {
     setSaving(true);
     try {
-      const res = await fetch("/api/project", {
+      const res = await request(`/api/project`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -53,12 +55,16 @@ export default function DashboardCreateProject() {
           iconDark,
         }),
       });
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data?.error || "创建失败，请重试");
+      if (!res) {
+        toast.error("创建失败，请重试");
+        throw new Error("创建失败，请重试");
       }
+      toast.success("创建成功");
       router.push("/dashboard/config/work");
     } catch (err) {
+      toast.error("创建失败，请重试", {
+        description: err instanceof Error ? err.message : "创建失败，请稍后再试",
+      });
       const msg = err instanceof Error ? err.message : "创建失败，请稍后再试";
       setErrorMessage(msg);
       setShowErrorDialog(true);

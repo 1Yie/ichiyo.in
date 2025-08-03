@@ -1,8 +1,20 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "nextjs-toploader/app";
+import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -12,20 +24,6 @@ import {
   AlertDialogFooter,
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
-
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
-import { Separator } from "@/components/ui/separator";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-
 import {
   Select,
   SelectContent,
@@ -34,9 +32,11 @@ import {
   SelectValue,
   SelectGroup,
 } from "@/components/ui/select";
-
 import { FontStyleToggleGroup } from "@/ui/font-style-toggle-group";
 import { PostContentEditor } from "@/ui/post-content-editor";
+import { toast } from "sonner";
+import { request } from "@/hooks/use-request";
+import { Me, Users } from "@/types/user";
 
 export default function DashboardNewPost() {
   const router = useRouter();
@@ -60,28 +60,38 @@ export default function DashboardNewPost() {
     { uid: number; id: string; email: string }[]
   >([]);
   const [selectedAuthors, setSelectedAuthors] = useState<string[]>([]);
+  const [usersLoaded, setUsersLoaded] = useState(false);
 
-  useEffect(() => {
-    fetch("/api/me", { credentials: "include" })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data?.authenticated && data.user?.uid != null) {
-          const uid = String(data.user.uid);
-          setMyUid(uid);
-          setSelectedAuthors([uid]);
-        }
-      });
-  }, []);
+  const loadUserData = async () => {
+    if (usersLoaded) return;
 
-  useEffect(() => {
-    fetch("/api/users", { credentials: "include" })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data?.users) {
-          setAllUsers(data.users);
-        }
-      });
-  }, []);
+    try {
+      const meRes = await request<Me>("/api/me", { credentials: "include" });
+      const meData = meRes;
+
+      if (meData?.authenticated && meData.user?.uid != null) {
+        const uid = String(meData.user.uid);
+        setMyUid(uid);
+        setSelectedAuthors([uid]);
+      }
+
+      const usersRes = await request<Users>("/api/users", { credentials: "include" });
+      const usersData = usersRes;
+
+      if (usersData) {
+        setAllUsers([usersData]);
+      }
+
+      setUsersLoaded(true);
+    } catch (error) {
+      toast.error("加载用户数据失败");
+      console.error("加载用户数据失败:", error);
+    }
+  };
+
+  const handleSelectOpen = () => {
+    loadUserData();
+  };
 
   const handleAddAuthor = (uid: string) => {
     if (!selectedAuthors.includes(uid)) {
@@ -109,7 +119,7 @@ export default function DashboardNewPost() {
   const handleCreate = async () => {
     setSaving(true);
     try {
-      const res = await fetch("/api/post", {
+      const res = await request("/api/post", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -123,25 +133,21 @@ export default function DashboardNewPost() {
         }),
       });
 
-      if (!res.ok) {
-        const data = await res.json();
-        const msg = data?.error || "创建失败，请重试";
+      if (!res) {
+        const msg = "创建失败，请重试";
+        toast.error(msg);
         throw new Error(msg);
       }
-
+      toast.success("文章创建成功");
       router.push("/dashboard/post");
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "创建失败，请重试";
+      const msg = err instanceof Error ? err.message : "创建失败，请稍后再试";
+      toast.error(msg);
       setErrorMessage(msg);
       setShowErrorDialog(true);
-      console.error("创建文章失败:", err);
     } finally {
       setSaving(false);
     }
-  };
-
-  const handleCancel = () => {
-    router.push("/dashboard/post");
   };
 
   return (
@@ -257,10 +263,10 @@ export default function DashboardNewPost() {
                         String(u.uid) !== myUid &&
                         !selectedAuthors.includes(String(u.uid))
                     ).length === 0 && (
-                      <div className="p-2 text-sm text-gray-400 dark:text-gray-500">
-                        无更多作者可添加
-                      </div>
-                    )}
+                        <div className="p-2 text-sm text-gray-400 dark:text-gray-500">
+                          无更多作者可添加
+                        </div>
+                      )}
                   </SelectGroup>
                 </SelectContent>
               </Select>
@@ -273,11 +279,10 @@ export default function DashboardNewPost() {
                   return (
                     <div
                       key={uid}
-                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-sm border ${
-                        isSelf
-                          ? "bg-gray-100 text-gray-700 border-gray-300"
-                          : "bg-blue-100 text-blue-700 border-blue-300"
-                      }`}
+                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-sm border ${isSelf
+                        ? "bg-gray-100 text-gray-700 border-gray-300"
+                        : "bg-blue-100 text-blue-700 border-blue-300"
+                        }`}
                     >
                       {user.id}
                       {!isSelf && (
@@ -394,7 +399,7 @@ export default function DashboardNewPost() {
                 {saving ? "创建中..." : "创建"}
               </Button>
               <Button
-                onClick={handleCancel}
+                onClick={handleSelectOpen}
                 variant="outline"
                 disabled={saving}
                 className="disabled:opacity-50"

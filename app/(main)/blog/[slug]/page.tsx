@@ -1,23 +1,8 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import BlogSlug from "@/ui/blog-slug";
-
-interface Post {
-  id: number;
-  slug: string;
-  title: string;
-  content: string;
-  published: boolean;
-  createdAt: string;
-  updatedAt: string;
-  author: {
-    id: string;
-    email: string;
-    uid: number;
-  };
-}
-
-const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
+import { request, baseUrl } from "@/hooks/use-request";
+import type { Post } from "@/types/post";
 
 export const dynamic = "force-dynamic";
 
@@ -28,15 +13,12 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const realParams = await params;
 
-  const res = await fetch(`${baseUrl}/api/post/bySlug/${realParams.slug}`, {
+  const res = request<Post>(`/api/post/bySlug/${realParams.slug}`, {
     next: { revalidate: 60 },
   });
 
-  if (!res.ok) {
-    return { title: "404 | ichiyo" };
-  }
 
-  const post = await res.json();
+  const post = await res;
   return {
     title: post.title + " | ichiyo",
     description: post.content.slice(0, 150) + (post.content.length > 150 ? '...' : ''),
@@ -50,16 +32,18 @@ export async function generateMetadata({
   };
 }
 
-async function getPostData(slug: string): Promise<Post | null> {
-  const res = await fetch(`${baseUrl}/api/post/bySlug/${slug}`, {
-    cache: "no-store",
-  });
-
-  if (!res.ok) {
-    return null;
+async function getPostData(slug: string): Promise<Post> {
+  try {
+    const post = await request<Post>(`/api/post/bySlug/${slug}`, {
+      cache: "no-store",
+    });
+    return post;
+  } catch (error) {
+    if (error instanceof Error) {
+      notFound();
+    }
+    throw error;
   }
-
-  return res.json();
 }
 
 export default async function Page(props: {

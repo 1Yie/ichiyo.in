@@ -24,6 +24,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { ImageUrlWithPreview } from "@/ui/ImageUrlWithPreview";
 import { Checkbox } from "@/components/ui/checkbox";
+import { request } from "@/hooks/use-request";
+import { toast } from "sonner";
 
 export default function DashboardConfigPicNew() {
   const router = useRouter();
@@ -41,7 +43,7 @@ export default function DashboardConfigPicNew() {
   async function handleSave() {
     setSaving(true);
     try {
-      const res = await fetch("/api/pic", {
+      const res = await request("/api/pic", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -53,10 +55,11 @@ export default function DashboardConfigPicNew() {
           newTab,
         }),
       });
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data?.error || "保存失败，请重试");
+      if (!res) {
+        toast.error("保存失败，请重试");
+        throw new Error("保存失败，请重试");
       }
+      toast.success("保存成功");
       router.push("/dashboard/config/pic");
     } catch (err) {
       setErrorMessage(
@@ -91,11 +94,8 @@ export default function DashboardConfigPicNew() {
                 </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator className="text-foreground/80" />
-              <BreadcrumbItem
-                className="cursor-pointer"
-                onClick={() => router.push("/dashboard/config/pic/new")}
-              >
-                新建图片
+              <BreadcrumbItem className="cursor-pointer">
+                <BreadcrumbLink onClick={() => router.push("/dashboard/config/pic/new")}>新建图片</BreadcrumbLink>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
@@ -160,9 +160,8 @@ export default function DashboardConfigPicNew() {
                 />
                 <label
                   htmlFor="newTab"
-                  className={`select-none text-foreground/90 ${
-                    button.trim() === "" ? "opacity-50 cursor-not-allowed" : ""
-                  }`}
+                  className={`select-none text-foreground/90 ${button.trim() === "" ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
                 >
                   是否新标签页打开链接
                 </label>

@@ -4,6 +4,7 @@ import "@/app/globals.css";
 
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/ui/app-sidebar";
+import { Toaster } from "@/components/ui/sonner"
 import NextTopLoader from "nextjs-toploader";
 import ClientThemeWrapper from "./client-theme-wrapper";
 
@@ -65,6 +66,7 @@ export default async function RootLayout({
                 shadow="0 0 10px var(--foreground),0 0 5px var(--foreground)"
               />
               <AppSidebar />
+              <Toaster richColors position="top-center" />
               {children}
             </SidebarProvider>
           </ThemeProvider>
