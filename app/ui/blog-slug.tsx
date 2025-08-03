@@ -102,7 +102,7 @@ function PostContent({ postPromise }: { postPromise: Promise<{ post: Post; htmlC
           <h1 className="text-5xl font-bold mt-2 mb-2">{post.title}</h1>
           <p className="text-gray-600 text-2xl mb-3 dark:text-gray-300">
             {post.authors && post.authors.length > 0
-              ? post.authors.map((a) => a.id).join(", ")
+              ? post.authors.map((a) => a.user.id).join(", ")
               : "匿名"}
           </p>
 

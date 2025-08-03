@@ -13,9 +13,7 @@ export interface Post {
   createdAt: string;
   updatedAt: string;
   authors: {
-    uid: number;
-    id: string;
-    email: string;
+    user: User;
   }[];
 }
 

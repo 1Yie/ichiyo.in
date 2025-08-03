@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { verifyPassword, generateToken } from "@/lib/auth";
+import {
+  verifyPassword,
+  generateToken,
+  getTokenExpirationInSeconds,
+} from "@/lib/auth";
 
 export async function POST(request: Request) {
   try {
@@ -8,7 +12,7 @@ export async function POST(request: Request) {
 
     if (!email || !password) {
       return NextResponse.json(
-        { code: "MISSING_FIELDS", message: "Missing email or password" },
+        { code: "MISSING_FIELDS", message: "缺少邮箱或密码" },
         { status: 400 }
       );
     }
@@ -16,7 +20,7 @@ export async function POST(request: Request) {
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
       return NextResponse.json(
-        { code: "INVALID_CREDENTIALS", message: "Invalid email or password" },
+        { code: "INVALID_CREDENTIALS", message: "无效的邮箱或密码" },
         { status: 401 }
       );
     }
@@ -24,12 +28,12 @@ export async function POST(request: Request) {
     const isValid = await verifyPassword(password, user.hashpassword);
     if (!isValid) {
       return NextResponse.json(
-        { code: "INVALID_CREDENTIALS", message: "Invalid email or password" },
+        { code: "INVALID_CREDENTIALS", message: "无效的邮箱或密码" },
         { status: 401 }
       );
     }
 
-    const token = generateToken({
+    const token = await generateToken({
       uid: user.uid,
       email: user.email,
       id: user.id,
@@ -40,19 +44,21 @@ export async function POST(request: Request) {
       token,
     });
 
+    const expiresInSeconds = getTokenExpirationInSeconds();
+
     response.cookies.set("token", token, {
       httpOnly: true,
       path: "/",
-      maxAge: 60 * 60 * 24 * 7, // 7 天
+      maxAge: expiresInSeconds,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
     });
 
     return response;
   } catch (error) {
-    console.error("Login Error:", error);
+    console.error("登录错误:", error);
     return NextResponse.json(
-      { code: "INTERNAL_ERROR", message: "Something went wrong" },
+      { code: "INTERNAL_ERROR", message: "服务器内部错误" },
       { status: 500 }
     );
   }

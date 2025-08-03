@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { verifyToken } from "@/lib/auth";
+import { authenticateToken } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 
 export async function GET(request: Request) {
@@ -11,11 +11,12 @@ export async function GET(request: Request) {
   const token = tokenMatch[1];
 
   try {
-    const payload = verifyToken(token);
+
+    const payload = await authenticateToken(token);
+
     if (!payload) {
       return NextResponse.json({ authenticated: false }, { status: 401 });
     }
-   
     const user = await prisma.user.findUnique({
       where: { uid: payload.uid },
       select: { isAdmin: true },

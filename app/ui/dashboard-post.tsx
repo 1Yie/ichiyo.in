@@ -68,6 +68,7 @@ function PostList({ postsPromise }: { postsPromise: Promise<PostsResponse> }) {
   const [errorMessage, setErrorMessage] = useState("");
   const router = useRouter();
 
+  
   const handleEdit = (id: number) => {
     router.push(`/dashboard/post/${id}`);
   };
@@ -214,7 +215,7 @@ function PostList({ postsPromise }: { postsPromise: Promise<PostsResponse> }) {
                 {currentUser.isAdmin && (
                   <TableCell>
                     {post.authors.length > 0
-                      ? post.authors.map((author) => author.id).join(", ")
+                      ? post.authors.map((author) => author.user.id).join(", ")
                       : "匿名"}
                   </TableCell>
                 )}

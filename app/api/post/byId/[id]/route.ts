@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import prisma from "@/lib/prisma";
-import { verifyToken } from "@/lib/auth";
+import { authenticateToken } from "@/lib/auth";
 import { generateSlug } from "@/lib/slug";
 
 interface Params {
@@ -21,13 +21,9 @@ export async function GET(request: Request, props: Params) {
     return NextResponse.json({ error: "未登录" }, { status: 401 });
   }
 
-  let payload;
-  try {
-    payload = verifyToken(token);
-    if (!payload) {
-      return NextResponse.json({ error: "无效身份" }, { status: 401 });
-    }
-  } catch {
+  const payload = await authenticateToken(token);
+
+  if (!payload) {
     return NextResponse.json({ error: "无效身份" }, { status: 401 });
   }
 
@@ -75,13 +71,9 @@ export async function PATCH(request: Request, props: Params) {
     return NextResponse.json({ error: "未登录" }, { status: 401 });
   }
 
-  let payload;
-  try {
-    payload = verifyToken(token);
-    if (!payload) {
-      return NextResponse.json({ error: "无效身份" }, { status: 401 });
-    }
-  } catch {
+  const payload = await authenticateToken(token);
+
+  if (!payload) {
     return NextResponse.json({ error: "无效身份" }, { status: 401 });
   }
 
@@ -227,13 +219,9 @@ export async function DELETE(request: Request, props: Params) {
     return NextResponse.json({ error: "未登录" }, { status: 401 });
   }
 
-  let payload;
-  try {
-    payload = verifyToken(token);
-    if (!payload) {
-      return NextResponse.json({ error: "无效身份" }, { status: 401 });
-    }
-  } catch {
+  const payload = await authenticateToken(token);
+
+  if (!payload) {
     return NextResponse.json({ error: "无效身份" }, { status: 401 });
   }
 

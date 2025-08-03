@@ -1,21 +1,18 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { verifyToken } from "@/lib/auth";
+import { authenticateToken } from "@/lib/auth";
 import { cookies } from "next/headers";
 import { generateSlug } from "@/lib/slug";
 
 export async function GET(request: Request) {
   try {
     const cookieStore = await cookies();
-    const token = (await cookieStore).get("token")?.value;
+    const token = cookieStore.get("token")?.value;
 
-    let payload = null;
-    if (token) {
-      try {
-        payload = verifyToken(token);
-      } catch {
-        payload = null;
-      }
+    const payload = await authenticateToken(token);
+
+    if (!payload) {
+      return NextResponse.json({ error: "未登录" }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
@@ -188,13 +185,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "未登录" }, { status: 401 });
     }
 
-    let payload;
-    try {
-      payload = verifyToken(token);
-      if (!payload) {
-        return NextResponse.json({ error: "无效身份" }, { status: 401 });
-      }
-    } catch {
+    const payload = await authenticateToken(token);
+
+    if (!payload) {
       return NextResponse.json({ error: "无效身份" }, { status: 401 });
     }
 
