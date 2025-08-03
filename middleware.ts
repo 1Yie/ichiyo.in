@@ -15,18 +15,19 @@ export async function middleware(request: NextRequest) {
   const token = request.cookies.get("token")?.value;
   const pathname = request.nextUrl.pathname;
 
-  const isDashboard = pathname.startsWith("/dashboard");
   const isLoginPage = pathname === "/login";
+  const isDashboardPage = pathname.startsWith("/dashboard");
 
   if (token && !(await isValidToken(token))) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("from", pathname);
+
     const res = NextResponse.redirect(loginUrl);
-    res.cookies.delete("token");
+    res.cookies.set("token", "", { maxAge: 0 });
     return res;
   }
 
-  if (isDashboard && !token) {
+  if (isDashboardPage && !token) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("from", pathname);
     return NextResponse.redirect(loginUrl);
@@ -36,6 +37,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
+  // 默认放行
   return NextResponse.next();
 }
 

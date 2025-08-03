@@ -1,6 +1,8 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { useRouter } from "next/navigation";
+
 import md5 from "md5";
 import { request } from "@/hooks/use-request";
 
@@ -70,18 +72,10 @@ interface UserProviderProps {
     redirectOnAuth?: boolean;
 }
 
-export function UserProvider({
-    children,
-}: UserProviderProps) {
-
-    const [userInfo, setUserInfo] = useState<UserInfo | null>(() => {
-        return getCachedUser();
-    });
-
-    const [loading, setLoading] = useState(() => {
-        return !getCachedUser();
-    });
-
+export function UserProvider({ children }: UserProviderProps) {
+    const router = useRouter();
+    const [userInfo, setUserInfo] = useState<UserInfo | null>(() => getCachedUser());
+    const [loading, setLoading] = useState(() => !getCachedUser());
     const [error, setError] = useState<string | null>(null);
 
     const fetchUser = async (showLoading = true) => {
@@ -91,12 +85,11 @@ export function UserProvider({
 
             const res = await fetch("/api/me", {
                 credentials: "include",
-                cache: 'no-cache'
+                cache: "no-cache",
             });
 
             if (res.ok) {
                 const data = await res.json();
-
                 if (data.authenticated && data.user) {
                     const email = data.user.email || "unknown@example.com";
                     const name = data.user.id || data.user.name || "用户";
@@ -115,69 +108,40 @@ export function UserProvider({
                 } else {
                     setUserInfo(null);
                     clearCachedUser();
-                    
-                    // if (redirectOnAuth) {
-                    //     const currentPath = window.location.pathname;
-                    //     const protectedPaths = ['/dashboard', '/admin', '/profile'];
-                    //     if (protectedPaths.some(path => currentPath.startsWith(path))) {
-                    //         router.replace("/login");
-                    //     }
-                    // }
                 }
             } else if (res.status === 401) {
                 setUserInfo(null);
                 clearCachedUser();
-                
-                // // 同样的逻辑
-                // if (redirectOnAuth) {
-                //     const currentPath = window.location.pathname;
-                //     const protectedPaths = ['/dashboard', '/admin', '/profile'];
-                //     if (protectedPaths.some(path => currentPath.startsWith(path))) {
-                //         router.replace("/login");
-                //     }
-                // }
             } else {
                 throw new Error(`请求失败: ${res.status}`);
             }
         } catch (err) {
-            const errorMessage = err instanceof Error ? err.message : '获取用户信息失败';
-            console.error('获取用户信息失败:', err);
+            const errorMessage = err instanceof Error ? err.message : "获取用户信息失败";
+            console.error("获取用户信息失败:", err);
             setError(errorMessage);
 
-            if (!userInfo) {
-                setUserInfo(null);
-                clearCachedUser();
-
-                // if (redirectOnAuth) {
-                //     const currentPath = window.location.pathname;
-                //     const protectedPaths = ['/dashboard', '/admin', '/profile'];
-                //     if (protectedPaths.some(path => currentPath.startsWith(path))) {
-                //         router.replace("/login");
-                //     }
-                // }
-            }
+            setUserInfo(null);
+            clearCachedUser();
         } finally {
             setLoading(false);
         }
     };
 
-    // 修正的登出方法
     const logout = async () => {
         try {
             setLoading(true);
-
             await request("/api/logout", {
                 method: "POST",
                 credentials: "include",
             });
         } catch (error) {
-            console.error('登出请求失败:', error);
+            console.error("登出请求失败:", error);
         } finally {
-            // 清除用户状态和缓存
             setUserInfo(null);
             clearCachedUser();
             setError(null);
             setLoading(false);
+            router.refresh()
         }
     };
 
@@ -189,6 +153,7 @@ export function UserProvider({
         if (!userInfo) {
             fetchUser();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const contextValue: UserContextType = {
@@ -201,12 +166,9 @@ export function UserProvider({
         isAuthenticated: !!userInfo,
     };
 
-    return (
-        <UserContext.Provider value={contextValue}>
-            {children}
-        </UserContext.Provider>
-    );
+    return <UserContext.Provider value={contextValue}>{children}</UserContext.Provider>;
 }
+
 
 export function useUser() {
     const context = useContext(UserContext);
@@ -220,7 +182,7 @@ export function useUser() {
 
 export function useAdminCheck() {
     const { userInfo, isAuthenticated } = useUser();
-    
+
     return {
         isAdmin: isAuthenticated && userInfo?.isAdmin === true,
         isAuthenticated,
