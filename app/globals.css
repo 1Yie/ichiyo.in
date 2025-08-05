@@ -195,11 +195,6 @@ code:not(pre code) {
   }
 }
 
-* {
-  
-  scrollbar-color: var(--foreground) var(--accent);
-}
-
 ::-webkit-scrollbar,
 scrollbar {
   max-width: 10px;

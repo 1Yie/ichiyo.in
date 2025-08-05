@@ -69,7 +69,9 @@ function PostList({ postsPromise }: { postsPromise: Promise<PostsResponse> }) {
   const [errorMessage, setErrorMessage] = useState("");
   const router = useRouter();
 
-  
+  console.log(posts);
+
+
   const handleEdit = (id: number) => {
     router.push(`/dashboard/post/${id}`);
   };

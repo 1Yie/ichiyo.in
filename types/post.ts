@@ -1,24 +1,35 @@
 import type { User } from "@/types/auth";
 
+export interface Tag {
+  id: number;
+  name: string;
+}
+
 export interface Post {
   id: number;
   slug: string;
   title: string;
   content: string;
-  tags: {
-    id: number;
-    name: string;
-  }[];
+  tags: Tag[];
   published: boolean;
   createdAt: string;
   updatedAt: string;
-  authors: {
-    user: User;
-  }[];
+  authors: { user: User }[];
 }
 
+export interface PostBySlug {
+  id: number;
+  slug: string;
+  title: string;
+  content: string;
+  tags: Tag[];
+  published: boolean;
+  createdAt: string;
+  updatedAt: string;
+  authors: User[];
+}
 
-export interface PostT {
+export interface PostById {
   id: number;
   title: string;
   content: string;
@@ -29,7 +40,7 @@ export interface PostT {
 }
 
 export interface PostData {
-  post: PostT;
+  post: PostById;
   me: User;
   users: User[];
 }

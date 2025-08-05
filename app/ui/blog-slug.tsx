@@ -13,7 +13,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import ErrorBoundary from "@/ui/error-boundary";
-import type { Post } from "@/types/post";
+import type { PostBySlug } from "@/types/post";
 
 function dayDiff(d1: Date, d2: Date) {
   const date1 = new Date(d1.getFullYear(), d1.getMonth(), d1.getDate());
@@ -74,14 +74,15 @@ function timeDiffText(createdAt: string, updatedAt: string) {
 }
 
 async function fetchPostData(slug: string) {
-  const post = await request<Post>(`/api/post/bySlug/${slug}`);
+  const post = await request<PostBySlug>(`/api/post/bySlug/${slug}`);
   if (!post) throw new Error("Post not found");
   const htmlContent = await parseMarkdown(post.content);
   return { post, htmlContent };
 }
 
-function PostContent({ postPromise }: { postPromise: Promise<{ post: Post; htmlContent: string }> }) {
+function PostContent({ postPromise }: { postPromise: Promise<{ post: PostBySlug; htmlContent: string }> }) {
   const { post, htmlContent } = use(postPromise);
+  console.log(post);
 
   return (
     <>
@@ -102,7 +103,7 @@ function PostContent({ postPromise }: { postPromise: Promise<{ post: Post; htmlC
           <h1 className="text-5xl font-bold mt-2 mb-2">{post.title}</h1>
           <p className="text-gray-600 text-2xl mb-3 dark:text-gray-300">
             {post.authors && post.authors.length > 0
-              ? post.authors.map((a) => a.user?.id).join(", ")
+              ? post.authors.map((a) => a.id).join(", ")
               : "匿名"}
           </p>
 

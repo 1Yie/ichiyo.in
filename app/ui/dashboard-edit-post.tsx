@@ -44,14 +44,14 @@ import { request } from "@/hooks/use-request";
 import ErrorBoundary from "@/ui/error-boundary";
 import { toast } from "sonner";
 
-import type { PostT, PostData } from "@/types/post";
+import type { PostById, PostData } from "@/types/post";
 import type { User } from "@/types/auth";
 
 
 async function fetchPostData(postId: number): Promise<PostData> {
   try {
     const [postRes, meRes, usersRes] = await Promise.all([
-      request<PostT>(`/api/post/byId/${postId}`, {
+      request<PostById>(`/api/post/byId/${postId}`, {
         credentials: "include",
         cache: "no-store"
       }),
@@ -154,7 +154,7 @@ function DashboardEditPostInner({
   const handleSave = async () => {
     setSaving(true);
     try {
-      const res = await request<PostT>(`/api/post/byId/${postId}`, {
+      const res = await request<PostById>(`/api/post/byId/${postId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
