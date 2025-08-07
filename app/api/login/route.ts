@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import {
   verifyPassword,
+  hashPassword,
   generateToken,
   getTokenExpirationInSeconds,
 } from "@/lib/auth";
@@ -26,12 +27,33 @@ export async function POST(request: Request) {
       );
     }
 
-    const isValid = await verifyPassword(password, user.hashpassword);
+    const { isValid, needsUpdate, isLegacy } = await verifyPassword(
+      password,
+      user.hashpassword
+    );
+
     if (!isValid) {
       return NextResponse.json(
         { code: "INVALID_CREDENTIALS", message: "无效的邮箱或密码" },
         { status: 401 }
       );
+    }
+
+    if (needsUpdate) {
+      const newHash = await hashPassword(password);
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { hashpassword: newHash },
+      });
+    }
+
+    // 如果是旧密码格式，登录成功后更新为新格式
+    if (isLegacy) {
+      const newHash = await hashPassword(password);
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { hashpassword: newHash },
+      });
     }
 
     const token = await generateToken({

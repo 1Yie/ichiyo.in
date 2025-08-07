@@ -4,88 +4,145 @@ import ms from "ms";
 const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_key";
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "1d";
 
+const DEFAULT_ITERATIONS = Number(process.env.DEFAULT_ITERATIONS);
+
+const LEGACY_ITERATIONS = 10_000; // 旧密码格式迭代次数
+const SALT_LENGTH = 16; // 16 字节盐
+const KEY_LENGTH = 256; // 256 位密钥
+const HASH_LENGTH = 32; // SHA-256 生成 32 字节的哈希值
+
 const getJwtSecretKey = () => {
   return new TextEncoder().encode(JWT_SECRET);
 };
 
 // 密码加密 (PBKDF2)
-export async function hashPassword(password: string): Promise<string> {
+export async function hashPassword(
+  password: string,
+  iterations: number = DEFAULT_ITERATIONS
+): Promise<string> {
   const encoder = new TextEncoder();
-  const data = encoder.encode(password);
-
-  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const salt = crypto.getRandomValues(new Uint8Array(SALT_LENGTH));
 
   const key = await crypto.subtle.importKey(
     "raw",
-    data,
-    { name: "PBKDF2" },
+    encoder.encode(password),
+    "PBKDF2",
     false,
     ["deriveBits"]
   );
 
   const hashBuffer = await crypto.subtle.deriveBits(
-    {
-      name: "PBKDF2",
-      salt: salt,
-      iterations: 10000,
-      hash: "SHA-256",
-    },
+    { name: "PBKDF2", salt, iterations, hash: "SHA-256" },
     key,
-    256
+    KEY_LENGTH
   );
 
-  const combined = new Uint8Array(salt.length + hashBuffer.byteLength);
-  combined.set(salt);
-  combined.set(new Uint8Array(hashBuffer), salt.length);
+  // 新格式：[salt (16B)] + [iterations (4B)] + [hash (32B)]
+  const iterationsBytes = new Uint8Array(new Uint32Array([iterations]).buffer);
+  const hashBytes = new Uint8Array(hashBuffer);
+  const combined = new Uint8Array(
+    salt.length + iterationsBytes.length + hashBytes.length
+  );
 
-  // 转成 base64 存储
+  combined.set(salt);
+  combined.set(iterationsBytes, salt.length);
+  combined.set(hashBytes, salt.length + iterationsBytes.length);
+
   return Buffer.from(combined).toString("base64");
 }
 
-// 密码验证 (PBKDF2)
+interface VerificationResult {
+  isValid: boolean;
+  needsUpdate?: boolean; // 需要升级的情况：1.旧格式 2.迭代次数不等于当前配置
+  isLegacy?: boolean; // 统计的旧格式标记
+  storedIterations?: number; // 返回存储的迭代次数
+}
+
+// 密码验证 (兼容新旧版本)
 export async function verifyPassword(
   password: string,
   hashedPassword: string
-): Promise<boolean> {
+): Promise<VerificationResult> {
   try {
+    const decoded = Uint8Array.from(Buffer.from(hashedPassword, "base64"));
     const encoder = new TextEncoder();
-    const passwordData = encoder.encode(password);
-    const combined = Uint8Array.from(Buffer.from(hashedPassword, "base64"));
 
-    const salt = combined.slice(0, 16);
-    const storedHash = combined.slice(16);
+    // 情况1：旧密码格式 (48字节)
+    if (decoded.length === SALT_LENGTH + HASH_LENGTH) {
+      const salt = decoded.slice(0, SALT_LENGTH);
+      const storedHash = decoded.slice(SALT_LENGTH);
 
-    const key = await crypto.subtle.importKey(
-      "raw",
-      passwordData,
-      { name: "PBKDF2" },
-      false,
-      ["deriveBits"]
-    );
+      const hashBuffer = await crypto.subtle.deriveBits(
+        {
+          name: "PBKDF2",
+          salt,
+          iterations: LEGACY_ITERATIONS,
+          hash: "SHA-256",
+        },
+        await crypto.subtle.importKey(
+          "raw",
+          encoder.encode(password),
+          "PBKDF2",
+          false,
+          ["deriveBits"]
+        ),
+        KEY_LENGTH
+      );
 
-    const hashBuffer = await crypto.subtle.deriveBits(
-      {
-        name: "PBKDF2",
-        salt,
-        iterations: 10000,
-        hash: "SHA-256",
-      },
-      key,
-      256
-    );
-
-    const computedHash = new Uint8Array(hashBuffer);
-    if (computedHash.length !== storedHash.length) return false;
-
-    for (let i = 0; i < computedHash.length; i++) {
-      if (computedHash[i] !== storedHash[i]) return false;
+      return {
+        isValid: timingSafeEqual(new Uint8Array(hashBuffer), storedHash),
+        needsUpdate: true, // 强制升级
+        isLegacy: true,
+        storedIterations: LEGACY_ITERATIONS,
+      };
     }
 
-    return true;
+    // 情况2：新密码格式 (52字节)
+    if (decoded.length === SALT_LENGTH + 4 + HASH_LENGTH) {
+      const salt = decoded.slice(0, SALT_LENGTH);
+      const iterations = new DataView(
+        decoded.slice(SALT_LENGTH, SALT_LENGTH + 4).buffer
+      ).getUint32(0, true);
+      const storedHash = decoded.slice(SALT_LENGTH + 4);
+
+      // 检查迭代次数是否需要升级（只要不等于当前配置就更新）
+      const shouldUpgrade = iterations !== DEFAULT_ITERATIONS;
+
+      const hashBuffer = await crypto.subtle.deriveBits(
+        { name: "PBKDF2", salt, iterations, hash: "SHA-256" },
+        await crypto.subtle.importKey(
+          "raw",
+          encoder.encode(password),
+          "PBKDF2",
+          false,
+          ["deriveBits"]
+        ),
+        KEY_LENGTH
+      );
+
+      return {
+        isValid: timingSafeEqual(new Uint8Array(hashBuffer), storedHash),
+        needsUpdate: shouldUpgrade,
+        isLegacy: false,
+        storedIterations: iterations,
+      };
+    }
+
+    return { isValid: false };
   } catch (error) {
-    console.error("PBKDF2 verify failed:", error);
-    return false;
+    console.error("Password verification error:", error);
+    return { isValid: false };
   }
+}
+
+// 安全比较函数（时序安全）
+function timingSafeEqual(a: Uint8Array, b: Uint8Array): boolean {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) {
+    diff |= a[i] ^ b[i];
+  }
+  return diff === 0;
 }
 
 export interface JwtPayload {
@@ -105,7 +162,9 @@ export type TokenResult = {
 export async function generateToken(payload: JwtPayload): Promise<string> {
   const secretKey = getJwtSecretKey();
 
-  const expiresInSeconds = Math.floor(ms(JWT_EXPIRES_IN as ms.StringValue) / 1000);
+  const expiresInSeconds = Math.floor(
+    ms(JWT_EXPIRES_IN as ms.StringValue) / 1000
+  );
 
   return new SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" })
@@ -142,17 +201,22 @@ export async function verifyToken(token: string): Promise<TokenResult> {
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Token verification failed",
+      error:
+        error instanceof Error ? error.message : "Token verification failed",
     };
   }
 }
 
 // 验证 token 并返回有效载荷或 null
-export async function authenticateToken(token: string | undefined): Promise<JwtPayload | null> {
+export async function authenticateToken(
+  token: string | undefined
+): Promise<JwtPayload | null> {
   if (!token) return null;
 
   const tokenResult = await verifyToken(token);
-  return tokenResult.success && tokenResult.payload ? tokenResult.payload : null;
+  return tokenResult.success && tokenResult.payload
+    ? tokenResult.payload
+    : null;
 }
 
 // 获取 token 过期秒数
