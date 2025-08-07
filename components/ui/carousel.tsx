@@ -24,7 +24,7 @@ const Slide = ({ slide, index, current, handleSlideClick }: SlideProps) => {
   const yRef = useRef(0);
   const frameRef = useRef<number>(0);
   const [isTouching, setIsTouching] = useState(false);
-  const [showContent, setShowContent] = useState(current === index);
+  const [contentVisible, setContentVisible] = useState(current === index);
 
   useEffect(() => {
     const animate = () => {
@@ -46,12 +46,16 @@ const Slide = ({ slide, index, current, handleSlideClick }: SlideProps) => {
     };
   }, []);
 
-  // 控制内容显示与隐藏，配合淡入淡出动画
+  // 优化内容显示与隐藏的时机控制
   useEffect(() => {
     if (current === index) {
-      setShowContent(true);
+      // 当前幻灯片，立即显示内容
+      setContentVisible(true);
     } else {
-      const timer = setTimeout(() => setShowContent(false), 300);
+      // 非当前幻灯片，延迟隐藏内容以配合淡出动画
+      const timer = setTimeout(() => {
+        setContentVisible(false);
+      }, 600); // 与transition时长保持一致
       return () => clearTimeout(timer);
     }
   }, [current, index]);
@@ -156,29 +160,32 @@ const Slide = ({ slide, index, current, handleSlideClick }: SlideProps) => {
           />
         </div>
 
-        {showContent && (
-          <article
-            className={`relative p-[4vmin] z-50 transition-opacity duration-300 ease-in-out ${
-              current === index
-                ? "opacity-100 pointer-events-auto"
-                : "opacity-0 pointer-events-none"
-            }`}
-          >
-            <h2 className="text-lg md:text-2xl lg:text-4xl font-semibold relative">
-              {title}
-            </h2>
-            {button && (
-              <div className="flex justify-center">
-                <button
-                  className="cursor-pointer select-none mt-6 px-4 py-2 w-fit mx-auto sm:text-sm text-black bg-white hover:bg-gray-200 h-12 border border-transparent text-xs flex justify-center items-center rounded-2xl hover:shadow-lg transition duration-200 shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)]"
-                  onClick={handleContentClick}
-                >
-                  {button}
-                </button>
-              </div>
-            )}
-          </article>
-        )}
+        {/* 始终渲染内容，通过CSS控制可见性和交互性 */}
+        <article
+          className={`relative p-[4vmin] z-50 transition-all duration-600 ease-in-out ${
+            current === index
+              ? "opacity-100 pointer-events-auto transform translate-y-0"
+              : "opacity-0 pointer-events-none transform translate-y-2"
+          }`}
+          style={{
+            // 确保内容在DOM中始终存在，避免闪现
+            visibility: contentVisible ? 'visible' : 'hidden'
+          }}
+        >
+          <h2 className="text-lg md:text-2xl lg:text-4xl font-semibold relative">
+            {title}
+          </h2>
+          {button && (
+            <div className="flex justify-center">
+              <button
+                className="cursor-pointer select-none mt-6 px-4 py-2 w-fit mx-auto sm:text-sm text-black bg-white hover:bg-gray-200 h-12 border border-transparent text-xs flex justify-center items-center rounded-2xl hover:shadow-lg transition duration-200 shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)]"
+                onClick={handleContentClick}
+              >
+                {button}
+              </button>
+            </div>
+          )}
+        </article>
       </li>
     </div>
   );
