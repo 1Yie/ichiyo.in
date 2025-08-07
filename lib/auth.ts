@@ -10,16 +10,90 @@ const getJwtSecretKey = () => {
   return encoder.encode(JWT_SECRET);
 };
 
+const isBcryptHash = (hash: string) => hash.startsWith("$2");
+
+// --- 密码加密 (PBKDF2) ---
 export async function hashPassword(password: string): Promise<string> {
-  const salt = await bcrypt.genSalt(10);
-  return bcrypt.hash(password, salt);
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password);
+
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+
+  const key = await crypto.subtle.importKey(
+    "raw",
+    data,
+    { name: "PBKDF2" },
+    false,
+    ["deriveBits"]
+  );
+
+  const hashBuffer = await crypto.subtle.deriveBits(
+    {
+      name: "PBKDF2",
+      salt: salt,
+      iterations: 10000,
+      hash: "SHA-256",
+    },
+    key,
+    256
+  );
+
+  const combined = new Uint8Array(salt.length + hashBuffer.byteLength);
+  combined.set(salt);
+  combined.set(new Uint8Array(hashBuffer), salt.length);
+
+  return Buffer.from(combined).toString("base64");
 }
 
+// --- 密码验证（兼容 bcrypt + PBKDF2） ---
 export async function verifyPassword(
   password: string,
   hashedPassword: string
 ): Promise<boolean> {
-  return bcrypt.compare(password, hashedPassword);
+  if (isBcryptHash(hashedPassword)) {
+    return bcrypt.compare(password, hashedPassword);
+  }
+
+  // fallback: PBKDF2
+  try {
+    const encoder = new TextEncoder();
+    const passwordData = encoder.encode(password);
+    const combined = Uint8Array.from(Buffer.from(hashedPassword, "base64"));
+
+    const salt = combined.slice(0, 16);
+    const storedHash = combined.slice(16);
+
+    const key = await crypto.subtle.importKey(
+      "raw",
+      passwordData,
+      { name: "PBKDF2" },
+      false,
+      ["deriveBits"]
+    );
+
+    const hashBuffer = await crypto.subtle.deriveBits(
+      {
+        name: "PBKDF2",
+        salt: salt,
+        iterations: 10000,
+        hash: "SHA-256",
+      },
+      key,
+      256
+    );
+
+    const computedHash = new Uint8Array(hashBuffer);
+    if (computedHash.length !== storedHash.length) return false;
+
+    for (let i = 0; i < computedHash.length; i++) {
+      if (computedHash[i] !== storedHash[i]) return false;
+    }
+
+    return true;
+  } catch (err) {
+    console.error("PBKDF2 verify failed:", err);
+    return false;
+  }
 }
 
 export interface JwtPayload {
