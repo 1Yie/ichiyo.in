@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import {
   verifyPassword,
-  hashPassword,
   generateToken,
   getTokenExpirationInSeconds,
 } from "@/lib/auth";
@@ -33,15 +32,6 @@ export async function POST(request: Request) {
         { code: "INVALID_CREDENTIALS", message: "无效的邮箱或密码" },
         { status: 401 }
       );
-    }
-
-    // 如果旧密码是 bcrypt，则升级为 PBKDF2
-    if (user.hashpassword.startsWith("$2")) {
-      const newHash = await hashPassword(password);
-      await prisma.user.update({
-        where: { id: user.id },
-        data: { hashpassword: newHash },
-      });
     }
 
     const token = await generateToken({

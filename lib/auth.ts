@@ -1,4 +1,3 @@
-import bcrypt from "bcryptjs";
 import { SignJWT, jwtVerify } from "jose";
 import ms from "ms";
 
@@ -6,13 +5,10 @@ const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_key";
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "1d";
 
 const getJwtSecretKey = () => {
-  const encoder = new TextEncoder();
-  return encoder.encode(JWT_SECRET);
+  return new TextEncoder().encode(JWT_SECRET);
 };
 
-const isBcryptHash = (hash: string) => hash.startsWith("$2");
-
-// --- 密码加密 (PBKDF2) ---
+// 密码加密 (PBKDF2)
 export async function hashPassword(password: string): Promise<string> {
   const encoder = new TextEncoder();
   const data = encoder.encode(password);
@@ -42,19 +38,15 @@ export async function hashPassword(password: string): Promise<string> {
   combined.set(salt);
   combined.set(new Uint8Array(hashBuffer), salt.length);
 
+  // 转成 base64 存储
   return Buffer.from(combined).toString("base64");
 }
 
-// --- 密码验证（兼容 bcrypt + PBKDF2） ---
+// 密码验证 (PBKDF2)
 export async function verifyPassword(
   password: string,
   hashedPassword: string
 ): Promise<boolean> {
-  if (isBcryptHash(hashedPassword)) {
-    return bcrypt.compare(password, hashedPassword);
-  }
-
-  // fallback: PBKDF2
   try {
     const encoder = new TextEncoder();
     const passwordData = encoder.encode(password);
@@ -74,7 +66,7 @@ export async function verifyPassword(
     const hashBuffer = await crypto.subtle.deriveBits(
       {
         name: "PBKDF2",
-        salt: salt,
+        salt,
         iterations: 10000,
         hash: "SHA-256",
       },
@@ -90,8 +82,8 @@ export async function verifyPassword(
     }
 
     return true;
-  } catch (err) {
-    console.error("PBKDF2 verify failed:", err);
+  } catch (error) {
+    console.error("PBKDF2 verify failed:", error);
     return false;
   }
 }
@@ -109,12 +101,11 @@ export type TokenResult = {
   error?: string;
 };
 
+// 生成 JWT
 export async function generateToken(payload: JwtPayload): Promise<string> {
   const secretKey = getJwtSecretKey();
 
-  const expiresInSeconds = Math.floor(
-    ms(JWT_EXPIRES_IN as ms.StringValue) / 1000
-  );
+  const expiresInSeconds = Math.floor(ms(JWT_EXPIRES_IN as ms.StringValue) / 1000);
 
   return new SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" })
@@ -123,6 +114,7 @@ export async function generateToken(payload: JwtPayload): Promise<string> {
     .sign(secretKey);
 }
 
+// 验证 JWT
 export async function verifyToken(token: string): Promise<TokenResult> {
   try {
     const secretKey = getJwtSecretKey();
@@ -150,28 +142,21 @@ export async function verifyToken(token: string): Promise<TokenResult> {
   } catch (error) {
     return {
       success: false,
-      error:
-        error instanceof Error ? error.message : "Token verification failed",
+      error: error instanceof Error ? error.message : "Token verification failed",
     };
   }
 }
 
-export async function authenticateToken(
-  token: string | undefined
-): Promise<JwtPayload | null> {
+// 验证 token 并返回有效载荷或 null
+export async function authenticateToken(token: string | undefined): Promise<JwtPayload | null> {
   if (!token) return null;
 
   const tokenResult = await verifyToken(token);
-  if (tokenResult.success && tokenResult.payload) {
-    return tokenResult.payload;
-  }
-
-  return null;
+  return tokenResult.success && tokenResult.payload ? tokenResult.payload : null;
 }
 
+// 获取 token 过期秒数
 export function getTokenExpirationInSeconds(): number {
   const expiresIn = process.env.JWT_EXPIRES_IN || "1d";
-  const milliseconds = ms(expiresIn as ms.StringValue);
-
-  return Math.round(milliseconds / 1000);
+  return Math.round(ms(expiresIn as ms.StringValue) / 1000);
 }
