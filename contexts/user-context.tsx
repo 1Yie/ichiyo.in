@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 import md5 from "md5";
 import { request } from "@/hooks/use-request";
@@ -130,12 +131,14 @@ export function UserProvider({ children }: UserProviderProps) {
     const logout = async () => {
         try {
             setLoading(true);
+            toast.success("退出成功");
+
             await request("/api/logout", {
                 method: "POST",
                 credentials: "include",
             });
         } catch (error) {
-            console.error("登出请求失败:", error);
+            console.error("退出请求失败:", error);
         } finally {
             setUserInfo(null);
             clearCachedUser();

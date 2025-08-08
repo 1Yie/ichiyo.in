@@ -17,6 +17,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 
 const errorMessages: Record<string, string> = {
   MISSING_FIELDS: "请输入邮箱和密码",
@@ -52,7 +53,9 @@ export function LoginForm({
       const data = await res.json();
 
       if (res.ok) {
+        toast.success("登录成功");
         router.refresh();
+
       } else {
         const msg =
           errorMessages[data.code as string] ||

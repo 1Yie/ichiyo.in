@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { hashPassword } from "@/lib/auth";
-
-const REQUIRED_KEY = process.env.REGISTER_KEY || "default_key";
+import { validateRegisterKey } from "@/app/api/register/key/route";
 
 export async function POST(request: Request) {
   try {
@@ -17,7 +16,7 @@ export async function POST(request: Request) {
     }
 
     // 校验密钥
-    if (registerKey !== REQUIRED_KEY) {
+    if (!registerKey || !(await validateRegisterKey(registerKey))) {
       return NextResponse.json(
         { code: "INVALID_REGISTER_KEY", message: "注册密钥错误" },
         { status: 403 }
@@ -37,10 +36,8 @@ export async function POST(request: Request) {
       );
     }
 
-    // 哈希密码
     const hashed = await hashPassword(password);
 
-    // 创建用户
     const user = await prisma.user.create({
       data: {
         id,

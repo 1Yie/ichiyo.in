@@ -90,3 +90,10 @@ model Social {
   friendId Int
   friend   Friend @relation("FriendSocial", fields: [friendId], references: [id], onDelete: Cascade)
 }
+
+model RegisterKey {
+  id         Int      @id @default(autoincrement())
+  key        String   @unique
+  expiresAt  BigInt
+  createdAt  DateTime @default(now())
+}

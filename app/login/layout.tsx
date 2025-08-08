@@ -5,6 +5,8 @@ import ClientThemeWrapper from "./client-theme-wrapper";
 
 import { ThemeProvider } from "next-themes";
 import FaviconSwitcher from "@/lib/favicon-switcher";
+import { Toaster } from "sonner";
+
 
 import "@/app/globals.css";
 
@@ -50,6 +52,7 @@ export default async function RootLayout({
             enableColorScheme={false}
           >
             <FaviconSwitcher />
+            <Toaster richColors position="top-center" />
             {children}
           </ThemeProvider>
         </ClientThemeWrapper>

@@ -45,13 +45,15 @@ pnpm dev
 DATABASE_URL=""
 JWT_SECRET=""
 JWT_EXPIRES_IN=""
-REGISTER_KEY=""
+DEFAULT_ITERATIONS=""
+KEY_TTL_MS=""
 ```
 
 - `DATABASE_URL` 数据库地址
 - `JWT_SECRET` JWT 加密密钥
 - `JWT_EXPIRES_IN` JWT 过期时间
-- `REGISTER_KEY` 注册密钥
+- `DEFAULT_ITERATIONS` 密码迭代次数
+- `KEY_TTL_MS` 注册密钥过期时间
 
 #### **.env.local**
 
