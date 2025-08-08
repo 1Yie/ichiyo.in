@@ -27,7 +27,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { isValid, needsUpdate, isLegacy } = await verifyPassword(
+    const { isValid, needsUpdate } = await verifyPassword(
       password,
       user.hashpassword
     );
@@ -40,15 +40,6 @@ export async function POST(request: Request) {
     }
 
     if (needsUpdate) {
-      const newHash = await hashPassword(password);
-      await prisma.user.update({
-        where: { id: user.id },
-        data: { hashpassword: newHash },
-      });
-    }
-
-    // 如果是旧密码格式，登录成功后更新为新格式
-    if (isLegacy) {
       const newHash = await hashPassword(password);
       await prisma.user.update({
         where: { id: user.id },

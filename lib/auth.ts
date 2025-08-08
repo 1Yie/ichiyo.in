@@ -6,7 +6,6 @@ const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "1d";
 
 const DEFAULT_ITERATIONS = Number(process.env.DEFAULT_ITERATIONS);
 
-const LEGACY_ITERATIONS = 10_000; // 旧密码格式迭代次数
 const SALT_LENGTH = 16; // 16 字节盐
 const KEY_LENGTH = 256; // 256 位密钥
 const HASH_LENGTH = 32; // SHA-256 生成 32 字节的哈希值
@@ -53,12 +52,11 @@ export async function hashPassword(
 
 interface VerificationResult {
   isValid: boolean;
-  needsUpdate?: boolean; // 需要升级的情况：1.旧格式 2.迭代次数不等于当前配置
-  isLegacy?: boolean; // 统计的旧格式标记
+  needsUpdate?: boolean;
   storedIterations?: number; // 返回存储的迭代次数
 }
 
-// 密码验证 (兼容新旧版本)
+// 密码验证
 export async function verifyPassword(
   password: string,
   hashedPassword: string
@@ -67,37 +65,6 @@ export async function verifyPassword(
     const decoded = Uint8Array.from(Buffer.from(hashedPassword, "base64"));
     const encoder = new TextEncoder();
 
-    // 情况1：旧密码格式 (48字节)
-    if (decoded.length === SALT_LENGTH + HASH_LENGTH) {
-      const salt = decoded.slice(0, SALT_LENGTH);
-      const storedHash = decoded.slice(SALT_LENGTH);
-
-      const hashBuffer = await crypto.subtle.deriveBits(
-        {
-          name: "PBKDF2",
-          salt,
-          iterations: LEGACY_ITERATIONS,
-          hash: "SHA-256",
-        },
-        await crypto.subtle.importKey(
-          "raw",
-          encoder.encode(password),
-          "PBKDF2",
-          false,
-          ["deriveBits"]
-        ),
-        KEY_LENGTH
-      );
-
-      return {
-        isValid: timingSafeEqual(new Uint8Array(hashBuffer), storedHash),
-        needsUpdate: true, // 强制升级
-        isLegacy: true,
-        storedIterations: LEGACY_ITERATIONS,
-      };
-    }
-
-    // 情况2：新密码格式 (52字节)
     if (decoded.length === SALT_LENGTH + 4 + HASH_LENGTH) {
       const salt = decoded.slice(0, SALT_LENGTH);
       const iterations = new DataView(
@@ -123,7 +90,6 @@ export async function verifyPassword(
       return {
         isValid: timingSafeEqual(new Uint8Array(hashBuffer), storedHash),
         needsUpdate: shouldUpgrade,
-        isLegacy: false,
         storedIterations: iterations,
       };
     }
