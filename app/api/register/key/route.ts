@@ -11,35 +11,6 @@ function generateKey(): string {
   return Buffer.from(randomBytes).toString("base64");
 }
 
-export async function validateRegisterKey(key: string): Promise<boolean> {
-  const now = Date.now(); // 使用时间戳匹配 BigInt 类型
-
-  console.log("validateRegisterKey called");
-  console.log("input key:", key);
-  console.log("current timestamp:", now);
-
-  // 查找匹配的未过期密钥
-  const record = await prisma.registerKey.findFirst({
-    where: {
-      key: key, // 直接匹配密钥
-      expiresAt: { gt: BigInt(now) }, // 使用 BigInt 比较
-    },
-    orderBy: { expiresAt: "desc" },
-  });
-
-  console.log("found record:", record);
-  console.log("record expiresAt:", record?.expiresAt?.toString());
-
-  if (!record) {
-    console.log("No valid key found");
-    return false;
-  }
-
-  // 验证成功后删除该密钥（一次性使用）
-  await prisma.registerKey.delete({ where: { id: record.id } });
-  console.log("Key validated and deleted");
-  return true;
-}
 
 export async function GET() {
   try {

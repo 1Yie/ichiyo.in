@@ -6,11 +6,19 @@ const nextConfig: NextConfig = {
       "file.ichiyo.in",
       "dn-qiniu-avatar.qbox.me",
       "images.unsplash.com",
-      "iph.href.lu"
+      "iph.href.lu",
     ],
   },
   experimental: {
-    reactCompiler: true
+    reactCompiler: true,
+  },
+  compiler: {
+    removeConsole:
+      process.env.NODE_ENV === "production"
+        ? {
+            exclude: ["error", "info"],
+          }
+        : false,
   },
   async rewrites() {
     return [

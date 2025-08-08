@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { hashPassword } from "@/lib/auth";
-import { validateRegisterKey } from "@/app/api/register/key/route";
+import { validateRegisterKey } from "@/lib/registerKey";
 
 export async function POST(request: Request) {
   try {
