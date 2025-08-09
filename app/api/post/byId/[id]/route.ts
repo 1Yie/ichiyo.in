@@ -16,7 +16,7 @@ export async function GET(request: Request, props: Params) {
   }
 
   const cookieStore = await cookies();
-  const token = (await cookieStore).get("token")?.value;
+  const token = cookieStore.get("token")?.value;
   if (!token) {
     return NextResponse.json({ error: "未登录" }, { status: 401 });
   }

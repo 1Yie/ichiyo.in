@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { verifyToken } from "@/lib/auth";
 
-export async function POST(request: Request) {
-  const cookieHeader = request.headers.get("cookie") || "";
-  const tokenMatch = cookieHeader.match(/token=([^;]+)/);
-  if (!tokenMatch) {
+export async function POST() {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("token")?.value;
+  if (!token) {
     return NextResponse.json({ success: false, message: "no token provided" }, { status: 401 });
   }
-  const token = tokenMatch[1];
 
   try {
     verifyToken(token);
