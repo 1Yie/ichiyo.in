@@ -17,6 +17,8 @@ type SocialIconLinkProps = {
   children: React.ReactNode;
 };
 
+const ICP = "";
+
 export default function Footer() {
   const SocialIconLink = ({ href, children }: SocialIconLinkProps) => (
     <Link
@@ -40,9 +42,21 @@ export default function Footer() {
           </div>
 
           <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center space-x-4 max-[768px]:hidden">
-            <p className="text-sm text-gray-500 dark:text-gray-300 font-['Source_Code_Pro',monospace]">
-              Copyright © 2025 ichiyo
-            </p>
+            <div className="flex flex-col items-center">
+              <p className="text-sm text-gray-500 dark:text-gray-300 font-['Source_Code_Pro',monospace]">
+                Copyright © 2025 ichiyo
+              </p>
+              {ICP && (
+                <Link
+                  href="https://beian.miit.gov.cn/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-gray-500 dark:text-gray-300 font-['Source_Code_Pro',monospace] hover:text-gray-700 dark:hover:text-gray-400 transition-colors"
+                >
+                  {ICP}
+                </Link>
+              )}
+            </div>
           </div>
 
           <div className="flex items-center space-x-4">
