@@ -2,7 +2,6 @@ import Link from "next/link";
 import {
   NavigationMenu,
   NavigationMenuItem,
-  // NavigationMenuLink,
   NavigationMenuList,
 } from "@/components/ui/navigation-menu";
 import { FaGithub } from "react-icons/fa6";
@@ -18,8 +17,8 @@ type SocialIconLinkProps = {
 };
 
 const ICP = {
-  name: "萌ICP备20256090号",
-  url: "https://icp.gov.moe/?keyword=20256090",
+  name: "萌ICP备20250279号",
+  url: "https://icp.gov.moe/?keyword=20250279",
 };
 
 export default function Footer() {
@@ -37,18 +36,15 @@ export default function Footer() {
   return (
     <div className="relative">
       <section className="section-base">
-        <div className="h-14 flex justify-between items-center px-4 sm:px-8">
+        <div className="h-14 flex justify-between items-center px-4 sm:px-8 relative">
           <div className="flex items-center space-x-4 font-['Raleway',sans-serif]">
             <Link href="/">
               <p className="text-lg text-primary">ichiyo</p>
             </Link>
-          </div>
 
-          <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center space-x-4 max-[768px]:hidden">
-            <div className="flex flex-col items-center">
-              <p className="text-sm text-gray-500 dark:text-gray-300 font-['Source_Code_Pro',monospace]">
-                Copyright © 2025 ichiyo
-              </p>
+            {/* 移动端 版权和 ICP */}
+            <div className="flex flex-col items-start md:hidden">
+              <p className="text-xs text-gray-500 dark:text-gray-300 font-['Source_Code_Pro',monospace]">Copyright © 2025 ichiyo</p>
               {ICP.name && ICP.url && (
                 <Link
                   href={ICP.url}
@@ -62,8 +58,41 @@ export default function Footer() {
             </div>
           </div>
 
-          <div className="flex items-center space-x-4">
-            <NavigationMenu>
+          <div className="absolute left-1/2 transform -translate-x-1/2 flex flex-col items-center space-y-0 max-md:hidden">
+            <p className="text-sm text-gray-500 dark:text-gray-300 font-['Source_Code_Pro',monospace] whitespace-nowrap">
+              Copyright © 2025 ichiyo
+            </p>
+            {ICP.name && ICP.url && (
+              <Link
+                href={ICP.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-gray-500 font-['Source_Code_Pro',monospace] dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-400 transition-colors whitespace-nowrap"
+              >
+                {ICP.name}
+              </Link>
+            )}
+          </div>
+          <div className="sm:w-auto flex justify-end sm:justify-center">
+            {/* 移动端 */}
+            <NavigationMenu className="flex sm:hidden">
+              <NavigationMenuList>
+                <NavigationMenuItem className="flex flex-row gap-2">
+                  <SocialIconLink href="mailto:me@ichiyo.in">
+                    <FaEnvelope size={22} />
+                  </SocialIconLink>
+                  <SocialIconLink href="https://github.com/1Yie">
+                    <FaGithub size={22} />
+                  </SocialIconLink>
+                  <SocialIconLink href="https://x.com/IchiyoNico">
+                    <FaXTwitter size={22} />
+                  </SocialIconLink>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
+
+            {/* 桌面端显示全部社交图标 */}
+            <NavigationMenu className="hidden sm:flex">
               <NavigationMenuList>
                 <NavigationMenuItem className="flex flex-row gap-2">
                   <SocialIconLink href="mailto:me@ichiyo.in">
