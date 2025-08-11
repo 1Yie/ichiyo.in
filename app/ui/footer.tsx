@@ -17,8 +17,8 @@ type SocialIconLinkProps = {
 };
 
 const ICP = {
-  name: "萌ICP备20250279号",
-  url: "https://icp.gov.moe/?keyword=20250279",
+  name: "萌ICP备20256090号",
+  url: "https://icp.gov.moe/?keyword=20256090",
 };
 
 export default function Footer() {
