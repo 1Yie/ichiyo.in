@@ -17,7 +17,10 @@ type SocialIconLinkProps = {
   children: React.ReactNode;
 };
 
-const ICP = "";
+const ICP = {
+  name: "萌ICP备20256090号",
+  url: "https://icp.gov.moe/?keyword=20256090",
+};
 
 export default function Footer() {
   const SocialIconLink = ({ href, children }: SocialIconLinkProps) => (
@@ -46,14 +49,14 @@ export default function Footer() {
               <p className="text-sm text-gray-500 dark:text-gray-300 font-['Source_Code_Pro',monospace]">
                 Copyright © 2025 ichiyo
               </p>
-              {ICP && (
+              {ICP.name && ICP.url && (
                 <Link
-                  href="https://beian.miit.gov.cn/"
+                  href={ICP.url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-xs text-gray-500 dark:text-gray-300 font-['Source_Code_Pro',monospace] hover:text-gray-700 dark:hover:text-gray-400 transition-colors"
                 >
-                  {ICP}
+                  {ICP.name}
                 </Link>
               )}
             </div>
