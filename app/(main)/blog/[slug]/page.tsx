@@ -14,6 +14,7 @@ export async function generateMetadata({
   const realParams = await params;
 
   const res = request<Post>(`/api/post/bySlug/${realParams.slug}`, {
+    cache: "no-store",
   });
 
 
@@ -48,8 +49,7 @@ async function getPostData(slug: string): Promise<Post> {
 export default async function Page(props: {
   params: Promise<{ slug: string }>;
 }) {
-  const params = await props.params;
-  const realParams = await params;
+  const realParams = await props.params;
 
   const post = await getPostData(realParams.slug);
   if (!post) {
