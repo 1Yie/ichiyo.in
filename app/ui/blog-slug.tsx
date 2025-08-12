@@ -74,7 +74,9 @@ function timeDiffText(createdAt: string, updatedAt: string) {
 }
 
 async function fetchPostData(slug: string) {
-  const post = await request<PostBySlug>(`/api/post/bySlug/${slug}`);
+  const post = await request<PostBySlug>(`/api/post/bySlug/${slug}`, {
+    cache: "no-store",
+  });
   if (!post) throw new Error("Post not found");
   const htmlContent = await parseMarkdown(post.content);
   return { post, htmlContent };
