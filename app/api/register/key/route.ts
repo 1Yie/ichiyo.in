@@ -40,6 +40,7 @@ export async function GET() {
 
     if (existing) {
       return NextResponse.json({
+        id: existing.id,
         key: existing.key,
         expiresAt: existing.expiresAt.toString(),
       });

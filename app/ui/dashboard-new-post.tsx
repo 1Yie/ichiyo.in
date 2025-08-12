@@ -162,7 +162,7 @@ export default function DashboardNewPost() {
             <BreadcrumbList>
               <BreadcrumbItem>
                 <BreadcrumbLink
-                  className="cursor-pointer text-foreground/90"
+                  className="cursor-pointer"
                   onClick={() => router.push("/dashboard")}
                 >
                   仪表盘
@@ -171,7 +171,7 @@ export default function DashboardNewPost() {
               <BreadcrumbSeparator className="text-foreground/80" />
               <BreadcrumbItem>
                 <BreadcrumbLink
-                  className="cursor-pointer text-foreground/90"
+                  className="cursor-pointer"
                   onClick={() => router.push("/dashboard/post")}
                 >
                   文章管理
@@ -180,7 +180,7 @@ export default function DashboardNewPost() {
               <BreadcrumbSeparator className="text-foreground/80" />
               <BreadcrumbItem>
                 <BreadcrumbLink
-                  className="cursor-pointer text-foreground/90"
+                  className="cursor-pointer"
                   onClick={() => router.push(`/dashboard/post/new`)}
                 >
                   新建文章

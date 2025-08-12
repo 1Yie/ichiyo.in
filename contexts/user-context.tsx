@@ -149,6 +149,7 @@ export function UserProvider({ children }: UserProviderProps) {
     };
 
     const refreshUser = async () => {
+        clearCachedUser();
         await fetchUser(false);
     };
 

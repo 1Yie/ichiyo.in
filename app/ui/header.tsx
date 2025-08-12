@@ -98,7 +98,7 @@ export default function Header() {
         {isAuthenticated && userInfo ? (
           <AvatarImage
             src={avatarUrl}
-            alt={userInfo.name}
+            alt={userInfo.name} 
             onError={() => {
               /* 头像加载失败显示 fallback */
             }}
