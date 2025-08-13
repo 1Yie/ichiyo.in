@@ -36,6 +36,19 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async headers() {
+    return [
+      {
+        source: "/blog/:slug",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, s-maxage=60, stale-while-revalidate=30",
+          }
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

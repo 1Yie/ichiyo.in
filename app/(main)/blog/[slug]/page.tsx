@@ -8,9 +8,7 @@ export const dynamic = "force-dynamic";
 
 async function fetchPost(slug: string): Promise<Post | null> {
   try {
-    return await request<Post>(`/api/post/bySlug/${slug}`, {
-      cache: "no-store",
-    });
+    return await request<Post>(`/api/post/bySlug/${slug}`);
   } catch (error) {
     console.error("获取文章数据失败:", error);
     return null;
