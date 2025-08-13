@@ -222,7 +222,7 @@ function PostList({ postsPromise }: { postsPromise: Promise<PostsResponse> }) {
                       : "匿名"}
                   </TableCell>
                 )}
-                <TableCell>{post.title}1</TableCell>
+                <TableCell>{post.title}</TableCell>
                 <TableCell>
                   <span
                     className={cn(
