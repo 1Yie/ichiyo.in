@@ -54,7 +54,7 @@ function timeDiffText(createdAt: string, updatedAt: string) {
   const showUpdated = isUpdated && createdText !== updatedText;
 
   return (
-    <div className="inline-block text-gray-500 text-lg dark:text-gray-400 ">
+    <div className="inline-block text-gray-500 text-sm sm:text-lg dark:text-gray-400 ">
       <div>
         <Tooltip>
           <TooltipTrigger>创建于 {createdText}</TooltipTrigger>
@@ -102,8 +102,8 @@ function PostContent({ postPromise }: { postPromise: Promise<{ post: PostBySlug;
             </button>
           </div>
 
-          <h1 className="text-5xl font-bold mt-2 mb-2">{post.title}</h1>
-          <p className="text-gray-600 text-2xl mb-3 dark:text-gray-300">
+          <h1 className="sm:text-4xl text-3xl font-bold mt-2 mb-2">{post.title}</h1>
+          <p className="text-gray-600 text-lg sm:text-2xl mb-3 dark:text-gray-300">
             {post.authors && post.authors.length > 0
               ? post.authors.map((a) => a.id).join(", ")
               : "匿名"}

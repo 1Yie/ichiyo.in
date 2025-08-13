@@ -37,12 +37,15 @@ async function getPostData(slug: string): Promise<Post> {
     const post = await request<Post>(`/api/post/bySlug/${slug}`, {
       cache: "no-store",
     });
-    return post;
-  } catch (error) {
-    if (error instanceof Error) {
+    
+    if (!post) {
       notFound();
     }
-    throw error;
+    
+    return post;
+  } catch (error) {
+    console.error("获取文章数据失败:", error);
+    notFound();
   }
 }
 
