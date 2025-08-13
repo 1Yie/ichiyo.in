@@ -87,6 +87,7 @@ function LoadingSkeleton() {
 }
 
 function PostContent({ post, htmlContent }: { post: PostBySlug; htmlContent: string }) {
+  
   return (
     <>
       <div className="border-b">
@@ -156,6 +157,7 @@ export default function BlogSlug({
   post: PostBySlug;
   htmlContent: string;
 }) {
+  
   return (
     <Suspense fallback={<LoadingSkeleton />}>
       <ErrorBoundary fallback={null}>

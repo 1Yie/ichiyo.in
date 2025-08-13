@@ -169,6 +169,11 @@ export async function GET(request: Request) {
       }
     }
 
+    posts = posts.map((post) => ({
+      ...post,
+      authors: post.authors.map((a) => a.user),
+    }));
+
     return NextResponse.json({ posts, currentUser });
   } catch (error) {
     console.error("GET /api/post error:", error);
@@ -268,7 +273,10 @@ export async function POST(request: Request) {
       },
     });
 
-    return NextResponse.json(post);
+    return NextResponse.json({
+      ...post,
+      authors: post.authors.map((a) => a.user),
+    });
   } catch (err) {
     const error = err instanceof Error ? err : new Error("服务器错误");
     console.error("POST /api/post error:", error);

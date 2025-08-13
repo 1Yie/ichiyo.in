@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import BlogSlug from "@/ui/blog-slug";
 import { request, baseUrl } from "@/hooks/use-request";
 import type { Post, PostBySlug } from "@/types/post";
-import { use } from "react";
+import { parseMarkdown } from "@/lib/markdown";
 
 export const dynamic = "force-dynamic";
 
@@ -25,19 +25,18 @@ function getPost(slug: string) {
   return postCache.get(slug)!;
 }
 
-function transformPost(post: Post): PostBySlug {
+function transformPost(post: Post | PostBySlug): PostBySlug {
   return {
     ...post,
-    authors: post.authors?.map(a => a.user) || [],
+    authors: post.authors || [],
   };
 }
 
 export async function generateMetadata(props: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const params = await props.params;
   const post = await getPost(params.slug);
-  if (!post) {
-    return { title: "404 | ichiyo" };
-  }
+  if (!post) return { title: "404 | ichiyo" };
+
   const description = post.content.slice(0, 150) + (post.content.length > 150 ? "..." : "");
   return {
     title: `${post.title} | ichiyo`,
@@ -52,11 +51,14 @@ export async function generateMetadata(props: { params: Promise<{ slug: string }
   };
 }
 
-export default function Page(props: { params: Promise<{ slug: string }> }) {
-  const params = use(props.params);
-  const post = use(getPost(params.slug));
+export default async function Page(props: { params: Promise<{ slug: string }> }) {
+  const params = await props.params;
+  const post = await getPost(params.slug);
   if (!post) notFound();
+
   const transformedPost = transformPost(post);
 
-  return <BlogSlug post={transformedPost} htmlContent={transformedPost.content} />;
+  const htmlContent = await parseMarkdown(transformedPost.content);
+
+  return <BlogSlug post={transformedPost} htmlContent={htmlContent} />;
 }

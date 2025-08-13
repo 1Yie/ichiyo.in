@@ -114,7 +114,7 @@ function DashboardEditPostInner({
   const [saving, setSaving] = useState(false);
 
   const [selectedAuthors, setSelectedAuthors] = useState<number[]>(() => {
-    const authorsUid = post.authors.map((a) => a.user.uid);
+    const authorsUid = post.authors.map((a) => a.uid);
     if (!authorsUid.includes(me.uid)) authorsUid.push(me.uid);
     return authorsUid;
   });

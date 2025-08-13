@@ -41,7 +41,7 @@ function SearchResults({ searchPromise }: { searchPromise: Promise<Post[]> }) {
               {post.title}
             </h3>
             <p className="text-xs text-muted-foreground">
-              {post.authors.map((author) => author.user.id).join(" · ")}
+              {post.authors.map((author) => author.id).join(" · ")}
             </p>
             <div className="flex flex-wrap gap-1 my-1">
               {post.tags.slice(0, 5).map((tag) => (

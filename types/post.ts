@@ -14,7 +14,7 @@ export interface Post {
   published: boolean;
   createdAt: string;
   updatedAt: string;
-  authors: { user: User }[];
+  authors: User[];
 }
 
 export interface PostBySlug {
@@ -36,7 +36,7 @@ export interface PostById {
   published: boolean;
   slug?: string;
   tags: { name: string }[];
-  authors: { user: User }[];
+  authors: User[];
 }
 
 export interface PostData {
