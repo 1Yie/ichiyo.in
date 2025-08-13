@@ -6,19 +6,29 @@ import type { Post } from "@/types/post";
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}): Promise<Metadata> {
-  const realParams = await params;
+async function fetchPost(slug: string): Promise<Post | null> {
+  try {
+    return await request<Post>(`/api/post/bySlug/${slug}`, {
+      cache: "no-store",
+    });
+  } catch (error) {
+    console.error("获取文章数据失败:", error);
+    return null;
+  }
+}
 
-  const res = request<Post>(`/api/post/bySlug/${realParams.slug}`, {
-    cache: "no-store",
-  });
+export async function generateMetadata(
+  props: {
+    params: Promise<{ slug: string }>;
+  }
+): Promise<Metadata> {
+  const params = await props.params;
+  const post = await fetchPost(params.slug);
 
+  if (!post) {
+    return {};
+  }
 
-  const post = await res;
   return {
     title: post.title + " | ichiyo",
     description: post.content.slice(0, 150) + (post.content.length > 150 ? '...' : ''),
@@ -32,32 +42,13 @@ export async function generateMetadata({
   };
 }
 
-async function getPostData(slug: string): Promise<Post> {
-  try {
-    const post = await request<Post>(`/api/post/bySlug/${slug}`, {
-      cache: "no-store",
-    });
-    
-    if (!post) {
-      notFound();
-    }
-    
-    return post;
-  } catch (error) {
-    console.error("获取文章数据失败:", error);
-    notFound();
-  }
-}
+export default async function Page(props: { params: Promise<{ slug: string }> }) {
+  const params = await props.params;
+  const post = await fetchPost(params.slug);
 
-export default async function Page(props: {
-  params: Promise<{ slug: string }>;
-}) {
-  const realParams = await props.params;
-
-  const post = await getPostData(realParams.slug);
   if (!post) {
     notFound();
   }
 
-  return <BlogSlug params={{ slug: realParams.slug }} />;
+  return <BlogSlug params={{ slug: params.slug }} />;
 }
