@@ -53,7 +53,7 @@ export default function DashboardProfile() {
     // 注册密钥相关状态
     const [showKeyDialog, setShowKeyDialog] = useState(false);
     const [registerKey, setRegisterKey] = useState<{
-        id?: number;
+        id: number;
         value: string;
         expiresAt: number;
         isNew: boolean;
@@ -205,6 +205,8 @@ export default function DashboardProfile() {
             }
 
             const data = await res.json();
+            console.log(data);
+
             if (!data.key || !data.expiresAt || !data.id) {
                 throw new Error("无效的密钥响应");
             }
@@ -492,7 +494,8 @@ export default function DashboardProfile() {
                     <div className="mt-4 space-y-4">
                         <div className="p-4 bg-muted/50 rounded-lg">
                             <p className="select-all font-['Source_Code_Pro',monospace] text-lg break-all">
-                                {registerKey.value}
+                                {remainingTime === "已过期" ? "(X^X)" : registerKey.value}
+
                             </p>
                         </div>
 
@@ -501,9 +504,14 @@ export default function DashboardProfile() {
                                 variant="outline"
                                 size="sm"
                                 onClick={() => {
+                                    if (remainingTime === "已过期") {
+                                        toast.error("密钥已过期");
+                                        return;
+                                    }
                                     navigator.clipboard.writeText(registerKey.value);
                                     toast.success("已复制到剪贴板");
                                 }}
+                                disabled={remainingTime === "已过期"}
                             >
                                 复制密钥
                             </Button>

@@ -4,7 +4,7 @@ import BlogSlug from "@/ui/blog-slug";
 import { request, baseUrl } from "@/hooks/use-request";
 import type { Post } from "@/types/post";
 
-export const dynamic = "force-dynamic";
+export const dynamic = "auto";
 
 async function fetchPost(slug: string): Promise<Post | null> {
   try {

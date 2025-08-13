@@ -11,7 +11,6 @@ function generateKey(): string {
   return Buffer.from(randomBytes).toString("base64");
 }
 
-
 export async function GET() {
   try {
     const cookieStore = await cookies();
@@ -58,6 +57,7 @@ export async function GET() {
     });
 
     return NextResponse.json({
+      id: newRecord.id,
       key: newRecord.key,
       expiresAt: newRecord.expiresAt.toString(),
     });
