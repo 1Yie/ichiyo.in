@@ -166,7 +166,6 @@ function LoadingSkeleton() {
   );
 }
 
-
 export default function PostPage({ params }: { params: { slug: string } }) {
   const postPromise = fetchPostData(params.slug);
   return (

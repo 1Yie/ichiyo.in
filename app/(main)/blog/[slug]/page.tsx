@@ -4,7 +4,7 @@ import BlogSlug from "@/ui/blog-slug";
 import { request, baseUrl } from "@/hooks/use-request";
 import type { Post } from "@/types/post";
 
-export const dynamic = "auto";
+export const dynamic = "force-dynamic";
 
 async function fetchPost(slug: string): Promise<Post | null> {
   try {
@@ -24,7 +24,8 @@ export async function generateMetadata(
   const post = await fetchPost(params.slug);
 
   if (!post) {
-    return {};
+    console.error("文章不存在", post);
+    notFound();
   }
 
   return {
@@ -42,11 +43,5 @@ export async function generateMetadata(
 
 export default async function Page(props: { params: Promise<{ slug: string }> }) {
   const params = await props.params;
-  const post = await fetchPost(params.slug);
-
-  if (!post) {
-    notFound();
-  }
-
   return <BlogSlug params={{ slug: params.slug }} />;
 }
