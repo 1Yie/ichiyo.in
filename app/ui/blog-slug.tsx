@@ -1,25 +1,18 @@
 "use client";
 
-import { Suspense, use } from "react";
-import { parseMarkdown } from "@/lib/markdown";
+import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import Comments from "@/components/ui/comment";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
-import { request } from "@/hooks/use-request";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import ErrorBoundary from "@/ui/error-boundary";
 import type { PostBySlug } from "@/types/post";
 
 function dayDiff(d1: Date, d2: Date) {
   const date1 = new Date(d1.getFullYear(), d1.getMonth(), d1.getDate());
   const date2 = new Date(d2.getFullYear(), d2.getMonth(), d2.getDate());
-  const diffTime = date2.getTime() - date1.getTime();
-  return Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  return Math.floor((date2.getTime() - date1.getTime()) / (1000 * 60 * 60 * 24));
 }
 
 function timeDiffText(createdAt: string, updatedAt: string) {
@@ -31,10 +24,9 @@ function timeDiffText(createdAt: string, updatedAt: string) {
   const updatedDiffDays = dayDiff(updated, now);
 
   const formatDate = (d: Date) =>
-    `${d.getFullYear()}/${(d.getMonth() + 1).toString().padStart(2, "0")}/${d
-      .getDate()
+    `${d.getFullYear()}/${(d.getMonth() + 1)
       .toString()
-      .padStart(2, "0")}`;
+      .padStart(2, "0")}/${d.getDate().toString().padStart(2, "0")}`;
 
   const createdText =
     createdDiffDays <= 7
@@ -54,11 +46,11 @@ function timeDiffText(createdAt: string, updatedAt: string) {
   const showUpdated = isUpdated && createdText !== updatedText;
 
   return (
-    <div className="inline-block text-gray-500 text-sm sm:text-lg dark:text-gray-400 ">
+    <div className="inline-block text-gray-500 text-sm sm:text-lg dark:text-gray-400">
       <div>
         <Tooltip>
           <TooltipTrigger>创建于 {createdText}</TooltipTrigger>
-          <TooltipContent> 创建于 {formatDate(created)}</TooltipContent>
+          <TooltipContent>创建于 {formatDate(created)}</TooltipContent>
         </Tooltip>
       </div>
       {showUpdated && (
@@ -70,78 +62,6 @@ function timeDiffText(createdAt: string, updatedAt: string) {
         </div>
       )}
     </div>
-  );
-}
-
-async function fetchPostData(slug: string) {
-  const post = await request<PostBySlug>(`/api/post/bySlug/${slug}`);
-  if (!post) throw new Error("Post not found");
-  const htmlContent = await parseMarkdown(post.content);
-  return { post, htmlContent };
-}
-
-function PostContent({ postPromise }: { postPromise: Promise<{ post: PostBySlug; htmlContent: string }> }) {
-  const { post, htmlContent } = use(postPromise);
-  console.log(post);
-
-  return (
-    <>
-      <div className="border-b">
-        <section className="section-base p-12 bg-squares relative">
-          <div className="absolute top-0 right-full max-[768px]:hidden">
-            <button
-              className="flex items-center justify-center w-10 h-10 border-l border-b cursor-pointer"
-              onClick={() => window.history.back()}
-              title="返回"
-            >
-              <p className="text-muted-foreground">
-                <ChevronLeft className="w-6 h-6" />
-              </p>
-            </button>
-          </div>
-
-          <h1 className="sm:text-4xl text-3xl font-bold mt-2 mb-2">{post.title}</h1>
-          <p className="text-gray-600 text-lg sm:text-2xl mb-3 dark:text-gray-300">
-            {post.authors && post.authors.length > 0
-              ? post.authors.map((a) => a.id).join(", ")
-              : "匿名"}
-          </p>
-
-          {timeDiffText(post.createdAt, post.updatedAt)}
-          {post.tags && post.tags.length > 0 && (
-            <div className="mt-4 flex flex-wrap gap-2">
-              {post.tags.map((tag) => (
-                <Link
-                  key={tag.id}
-                  href={`/tags/${encodeURIComponent(tag.name)}`}
-                  className="inline-flex items-center bg-accent px-3 py-1 rounded-full text-sm font-medium text-accent-foreground cursor-pointer hover:bg-accent/80 transition"
-                >
-                  <span className="text-accent-foreground/60 mr-1 select-none">
-                    #
-                  </span>
-                  {tag.name}
-                </Link>
-              ))}
-            </div>
-          )}
-        </section>
-      </div>
-      <div className="border-b">
-        <section className="section-base">
-          <div
-            className="post-style max-[768px]:px-[20px] max-[768px]:py-[30px] py-[20px] px-[120px] leading-relaxed"
-            dangerouslySetInnerHTML={{
-              __html: htmlContent.replace(/<img/g, '<img data-zoom="true"'),
-            }}
-          />
-        </section>
-      </div>
-      <div className="border-b">
-        <section className="section-base p-[50px_120px] max-[768px]:p-[20px_30px] artalk">
-          <Comments />
-        </section>
-      </div>
-    </>
   );
 }
 
@@ -166,13 +86,80 @@ function LoadingSkeleton() {
   );
 }
 
-export default function PostPage({ params }: { params: { slug: string } }) {
-  const postPromise = fetchPostData(params.slug);
+function PostContent({ post, htmlContent }: { post: PostBySlug; htmlContent: string }) {
+  return (
+    <>
+      <div className="border-b">
+        <section className="section-base p-12 bg-squares relative">
+          <div className="absolute top-0 right-full max-[768px]:hidden">
+            <button
+              className="flex items-center justify-center w-10 h-10 border-l border-b cursor-pointer"
+              onClick={() => window.history.back()}
+              title="返回"
+            >
+              <p className="text-muted-foreground">
+                <ChevronLeft className="w-6 h-6" />
+              </p>
+            </button>
+          </div>
+
+          <h1 className="sm:text-4xl text-3xl font-bold mt-2 mb-2">{post.title}</h1>
+          <p className="text-gray-600 text-lg sm:text-2xl mb-3 dark:text-gray-300">
+            {post.authors && post.authors.length > 0
+              ? post.authors.map((a) => a.id).join(", ")
+              : "匿名"}
+          </p>
+
+          {timeDiffText(post.createdAt, post.updatedAt)}
+
+          {post.tags && post.tags.length > 0 && (
+            <div className="mt-4 flex flex-wrap gap-2">
+              {post.tags.map((tag) => (
+                <Link
+                  key={tag.id}
+                  href={`/tags/${encodeURIComponent(tag.name)}`}
+                  className="inline-flex items-center bg-accent px-3 py-1 rounded-full text-sm font-medium text-accent-foreground cursor-pointer hover:bg-accent/80 transition"
+                >
+                  <span className="text-accent-foreground/60 mr-1 select-none">#</span>
+                  {tag.name}
+                </Link>
+              ))}
+            </div>
+          )}
+        </section>
+      </div>
+
+      <div className="border-b">
+        <section className="section-base">
+          <div
+            className="post-style max-[768px]:px-[20px] max-[768px]:py-[30px] py-[20px] px-[120px] leading-relaxed"
+            dangerouslySetInnerHTML={{
+              __html: htmlContent.replace(/<img/g, '<img data-zoom="true"'),
+            }}
+          />
+        </section>
+      </div>
+
+      <div className="border-b">
+        <section className="section-base p-[50px_120px] max-[768px]:p-[20px_30px] artalk">
+          <Comments />
+        </section>
+      </div>
+    </>
+  );
+}
+
+export default function BlogSlug({
+  post,
+  htmlContent,
+}: {
+  post: PostBySlug;
+  htmlContent: string;
+}) {
   return (
     <Suspense fallback={<LoadingSkeleton />}>
-      <ErrorBoundary fallback={null}
-      >
-        <PostContent postPromise={postPromise} />
+      <ErrorBoundary fallback={null}>
+        <PostContent post={post} htmlContent={htmlContent} />
       </ErrorBoundary>
     </Suspense>
   );
