@@ -33,7 +33,6 @@ export default function TagsMain() {
     fetchTags();
   }, []);
 
-  // 过滤出postCount >= 1的标签
   const validTags = tags.filter(tag => tag.postCount >= 1);
 
   return (
