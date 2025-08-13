@@ -44,35 +44,62 @@ export default function Footer() {
 
             {/* 移动端 版权和 ICP */}
             <div className="flex flex-col items-start md:hidden">
-              <p className="text-xs text-gray-500 dark:text-gray-300 font-['Source_Code_Pro',monospace]">Copyright © 2025 ichiyo</p>
+              <p className="text-xs text-gray-500 dark:text-gray-300 font-['Source_Code_Pro',monospace]">
+                Copyright © {new Date().getFullYear()} ichiyo
+              </p>
               {ICP.name && ICP.url && (
-                <Link
-                  href={ICP.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs text-gray-500 dark:text-gray-300 font-['Source_Code_Pro',monospace] hover:text-gray-700 dark:hover:text-gray-400 transition-colors"
-                >
-                  {ICP.name}
-                </Link>
+                <div className="flex flex-row items-center justify-center gap-1">
+                  <Link
+                    href={ICP.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-gray-500 dark:text-gray-300 font-['Source_Code_Pro',monospace] hover:text-gray-700 dark:hover:text-gray-400 transition-colors"
+                  >
+                    {ICP.name}
+                  </Link>
+                  <span className="text-xs text-gray-500 font-['Source_Code_Pro',monospace] dark:text-gray-300">·</span>
+
+                  <Link
+                    href="https://travel.moe/go.html?travel=on "
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-gray-500 font-['Source_Code_Pro',monospace] dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-400 transition-colors whitespace-nowrap"
+                  >
+                    异次元之旅
+                  </Link>
+                </div>
               )}
             </div>
           </div>
 
           <div className="absolute left-1/2 transform -translate-x-1/2 flex flex-col items-center space-y-0 max-md:hidden">
             <p className="text-sm text-gray-500 dark:text-gray-300 font-['Source_Code_Pro',monospace] whitespace-nowrap">
-              Copyright © 2025 ichiyo
+              Copyright © {new Date().getFullYear()} ichiyo
             </p>
             {ICP.name && ICP.url && (
-              <Link
-                href={ICP.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs text-gray-500 font-['Source_Code_Pro',monospace] dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-400 transition-colors whitespace-nowrap"
-              >
-                {ICP.name}
-              </Link>
+              <div className="flex flex-row items-center justify-center gap-1">
+                <Link
+                  href={ICP.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-gray-500 font-['Source_Code_Pro',monospace] dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-400 transition-colors whitespace-nowrap"
+                >
+                  {ICP.name}
+                </Link>
+                <span className="text-xs text-gray-500 font-['Source_Code_Pro',monospace] dark:text-gray-300">·</span>
+
+                <Link
+                  href="https://travel.moe/go.html?travel=on "
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-gray-500 font-['Source_Code_Pro',monospace] dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-400 transition-colors whitespace-nowrap"
+                >
+                  异次元之旅
+                </Link>
+              </div>
             )}
           </div>
+
           <div className="sm:w-auto flex justify-end sm:justify-center">
             {/* 移动端 */}
             <NavigationMenu className="flex sm:hidden">
