@@ -6,7 +6,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/ui/app-sidebar";
 import { Toaster } from "@/components/ui/sonner"
 import NextTopLoader from "nextjs-toploader";
-import ClientThemeWrapper from "./client-theme-wrapper";
+import ClientThemeWrapper from "./client-wrapper";
 import { UserProvider } from "@/contexts/user-context";
 import { ThemeProvider } from "next-themes";
 import FaviconSwitcher from "@/lib/favicon-switcher";

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { Ubuntu_Sans, Source_Code_Pro, Raleway } from "next/font/google";
 import "@/app/globals.css";
-import ClientThemeWrapper from "./client-theme-wrapper";
+import ClientThemeWrapper from "./client-wrapper";
 
 import { ThemeProvider } from "next-themes";
 import FaviconSwitcher from "@/lib/favicon-switcher";

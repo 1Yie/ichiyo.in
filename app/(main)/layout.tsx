@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Ubuntu_Sans, Source_Code_Pro, Raleway } from "next/font/google";
 import "@/app/globals.css";
 
-import ClientThemeWrapper from "@/app/(main)/client-theme-wrapper";
+import ClientThemeWrapper from "@/app/(main)/client-wrapper";
 
 import NextTopLoader from "nextjs-toploader";
 import ImageZoom from "@/ui/img-zoom";
@@ -13,7 +13,7 @@ import Footer from "@/app/ui/footer";
 import { ThemeProvider } from "next-themes";
 import FaviconSwitcher from "@/lib/favicon-switcher";
 import { UserProvider } from "@/contexts/user-context";
-import { VersionCheckerSSE } from "@/components/version-checker-sse";
+
 
 export const metadata: Metadata = {
   title: "ichiyo (@1Yie)",
@@ -52,7 +52,6 @@ export default async function RootLayout({
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem enableColorScheme={false}>
             <UserProvider>
               <FaviconSwitcher />
-              <VersionCheckerSSE />
               <ImageZoom />
               <NextTopLoader
                 color="var(--foreground)"

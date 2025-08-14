@@ -1,6 +1,6 @@
 "use client";
 
-import ClientThemeProvider from "./client-theme-provider";
+import ClientThemeProvider from "./client-provider";
 
 export default function ClientThemeWrapper({
   children,
