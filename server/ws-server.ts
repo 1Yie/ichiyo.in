@@ -36,4 +36,4 @@ fs.watch(versionFile, async () => {
   }
 });
 
-console.log(`WebSocket server running on ws://localhost:${PORT}`);
+console.log(`WebSocket server running on ws://localhost:${PORT}/ws`);
