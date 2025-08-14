@@ -43,12 +43,42 @@ const nextConfig: NextConfig = {
       const version = new Date().toISOString().replace(/[:.-]/g, "");
       const filePath = join(__dirname, "public", "version.json");
       // const content = JSON.stringify({ version, timestamp: Date.now() });
-       const content = JSON.stringify({ version });
+      const content = JSON.stringify({ version });
 
       writeFileSync(filePath, content, "utf-8");
     }
 
-     return config;
+    return config;
+  },
+  async headers() {
+    return [
+      {
+        source: "/version.json",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "no-cache, no-store, must-revalidate, max-age=0",
+          },
+        ],
+      },
+      {
+        source: "/api/version/stream",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "no-cache, no-store, must-revalidate, max-age=0",
+          },
+          {
+            key: "Connection",
+            value: "keep-Alive",
+          },
+          {
+            key: "Content-Type",
+            value: "text/event-stream",
+          },
+        ],
+      },
+    ];
   },
 };
 
