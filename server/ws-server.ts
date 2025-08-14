@@ -7,9 +7,7 @@ const FILE_PATH = process.env.VERSION_FILE_PATH || "public/version.json";
 
 const wss = new WebSocketServer({ port: PORT });
 
-let currentVersion = JSON.parse(
-  fs.readFileSync(path.join(process.cwd(), FILE_PATH), "utf-8")
-).version;
+let currentVersion = JSON.parse(fs.readFileSync(path.join(process.cwd(), FILE_PATH), "utf-8")).version;
 
 wss.on("connection", (ws) => {
   console.log("Client connected");
@@ -28,9 +26,7 @@ fs.watch(versionFile, async () => {
       currentVersion = json.version;
       wss.clients.forEach((client) => {
         if (client.readyState === 1) {
-          client.send(
-            JSON.stringify({ type: "VERSION_UPDATE", version: currentVersion })
-          );
+          client.send(JSON.stringify({ type: "VERSION_UPDATE", version: currentVersion }));
         }
       });
       console.log("New version pushed:", currentVersion);
