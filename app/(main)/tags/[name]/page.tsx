@@ -1,3 +1,5 @@
+"use server";
+
 import { notFound } from "next/navigation";
 import TagsParamsTitle from "@/app/ui/tags-params-title";
 import TagParams from "@/app/ui/tags-params-main";

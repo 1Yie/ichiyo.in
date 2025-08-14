@@ -11,7 +11,9 @@ class WSManager {
 
   private constructor() {
     this.wsUrl = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:3001";
-    this.connect();
+    if (typeof window !== "undefined") {
+      this.connect();
+    }
   }
 
   public static getInstance(): WSManager {

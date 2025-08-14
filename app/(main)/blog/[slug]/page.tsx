@@ -1,3 +1,5 @@
+"use server";
+
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import BlogSlug from "@/ui/blog-slug";
@@ -5,7 +7,6 @@ import { request, baseUrl } from "@/hooks/use-request";
 import type { Post, PostBySlug } from "@/types/post";
 import { parseMarkdown } from "@/lib/markdown";
 
-export const dynamic = "force-dynamic";
 
 async function fetchPost(slug: string): Promise<Post | null> {
   try {
@@ -20,7 +21,7 @@ async function fetchPost(slug: string): Promise<Post | null> {
 
 const postCache = new Map<string, Promise<Post | null>>();
 
-function getPost(slug: string) {
+async function getPost(slug: string) {
   if (!postCache.has(slug)) {
     postCache.set(slug, fetchPost(slug));
   }
