@@ -37,7 +37,7 @@ function transformPost(post: Post | PostBySlug): PostBySlug {
 export async function generateMetadata(props: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const params = await props.params;
   const post = await getPost(params.slug);
-  if (!post) return { title: "404 | ichiyo" };
+  if (!post) return { title: "ichiyo | 404" };
 
   const description = post.content.slice(0, 150) + (post.content.length > 150 ? "..." : "");
   return {
