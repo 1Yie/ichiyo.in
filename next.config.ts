@@ -1,4 +1,6 @@
 import type { NextConfig } from "next";
+import { join } from "path";
+import { writeFileSync } from "fs";
 
 const nextConfig: NextConfig = {
   images: {
@@ -35,7 +37,19 @@ const nextConfig: NextConfig = {
         destination: "/feed.xml",
       },
     ];
-  }
+  },
+  webpack(config, { isServer }) {
+    if (!isServer) {
+      const version = new Date().toISOString().replace(/[:.-]/g, "");
+      const filePath = join(__dirname, "public", "version.json");
+      // const content = JSON.stringify({ version, timestamp: Date.now() });
+       const content = JSON.stringify({ version });
+
+      writeFileSync(filePath, content, "utf-8");
+    }
+
+     return config;
+  },
 };
 
 export default nextConfig;
