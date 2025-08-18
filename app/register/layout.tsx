@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Ubuntu_Sans, Source_Code_Pro, Raleway } from "next/font/google";
 import "@/app/globals.css";
 import ClientThemeWrapper from "./client-wrapper";
+import { Toaster } from "sonner";
 
 import { ThemeProvider } from "next-themes";
 import FaviconSwitcher from "@/lib/favicon-switcher";
@@ -49,6 +50,7 @@ export default async function RootLayout({
             enableColorScheme={false}
           >
             <FaviconSwitcher />
+            <Toaster richColors position="top-center" />
             {children}
           </ThemeProvider>
         </ClientThemeWrapper>

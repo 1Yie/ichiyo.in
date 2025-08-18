@@ -27,6 +27,7 @@
     "@radix-ui/react-toggle-group": "^1.1.10",
     "@radix-ui/react-tooltip": "^1.2.7",
     "@shadcn/ui": "^0.0.4",
+    "@svgr/webpack": "^8.1.0",
     "@tabler/icons-react": "^3.34.0",
     "@types/md5": "^2.3.5",
     "@types/ws": "^8.18.1",
