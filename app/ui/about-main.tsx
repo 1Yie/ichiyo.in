@@ -103,12 +103,6 @@ function SkillStack() {
     <div className="border-b">
       <section className="section-base bg-accent/10 relative">
         <div className="p-2 max-w-xl mx-auto relative">
-          {/* 技能标题 */}
-          <div className="text-center mb-6">
-            <span className="text-background font-medium text-2xl bg-accent-foreground px-4 py-1">
-              技术栈
-            </span>
-          </div>
           {/* 九宫格 */}
           <div className="grid grid-cols-3 gap-0 relative z-10">
             {skills.map((skill, index, arr) => {
@@ -168,7 +162,29 @@ export default function AboutMain() {
         </section>
       </div>
 
+      <div className="border-b">
+        <section className="section-base">
+          {/* 技能标题 */}
+          <div className="text-center py-2 sm:py-4">
+            <span className="text-background font-medium text-lg sm:text-2xl bg-accent-foreground px-4 py-1">
+              技术栈
+            </span>
+          </div>
+        </section>
+      </div>
+
       <SkillStack />
+
+      <div className="border-b">
+        <section className="section-base">
+          {/* 技能标题 */}
+          <div className="text-center py-2 sm:py-4">
+            <span className="text-background font-medium text-lg sm:text-2xl bg-accent-foreground px-4 py-1">
+              相册
+            </span>
+          </div>
+        </section>
+      </div>
 
       <div className="border-b">
         <section className="section-base">
