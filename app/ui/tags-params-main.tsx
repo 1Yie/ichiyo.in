@@ -12,8 +12,8 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { Tags, Rss } from "lucide-react";
-import BlogSearch from "@/ui/blog-search";
+import BlogPanel from "@/ui/blog-panel";
+
 
 interface Post {
   id: number;
@@ -62,23 +62,7 @@ export default function TagParams({ data }: { data: TagData }) {
 
   return (
     <>
-      <div className="border-b bg-diagonal-stripes-sm">
-        <section className="section-base flex flex-col sm:flex-row sm:justify-between px-4 py-3 sm:py-1.5 gap-3 sm:gap-0">
-          <div className="flex items-center justify-between sm:justify-start gap-4">
-            <Link href="/tags" className="flex items-center gap-1 text-lg">
-              <Tags size={19} />
-              Tags
-            </Link>
-            <Link href="/feed.xml" className="flex items-center gap-1 text-lg">
-              <Rss size={17} />
-              Rss
-            </Link>
-          </div>
-          <div className="w-full sm:w-auto sm:max-w-xs">
-            <BlogSearch />
-          </div>
-        </section>
-      </div>
+      <BlogPanel />
       <div className="border-b">
         <section className="section-base">
           {currentPosts.length === 0 ? (
@@ -107,7 +91,9 @@ export default function TagParams({ data }: { data: TagData }) {
                           ))}
                         </p>
                       )}
-                      <p className="text-lg text-gray-500 dark:text-gray-600">·</p>
+                      <p className="text-lg text-gray-500 dark:text-gray-600">
+                        ·
+                      </p>
                       <p className="text-lg text-gray-500 dark:text-gray-400">
                         {new Date(post.createdAt).toLocaleDateString()}
                       </p>
@@ -121,7 +107,9 @@ export default function TagParams({ data }: { data: TagData }) {
                             onClick={(e) => e.stopPropagation()}
                             className="inline-flex items-center bg-accent px-2 py-0.5 rounded-full text-sm font-medium text-accent-foreground cursor-pointer hover:bg-accent/80 transition"
                           >
-                            <span className="text-accent-foreground/60 mr-1 select-none">#</span>
+                            <span className="text-accent-foreground/60 mr-1 select-none">
+                              #
+                            </span>
                             {tag.name}
                           </Link>
                         ))}
@@ -142,7 +130,9 @@ export default function TagParams({ data }: { data: TagData }) {
                 <PaginationContent>
                   <PaginationItem>
                     <PaginationPrevious
-                      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.max(prev - 1, 1))
+                      }
                       className={
                         currentPage === 1
                           ? "pointer-events-none opacity-50"
@@ -151,31 +141,33 @@ export default function TagParams({ data }: { data: TagData }) {
                     />
                   </PaginationItem>
 
-                  {Array.from({ length: Math.min(5, totalPages) }).map((_, i) => {
-                    let pageNum: number;
+                  {Array.from({ length: Math.min(5, totalPages) }).map(
+                    (_, i) => {
+                      let pageNum: number;
 
-                    if (totalPages <= 5) {
-                      pageNum = i + 1;
-                    } else if (currentPage <= 3) {
-                      pageNum = i + 1;
-                    } else if (currentPage >= totalPages - 2) {
-                      pageNum = totalPages - 4 + i;
-                    } else {
-                      pageNum = currentPage - 2 + i;
+                      if (totalPages <= 5) {
+                        pageNum = i + 1;
+                      } else if (currentPage <= 3) {
+                        pageNum = i + 1;
+                      } else if (currentPage >= totalPages - 2) {
+                        pageNum = totalPages - 4 + i;
+                      } else {
+                        pageNum = currentPage - 2 + i;
+                      }
+
+                      return (
+                        <PaginationItem key={pageNum}>
+                          <PaginationLink
+                            onClick={() => setCurrentPage(pageNum)}
+                            isActive={currentPage === pageNum}
+                            className="cursor-pointer"
+                          >
+                            {pageNum}
+                          </PaginationLink>
+                        </PaginationItem>
+                      );
                     }
-
-                    return (
-                      <PaginationItem key={pageNum}>
-                        <PaginationLink
-                          onClick={() => setCurrentPage(pageNum)}
-                          isActive={currentPage === pageNum}
-                          className="cursor-pointer"
-                        >
-                          {pageNum}
-                        </PaginationLink>
-                      </PaginationItem>
-                    );
-                  })}
+                  )}
 
                   {totalPages > 5 && currentPage < totalPages - 2 && (
                     <>

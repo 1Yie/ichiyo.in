@@ -2,35 +2,17 @@
 
 import { Suspense, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import Link from "next/link";
-import { Tags, Rss } from "lucide-react";
-import BlogSearch from "@/ui/blog-search";
 import PostsList from "@/ui/posts-list";
+import BlogPanel from "@/ui/blog-panel";
+
 
 
 export default function BlogMain() {
   const [currentPage, setCurrentPage] = useState(1);
 
   return (
-    <>
-      <div className="border-b bg-diagonal-stripes-sm">
-        <section className="section-base flex flex-col sm:flex-row sm:justify-between px-4 py-3 sm:py-1.5 gap-3 sm:gap-0">
-          <div className="flex items-center justify-between sm:justify-start gap-4">
-            <Link href="/tags" className="flex items-center gap-1 text-lg">
-              <Tags size={19} />
-              Tags
-            </Link>
-            <Link href="/feed.xml" className="flex items-center gap-1 text-lg">
-              <Rss size={17} />
-              Rss
-            </Link>
-          </div>
-          <div className="w-full sm:w-auto sm:max-w-xs">
-            <BlogSearch />
-          </div>
-        </section>
-      </div>
-
+      <>
+      <BlogPanel />
       <Suspense
         fallback={
           <div className="border-b">

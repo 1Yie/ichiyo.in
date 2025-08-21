@@ -10,7 +10,6 @@ import { request } from "@/hooks/use-request";
 import ErrorBoundary from "@/ui/error-boundary";
 import type { Post } from "@/types/post";
 
-
 function fetchSearchResults(query: string): Promise<Post[]> {
   if (!query.trim()) return Promise.resolve([]);
   return request<Post[]>(`/api/post/search`, {
@@ -87,7 +86,7 @@ export default function BlogSearch() {
   return (
     <div className="relative w-full">
       <div className="relative">
-        <div className="flex items-center border rounded-lg overflow-hidden bg-background transition-all duration-300">
+        <div className="flex items-center border rounded-lg overflow-hidden bg-background transition-all duration-300 hover:border-foreground/50 focus-within:border-foreground/50">
           <div className="pl-2 sm:pl-3">
             <Search size={18} className="text-muted-foreground" />
           </div>
