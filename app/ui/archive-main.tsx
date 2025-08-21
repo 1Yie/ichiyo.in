@@ -31,7 +31,7 @@ function PostMain({ posts }: { posts: Post[] }) {
             {Object.entries(groupPostsByDate(posts)).map(([date, posts]) => (
               <div key={date} className="flex items-start gap-8 relative mb-12">
                 {/* 左侧日期 */}
-                <h2 className="sticky top-0 min-w-[120px] text-2xl font-bold">
+                <h2 className="sticky top-0 min-w-[80px] sm:min-w-[120px] text-2xl font-bold">
                   {date}
                 </h2>
 

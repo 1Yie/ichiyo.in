@@ -172,7 +172,7 @@ function FriendList({ friends }: { friends: Promise<Friend[]> }) {
         <TableBody>
           {sortedFriends.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={7} className="text-center text-muted-foreground dark:text-muted">
+              <TableCell colSpan={7} className="text-center text-muted-foreground">
                 暂无友链
               </TableCell>
             </TableRow>
