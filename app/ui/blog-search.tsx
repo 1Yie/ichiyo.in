@@ -9,15 +9,18 @@ import { Search, X } from "lucide-react";
 import { request } from "@/hooks/use-request";
 import ErrorBoundary from "@/ui/error-boundary";
 import type { Post } from "@/types/post";
+import { debouncePromise } from "@/lib/debounce";
 
+// 原始请求函数
 function fetchSearchResults(query: string): Promise<Post[]> {
   if (!query.trim()) return Promise.resolve([]);
   return request<Post[]>(`/api/post/search`, {
-    params: {
-      q: query,
-    },
+    params: { q: query },
   });
 }
+
+// 包装成防抖版本
+const debouncedFetchSearchResults = debouncePromise(fetchSearchResults, 500);
 
 function SearchResults({ searchPromise }: { searchPromise: Promise<Post[]> }) {
   const router = useRouter();
@@ -74,13 +77,27 @@ function SearchResults({ searchPromise }: { searchPromise: Promise<Post[]> }) {
 
 export default function BlogSearch() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchPromise, setSearchPromise] = useState<Promise<Post[]>>(
+    Promise.resolve([])
+  );
   const [showResults, setShowResults] = useState(false);
 
-  const searchPromise = fetchSearchResults(searchQuery);
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    setShowResults(value.trim().length > 0);
+
+    if (value.trim()) {
+      setSearchPromise(debouncedFetchSearchResults(value));
+    } else {
+      setSearchPromise(Promise.resolve([]));
+    }
+  };
 
   const clearSearch = () => {
     setSearchQuery("");
     setShowResults(false);
+    setSearchPromise(Promise.resolve([]));
   };
 
   return (
@@ -93,10 +110,7 @@ export default function BlogSearch() {
           <input
             type="text"
             value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-              setShowResults(e.target.value.trim().length > 0);
-            }}
+            onChange={handleChange}
             placeholder="搜索文章 标题 / 内容 / 标签"
             className="w-full py-2 placeholder:text-muted-foreground placeholder:text-sm sm:py-2 px-2 text-sm sm:text-base outline-none bg-transparent"
           />
