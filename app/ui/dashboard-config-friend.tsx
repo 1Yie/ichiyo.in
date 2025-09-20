@@ -3,15 +3,6 @@
 import { Suspense, use } from "react";
 import { useState, useMemo } from "react";
 import { useRouter } from "nextjs-toploader/app";
-import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Separator } from "@/components/ui/separator";
 import {
   Table,
   TableBody,
@@ -36,6 +27,7 @@ import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import DashboardLayout from "@/app/ui/dashboard-layout";
 import { request } from "@/hooks/use-request";
 import type { Friend } from "@/types/config";
 
@@ -76,7 +68,7 @@ function FriendList({ friends }: { friends: Promise<Friend[]> }) {
       });
       if (!res) throw new Error("删除失败");
 
-      setData(prev => prev.filter(friend => friend.id !== deleteId));
+      setData((prev) => prev.filter((friend) => friend.id !== deleteId));
 
       toast.success(`ID 为 ${deleteId} 的友链已被删除`);
     } catch (err) {
@@ -88,7 +80,6 @@ function FriendList({ friends }: { friends: Promise<Friend[]> }) {
       setDeleteId(null);
     }
   };
-
 
   const handleSort = (field: SortField) => {
     if (field === sortField) {
@@ -117,13 +108,13 @@ function FriendList({ friends }: { friends: Promise<Friend[]> }) {
           ? aVal === bVal
             ? 0
             : aVal
-              ? 1
-              : -1
+            ? 1
+            : -1
           : aVal === bVal
-            ? 0
-            : aVal
-              ? -1
-              : 1;
+          ? 0
+          : aVal
+          ? -1
+          : 1;
       }
       return sortOrder === "asc"
         ? String(aVal).localeCompare(String(bVal))
@@ -156,30 +147,43 @@ function FriendList({ friends }: { friends: Promise<Friend[]> }) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="cursor-pointer select-none text-foreground/90" onClick={() => handleSort("id")}>
+            <TableHead
+              className="cursor-pointer select-none text-foreground/90"
+              onClick={() => handleSort("id")}
+            >
               ID {renderSortIcon("id")}
             </TableHead>
             <TableHead className="text-foreground/90">头像</TableHead>
             <TableHead className="text-foreground/90">名称</TableHead>
             <TableHead className="text-foreground/90">介绍</TableHead>
-            <TableHead className="cursor-pointer select-none text-foreground/90" onClick={() => handleSort("pinned")}>
+            <TableHead
+              className="cursor-pointer select-none text-foreground/90"
+              onClick={() => handleSort("pinned")}
+            >
               置顶 {renderSortIcon("pinned")}
             </TableHead>
             <TableHead className="text-foreground/90">社交链接数</TableHead>
-            <TableHead className="text-right text-foreground/90">操作</TableHead>
+            <TableHead className="text-right text-foreground/90">
+              操作
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {sortedFriends.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={7} className="text-center text-muted-foreground">
+              <TableCell
+                colSpan={7}
+                className="text-center text-muted-foreground"
+              >
                 暂无友链
               </TableCell>
             </TableRow>
           ) : (
             sortedFriends.map((friend) => (
               <TableRow key={friend.id}>
-                <TableCell className="text-foreground/90">{friend.id}</TableCell>
+                <TableCell className="text-foreground/90">
+                  {friend.id}
+                </TableCell>
                 <TableCell>
                   <Image
                     src={friend.image}
@@ -191,15 +195,25 @@ function FriendList({ friends }: { friends: Promise<Friend[]> }) {
                     priority
                   />
                 </TableCell>
-                <TableCell className="text-foreground/90">{friend.name}</TableCell>
-                <TableCell className="text-foreground/90">{friend.description}</TableCell>
-                <TableCell className="text-foreground/90">{friend.pinned ? "是" : "否"}</TableCell>
-                <TableCell className="text-foreground/90">{friend.socialLinks.length}</TableCell>
+                <TableCell className="text-foreground/90">
+                  {friend.name}
+                </TableCell>
+                <TableCell className="text-foreground/90">
+                  {friend.description}
+                </TableCell>
+                <TableCell className="text-foreground/90">
+                  {friend.pinned ? "是" : "否"}
+                </TableCell>
+                <TableCell className="text-foreground/90">
+                  {friend.socialLinks.length}
+                </TableCell>
                 <TableCell className="text-right space-x-2">
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => router.push(`/dashboard/config/link/${friend.id}`)}
+                    onClick={() =>
+                      router.push(`/dashboard/config/link/${friend.id}`)
+                    }
                   >
                     编辑
                   </Button>
@@ -243,44 +257,25 @@ export default function DashboardConfigFriendSuspenseWrapper() {
   const router = useRouter();
 
   return (
-    <SidebarInset>
-      <header className="flex h-16 shrink-0 items-center gap-2">
-        <div className="flex items-center gap-2 px-4">
-          <SidebarTrigger className="-ml-1" />
-          <Separator orientation="vertical" className="mr-2 h-4 bg-foreground/30" />
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem className="cursor-pointer">
-                <BreadcrumbLink onClick={() => router.push("/dashboard")}>仪表盘</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator className="text-foreground/80" />
-              <BreadcrumbItem className="cursor-pointer">
-                <BreadcrumbLink onClick={() => router.push("/dashboard/config/link")}>友链</BreadcrumbLink>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-        </div>
-      </header>
-
-      <div className="flex flex-1 flex-col gap-4 p-4 pt-0 h-full w-full">
-        <div className="bg-muted/50 rounded-xl p-4 h-full w-full min-w-0">
-          <div className="bg-white dark:bg-muted/50 rounded-xl p-4 h-full w-full flex flex-col">
-            <div className="flex items-center justify-between mb-4 ml-2 mr-2">
-              <h1 className="text-2xl font-bold text-foreground/90">友链列表</h1>
-              <Button onClick={() => router.push("/dashboard/config/link/new")}>
-                <Pencil className="mr-1 h-4 w-4" />
-                新建友链
-              </Button>
-            </div>
-            <div className="rounded-xl bg-muted/50 p-4">
-              <Suspense fallback={<FriendListSkeleton />}>
-                <FriendList friends={friendsPromise} />
-              </Suspense>
-            </div>
-          </div>
-        </div>
+    <DashboardLayout
+      breadcrumbs={[
+        { label: "配置", href: "/dashboard/config" },
+        { label: "友链", href: "/dashboard/config/link" },
+      ]}
+    >
+      <div className="flex items-center justify-between mb-4 ml-2 mr-2">
+        <h1 className="text-2xl font-bold text-foreground/90">友链列表</h1>
+        <Button onClick={() => router.push("/dashboard/config/link/new")}>
+          <Pencil className="mr-1 h-4 w-4" />
+          新建友链
+        </Button>
       </div>
-    </SidebarInset>
+      <div className="rounded-xl bg-muted/50 p-4">
+        <Suspense fallback={<FriendListSkeleton />}>
+          <FriendList friends={friendsPromise} />
+        </Suspense>
+      </div>
+    </DashboardLayout>
   );
 }
 
@@ -301,12 +296,24 @@ function FriendListSkeleton() {
       <TableBody>
         {Array.from({ length: 5 }).map((_, i) => (
           <TableRow key={i}>
-            <TableCell><Skeleton className="h-4 w-6" /></TableCell>
-            <TableCell><Skeleton className="h-10 w-10 rounded-full" /></TableCell>
-            <TableCell><Skeleton className="h-4 w-20" /></TableCell>
-            <TableCell><Skeleton className="h-4 w-40" /></TableCell>
-            <TableCell><Skeleton className="h-4 w-8" /></TableCell>
-            <TableCell><Skeleton className="h-4 w-6" /></TableCell>
+            <TableCell>
+              <Skeleton className="h-4 w-6" />
+            </TableCell>
+            <TableCell>
+              <Skeleton className="h-10 w-10 rounded-full" />
+            </TableCell>
+            <TableCell>
+              <Skeleton className="h-4 w-20" />
+            </TableCell>
+            <TableCell>
+              <Skeleton className="h-4 w-40" />
+            </TableCell>
+            <TableCell>
+              <Skeleton className="h-4 w-8" />
+            </TableCell>
+            <TableCell>
+              <Skeleton className="h-4 w-6" />
+            </TableCell>
             <TableCell className="text-right space-x-2">
               <Skeleton className="inline-block h-8 w-12 rounded" />
               <Skeleton className="inline-block h-8 w-12 rounded" />

@@ -22,6 +22,9 @@ const nextConfig: NextConfig = {
           }
         : false,
   },
+  env: {
+    NEXT_PUBLIC_KEY_TTL_MS: process.env.KEY_TTL_MS,
+  },
   async rewrites() {
     return [
       {

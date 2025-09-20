@@ -19,6 +19,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Loader2 } from "lucide-react";
 
 export function RegisterForm({
   className,
@@ -35,6 +36,7 @@ export function RegisterForm({
   const [errorMsg, setErrorMsg] = useState("");
 
   const [successDialogOpen, setSuccessDialogOpen] = useState(false);
+  const [successRegister, setSuccessRegister] = useState(false);
 
   const router = useRouter();
 
@@ -73,6 +75,7 @@ export function RegisterForm({
       const data = await res.json();
 
       if (res.ok) {
+        setSuccessRegister(true);
         setSuccessDialogOpen(true);
       } else {
         const message =
@@ -83,6 +86,7 @@ export function RegisterForm({
         setErrorDialogOpen(true);
       }
     } catch (err) {
+      setSuccessRegister(false);
       console.error("请求错误:", err);
       setErrorMsg("请求失败，请检查网络");
       setErrorDialogOpen(true);
@@ -157,8 +161,15 @@ export function RegisterForm({
                     onChange={(e) => setRegisterKey(e.target.value)}
                   />
                 </div>
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? "注册中..." : "注册"}
+                <Button
+                  type="submit"
+                  className="w-full flex items-center justify-center gap-2"
+                  disabled={loading}
+                >
+                  {loading && <Loader2 className="animate-spin w-4 h-4" />}
+                  <span>
+                    {loading ? "注册中" : successRegister ? "注册成功" : "注册"}
+                  </span>
                 </Button>
               </div>
             </form>

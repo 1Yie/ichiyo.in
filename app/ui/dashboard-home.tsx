@@ -1,19 +1,11 @@
 "use client";
 
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-} from "@/components/ui/breadcrumb";
-import { Separator } from "@/components/ui/separator";
-import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useRouter } from "nextjs-toploader/app";
 import { Suspense } from "react";
 import { use } from "react";
 import { toast } from "sonner";
 import { Friend } from "@/types/config";
+import DashboardLayout from "@/app/ui/dashboard-layout";
 
 async function fetchStats() {
   const [postRes, projectRes, picRes, friendRes] = await Promise.all([
@@ -57,20 +49,20 @@ async function fetchStats() {
   const projectsArray = Array.isArray(projectRes.projects)
     ? projectRes.projects
     : Array.isArray(projectRes)
-      ? projectRes
-      : [];
+    ? projectRes
+    : [];
 
   const picsArray = Array.isArray(picRes.pics)
     ? picRes.pics
     : Array.isArray(picRes)
-      ? picRes
-      : [];
+    ? picRes
+    : [];
 
   const friendsArray: Friend[] = Array.isArray(friendRes.friends)
     ? friendRes.friends
     : Array.isArray(friendRes)
-      ? friendRes
-      : [];
+    ? friendRes
+    : [];
 
   const pinnedCount = friendsArray.filter((f) => f.pinned === true).length;
   const unpinnedCount = friendsArray.length - pinnedCount;
@@ -91,7 +83,9 @@ async function fetchStats() {
   };
 }
 
-function StatsDisplay({ statsPromise }: {
+function StatsDisplay({
+  statsPromise,
+}: {
   statsPromise: Promise<{
     posts: {
       total: number;
@@ -105,15 +99,17 @@ function StatsDisplay({ statsPromise }: {
       pinned: number;
       unpinned: number;
     };
-  }>
+  }>;
 }) {
   const stats = use(statsPromise);
 
   return (
     <>
       {/* 文章统计 */}
-      <div className="bg-muted/50 p-4 rounded-xl">
-        <h2 className="text-xl font-semibold text-foreground/90 mb-2">文章统计</h2>
+      <div className="bg-muted/50 p-4 rounded-xl mb-2">
+        <h2 className="text-xl font-semibold text-foreground/90 mb-2">
+          文章统计
+        </h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="bg-muted/100 p-4 rounded-xl flex flex-col items-start">
             <span className="text-foreground/50 text-sm">总文章数</span>
@@ -137,38 +133,54 @@ function StatsDisplay({ statsPromise }: {
       </div>
 
       {/* 项目统计 */}
-      <div className="bg-muted/50 p-4 rounded-xl">
-        <h2 className="text-xl font-semibold text-foreground/90 mb-2">项目统计</h2>
+      <div className="bg-muted/50 p-4 rounded-xl mb-2">
+        <h2 className="text-xl font-semibold text-foreground/90 mb-2">
+          项目统计
+        </h2>
         <div className="bg-muted/100 p-4 rounded-xl flex flex-col items-start max-w-xs">
           <span className="text-foreground/50 text-sm">项目总数</span>
-          <span className="text-2xl font-medium text-foreground/80">{stats.projects}</span>
+          <span className="text-2xl font-medium text-foreground/80">
+            {stats.projects}
+          </span>
         </div>
       </div>
 
       {/* 图片统计 */}
-      <div className="bg-muted/50 p-4 rounded-xl">
-        <h2 className="text-xl font-semibold text-foreground/90 mb-2">图片统计</h2>
+      <div className="bg-muted/50 p-4 rounded-xl mb-2">
+        <h2 className="text-xl font-semibold text-foreground/90 mb-2">
+          图片统计
+        </h2>
         <div className="bg-muted/100 p-4 rounded-xl flex flex-col items-start max-w-xs">
           <span className="text-foreground/50 text-sm">图片总数</span>
-          <span className="text-2xl font-medium text-foreground/80">{stats.pics}</span>
+          <span className="text-2xl font-medium text-foreground/80">
+            {stats.pics}
+          </span>
         </div>
       </div>
 
       {/* 友链统计 */}
-      <div className="bg-muted/50 p-4 rounded-xl">
-        <h2 className="text-xl font-semibold text-foreground/90 mb-2">友链统计</h2>
+      <div className="bg-muted/50 p-4 rounded-xl mb-2">
+        <h2 className="text-xl font-semibold text-foreground/90 mb-2">
+          友链统计
+        </h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="bg-muted/100 p-4 rounded-xl flex flex-col items-start">
             <span className="text-foreground/50 text-sm">友链总数</span>
-            <span className="text-2xl font-medium text-foreground/80">{stats.friends.total}</span>
+            <span className="text-2xl font-medium text-foreground/80">
+              {stats.friends.total}
+            </span>
           </div>
           <div className="bg-muted/100 p-4 rounded-xl flex flex-col items-start">
             <span className="text-foreground/50 text-sm">置顶人数</span>
-            <span className="text-2xl font-medium text-foreground/80">{stats.friends.pinned}</span>
+            <span className="text-2xl font-medium text-foreground/80">
+              {stats.friends.pinned}
+            </span>
           </div>
           <div className="bg-muted/100 p-4 rounded-xl flex flex-col items-start">
             <span className="text-foreground/50 text-sm">未置顶人数</span>
-            <span className="text-2xl font-medium text-foreground/80">{stats.friends.unpinned}</span>
+            <span className="text-2xl font-medium text-foreground/80">
+              {stats.friends.unpinned}
+            </span>
           </div>
         </div>
       </div>
@@ -177,40 +189,17 @@ function StatsDisplay({ statsPromise }: {
 }
 
 export default function DashboardHome() {
-  const router = useRouter();
   const statsPromise = fetchStats();
-
   return (
-    <SidebarInset>
-      <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
-        <div className="flex items-center gap-2 px-4">
-          <SidebarTrigger className="-ml-1" />
-          <Separator
-            orientation="vertical"
-            className="mr-2 data-[orientation=vertical]:h-4 bg-foreground/30"
-          />
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink
-                  className="cursor-pointer"
-                  onClick={() => router.push("/dashboard")}
-                >
-                  仪表盘
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-        </div>
-      </header>
-
-      <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-        <Suspense fallback={
+    <DashboardLayout breadcrumbs={[{ label: "仪表盘", href: "/dashboard" }]}>
+      <Suspense
+        fallback={
           <>
             <div className="bg-muted/50 p-4 rounded-xl">
-              <h2 className="text-xl font-semibold text-foreground/90 mb-2">文章统计</h2>
+              <h2 className="text-xl font-semibold text-foreground/90 mb-2">
+                文章统计
+              </h2>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-
                 <div className="bg-muted/100 p-4 rounded-xl flex flex-col items-start">
                   <span className="text-foreground/50 text-sm">总文章数</span>
                   <Skeleton className="bg-foreground/10 h-7 w-16 mt-1" />
@@ -225,38 +214,38 @@ export default function DashboardHome() {
                   <span className="text-foreground/50 text-sm">草稿</span>
                   <Skeleton className="bg-foreground/10 h-7 w-16 mt-1" />
                 </div>
-
               </div>
             </div>
 
             <div className="bg-muted/50 p-4 rounded-xl">
-              <h2 className="text-xl font-semibold text-foreground/90 mb-2">项目统计</h2>
+              <h2 className="text-xl font-semibold text-foreground/90 mb-2">
+                项目统计
+              </h2>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-
                 <div className="bg-muted/100 p-4 rounded-xl flex flex-col items-start">
                   <span className="text-foreground/50 text-sm">项目总数</span>
                   <Skeleton className="bg-foreground/10 h-7 w-16 mt-1" />
                 </div>
-
               </div>
             </div>
 
             <div className="bg-muted/50 p-4 rounded-xl">
-              <h2 className="text-xl font-semibold text-foreground/90 mb-2">图片统计</h2>
+              <h2 className="text-xl font-semibold text-foreground/90 mb-2">
+                图片统计
+              </h2>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-
                 <div className="bg-muted/100 p-4 rounded-xl flex flex-col items-start">
                   <span className="text-foreground/50 text-sm">图片总数</span>
                   <Skeleton className="bg-foreground/10 h-7 w-16 mt-1" />
                 </div>
-
               </div>
             </div>
 
             <div className="bg-muted/50 p-4 rounded-xl">
-              <h2 className="text-xl font-semibold text-foreground/90 mb-2">友链统计</h2>
+              <h2 className="text-xl font-semibold text-foreground/90 mb-2">
+                友链统计
+              </h2>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-
                 <div className="bg-muted/100 p-4 rounded-xl flex flex-col items-start">
                   <span className="text-foreground/50 text-sm">友链总数</span>
                   <Skeleton className="bg-foreground/10 h-7 w-16 mt-1" />
@@ -271,14 +260,13 @@ export default function DashboardHome() {
                   <span className="text-foreground/50 text-sm">未置顶人数</span>
                   <Skeleton className="bg-foreground/10 h-7 w-16 mt-1" />
                 </div>
-
               </div>
             </div>
           </>
-        }>
-          <StatsDisplay statsPromise={statsPromise} />
-        </Suspense>
-      </div>
-    </SidebarInset>
+        }
+      >
+        <StatsDisplay statsPromise={statsPromise} />
+      </Suspense>
+    </DashboardLayout>
   );
 }

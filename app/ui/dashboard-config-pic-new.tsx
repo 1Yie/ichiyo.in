@@ -2,15 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "nextjs-toploader/app";
-import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,6 +17,7 @@ import { ImageUrlWithPreview } from "@/app/ui/image-url-with-preview";
 import { Checkbox } from "@/components/ui/checkbox";
 import { request } from "@/hooks/use-request";
 import { toast } from "sonner";
+import DashboardLayout from "@/app/ui/dashboard-layout";
 
 export default function DashboardConfigPicNew() {
   const router = useRouter();
@@ -72,115 +64,85 @@ export default function DashboardConfigPicNew() {
   }
 
   return (
-    <SidebarInset>
-      <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
-        <div className="flex items-center gap-2 px-4">
-          <SidebarTrigger className="-ml-1" />
-          <Separator
-            orientation="vertical"
-            className="mr-2 data-[orientation=vertical]:h-4 bg-foreground/30"
+    <DashboardLayout
+      breadcrumbs={[
+        { label: "配置", href: "/dashboard/config" },
+        { label: "图片", href: "/dashboard/config/pic" },
+        { label: "新建图片", href: "/dashboard/config/pic/new" },
+      ]}
+    >
+      <h1 className="text-2xl font-bold mb-4 text-foreground/90">新建图片</h1>
+
+      <div className="space-y-4">
+        <div>
+          <label className="block mb-1 font-semibold text-foreground/90">
+            标题
+          </label>
+          <Input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="请输入标题"
           />
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem className="cursor-pointer">
-                <BreadcrumbLink onClick={() => router.push("/dashboard")}>
-                  仪表盘
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator className="text-foreground/80" />
-              <BreadcrumbItem className="cursor-pointer">
-                <BreadcrumbLink onClick={() => router.push("/dashboard/config/pic")}>
-                  图片
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator className="text-foreground/80" />
-              <BreadcrumbItem className="cursor-pointer">
-                <BreadcrumbLink onClick={() => router.push("/dashboard/config/pic/new")}>新建图片</BreadcrumbLink>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
         </div>
-      </header>
 
-      <div className="flex flex-1 flex-col gap-4 p-4 pt-0 h-full w-full">
-        <div className="bg-muted/50 dark:bg-muted/50 flex-1 rounded-xl p-4 h-full w-full min-w-0">
-          <div className="bg-white dark:bg-muted/50 rounded-xl p-4 h-full w-full min-w-0 flex flex-col">
-            <h1 className="text-2xl font-bold mb-4 text-foreground/90">
-              新建图片
-            </h1>
+        <ImageUrlWithPreview
+          src={src}
+          setSrc={setSrc}
+          labelName="图片链接"
+          labelClassName="block mb-1 font-semibold text-foreground/90"
+        />
 
-            <div className="space-y-4">
-              <div>
-                <label className="block mb-1 font-semibold text-foreground/90">
-                  标题
-                </label>
-                <Input
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="请输入标题"
-                />
-              </div>
+        <div>
+          <label className="block mb-1 font-semibold text-foreground/90">
+            按钮文字 (留空则不开启按钮)
+          </label>
+          <Input
+            value={button}
+            onChange={(e) => setButton(e.target.value)}
+            placeholder="按钮显示的文字"
+          />
+        </div>
 
-              <ImageUrlWithPreview
-                src={src}
-                setSrc={setSrc}
-                labelName="图片链接"
-                labelClassName="block mb-1 font-semibold text-foreground/90"
-              />
+        <div>
+          <label className="block mb-1 font-semibold text-foreground/90">
+            链接 URL
+          </label>
+          <Input
+            value={link}
+            onChange={(e) => setLink(e.target.value)}
+            placeholder="点击按钮跳转的链接"
+            disabled={button.trim() === ""}
+          />
+        </div>
 
-              <div>
-                <label className="block mb-1 font-semibold text-foreground/90">
-                  按钮文字 (留空则不开启按钮)
-                </label>
-                <Input
-                  value={button}
-                  onChange={(e) => setButton(e.target.value)}
-                  placeholder="按钮显示的文字"
-                />
-              </div>
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            id="newTab"
+            checked={newTab}
+            onCheckedChange={(checked) => setNewTab(!!checked)}
+            disabled={button.trim() === ""}
+          />
+          <label
+            htmlFor="newTab"
+            className={`select-none text-foreground/90 ${
+              button.trim() === "" ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+          >
+            是否新标签页打开链接
+          </label>
+        </div>
 
-              <div>
-                <label className="block mb-1 font-semibold text-foreground/90">
-                  链接 URL
-                </label>
-                <Input
-                  value={link}
-                  onChange={(e) => setLink(e.target.value)}
-                  placeholder="点击按钮跳转的链接"
-                  disabled={button.trim() === ""}
-                />
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="newTab"
-                  checked={newTab}
-                  onCheckedChange={(checked) => setNewTab(!!checked)}
-                  disabled={button.trim() === ""}
-                />
-                <label
-                  htmlFor="newTab"
-                  className={`select-none text-foreground/90 ${button.trim() === "" ? "opacity-50 cursor-not-allowed" : ""
-                    }`}
-                >
-                  是否新标签页打开链接
-                </label>
-              </div>
-
-              <div className="flex gap-2 justify-start">
-                <Button onClick={handleSave} disabled={saving}>
-                  {saving ? "保存中..." : "保存"}
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => router.push("/dashboard/config/pic")}
-                  disabled={saving}
-                >
-                  取消
-                </Button>
-              </div>
-            </div>
-          </div>
+        <div className="flex gap-2 justify-start">
+          <Button onClick={handleSave} disabled={saving}>
+            {saving ? "保存中..." : "保存"}
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => router.push("/dashboard/config/pic")}
+            disabled={saving}
+          >
+            取消
+          </Button>
         </div>
       </div>
 
@@ -195,6 +157,6 @@ export default function DashboardConfigPicNew() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </SidebarInset>
+    </DashboardLayout>
   );
 }

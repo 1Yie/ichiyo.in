@@ -95,5 +95,6 @@ model RegisterKey {
   id         Int      @id @default(autoincrement())
   key        String   @unique
   expiresAt  BigInt
+  isUsed     Boolean  @default(false)
   createdAt  DateTime @default(now())
 }

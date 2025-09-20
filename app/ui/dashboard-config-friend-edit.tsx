@@ -3,15 +3,6 @@
 import { Suspense, use } from "react";
 import { useState } from "react";
 import { useRouter } from "nextjs-toploader/app";
-import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -32,6 +23,7 @@ import { toast } from "sonner";
 import { request } from "@/hooks/use-request";
 import type { Friend, SocialLink } from "@/types/config";
 import ErrorBoundary from "@/ui/error-boundary";
+import DashboardLayout from "./dashboard-layout";
 
 interface DashboardConfigFriendEditProps {
   id: number;
@@ -44,7 +36,13 @@ async function fetchFriendData(id: number): Promise<Friend> {
   });
 }
 
-function FriendForm({ friendPromise, id }: { friendPromise: Promise<Friend>; id: number }) {
+function FriendForm({
+  friendPromise,
+  id,
+}: {
+  friendPromise: Promise<Friend>;
+  id: number;
+}) {
   const router = useRouter();
   const friend = use(friendPromise);
 
@@ -52,13 +50,19 @@ function FriendForm({ friendPromise, id }: { friendPromise: Promise<Friend>; id:
   const [image, setImage] = useState(friend.image || "");
   const [description, setDescription] = useState(friend.description || "");
   const [pinned, setPinned] = useState(!!friend.pinned);
-  const [socialLinks, setSocialLinks] = useState<SocialLink[]>(friend.socialLinks || []);
+  const [socialLinks, setSocialLinks] = useState<SocialLink[]>(
+    friend.socialLinks || []
+  );
 
   const [saving, setSaving] = useState(false);
   const [showErrorDialog, setShowErrorDialog] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  function updateSocialLink(index: number, field: keyof SocialLink, value: string) {
+  function updateSocialLink(
+    index: number,
+    field: keyof SocialLink,
+    value: string
+  ) {
     setSocialLinks((prev) => {
       const newLinks = [...prev];
       newLinks[index] = { ...newLinks[index], [field]: value };
@@ -104,7 +108,8 @@ function FriendForm({ friendPromise, id }: { friendPromise: Promise<Friend>; id:
       toast.success("保存成功");
       router.push("/dashboard/config/link");
     } catch (error) {
-      const msg = error instanceof Error ? error.message : "保存失败，请稍后再试";
+      const msg =
+        error instanceof Error ? error.message : "保存失败，请稍后再试";
       setErrorMessage(msg);
       setShowErrorDialog(true);
     } finally {
@@ -116,7 +121,9 @@ function FriendForm({ friendPromise, id }: { friendPromise: Promise<Friend>; id:
     <>
       <div className="space-y-4">
         <div>
-          <label htmlFor="name" className="block mb-1 font-semibold">名称</label>
+          <label htmlFor="name" className="block mb-1 font-semibold">
+            名称
+          </label>
           <Input
             id="name"
             value={name}
@@ -136,7 +143,10 @@ function FriendForm({ friendPromise, id }: { friendPromise: Promise<Friend>; id:
         <div>
           <label className="block mb-2 font-semibold">社交地址</label>
           {socialLinks.map((link, index) => (
-            <div key={index} className="mb-3 border border-foreground/20 shadow-xs rounded-lg p-3 relative transition-border duration-200 focus-within:border-foreground/50">
+            <div
+              key={index}
+              className="mb-3 border border-foreground/20 shadow-xs rounded-lg p-3 relative transition-border duration-200 focus-within:border-foreground/50"
+            >
               {socialLinks.length > 1 && (
                 <button
                   type="button"
@@ -149,47 +159,70 @@ function FriendForm({ friendPromise, id }: { friendPromise: Promise<Friend>; id:
               )}
               <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
                 <div>
-                  <label className="block mb-1 text-sm font-medium">社交平台名称</label>
+                  <label className="block mb-1 text-sm font-medium">
+                    社交平台名称
+                  </label>
                   <Input
                     value={link.name}
-                    onChange={(e) => updateSocialLink(index, "name", e.target.value)}
+                    onChange={(e) =>
+                      updateSocialLink(index, "name", e.target.value)
+                    }
                     placeholder="例如微博"
                   />
                 </div>
                 <div>
-                  <label className="block mb-1 text-sm font-medium">链接 URL</label>
+                  <label className="block mb-1 text-sm font-medium">
+                    链接 URL
+                  </label>
                   <Input
                     value={link.link}
-                    onChange={(e) => updateSocialLink(index, "link", e.target.value)}
+                    onChange={(e) =>
+                      updateSocialLink(index, "link", e.target.value)
+                    }
                     placeholder="https://example.com"
                   />
                 </div>
                 <div>
-                  <label className="block mb-1 text-sm font-medium">浅色 Icon URL</label>
+                  <label className="block mb-1 text-sm font-medium">
+                    浅色 Icon URL
+                  </label>
                   <Input
                     value={link.iconLight}
-                    onChange={(e) => updateSocialLink(index, "iconLight", e.target.value)}
+                    onChange={(e) =>
+                      updateSocialLink(index, "iconLight", e.target.value)
+                    }
                     placeholder="浅色图标链接"
                   />
                 </div>
                 <div>
-                  <label className="block mb-1 text-sm font-medium">深色 Icon URL</label>
+                  <label className="block mb-1 text-sm font-medium">
+                    深色 Icon URL
+                  </label>
                   <Input
                     value={link.iconDark}
-                    onChange={(e) => updateSocialLink(index, "iconDark", e.target.value)}
+                    onChange={(e) =>
+                      updateSocialLink(index, "iconDark", e.target.value)
+                    }
                     placeholder="深色图标链接"
                   />
                 </div>
               </div>
             </div>
           ))}
-          <Button type="button" variant="outline" onClick={addSocialLink} size="sm">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={addSocialLink}
+            size="sm"
+          >
             + 添加社交地址
           </Button>
         </div>
 
         <div>
-          <label htmlFor="description" className="block mb-1 font-semibold">介绍</label>
+          <label htmlFor="description" className="block mb-1 font-semibold">
+            介绍
+          </label>
           <Textarea
             id="description"
             value={description}
@@ -213,7 +246,11 @@ function FriendForm({ friendPromise, id }: { friendPromise: Promise<Friend>; id:
           <Button onClick={handleSave} disabled={saving}>
             {saving ? "保存中..." : "保存"}
           </Button>
-          <Button variant="outline" onClick={() => router.push("/dashboard/config/link")} disabled={saving}>
+          <Button
+            variant="outline"
+            onClick={() => router.push("/dashboard/config/link")}
+            disabled={saving}
+          >
             取消
           </Button>
         </div>
@@ -234,103 +271,82 @@ function FriendForm({ friendPromise, id }: { friendPromise: Promise<Friend>; id:
   );
 }
 
-export default function DashboardConfigFriendEdit({ id }: DashboardConfigFriendEditProps) {
+export default function DashboardConfigFriendEdit({
+  id,
+}: DashboardConfigFriendEditProps) {
   const friendPromise = fetchFriendData(id);
-  const router = useRouter();
 
   return (
-    <SidebarInset>
-      <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
-        <div className="flex items-center gap-2 px-4">
-          <SidebarTrigger className="-ml-1" />
-          <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem className="cursor-pointer">
-                <BreadcrumbLink onClick={() => router.push("/dashboard")}>仪表盘</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem className="cursor-pointer">
-                <BreadcrumbLink onClick={() => router.push("/dashboard/config/link")}>友链</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem className="cursor-pointer">
-                <BreadcrumbLink onClick={() => router.push(`/dashboard/config/link/${id}`)}>编辑友链 #{id}</BreadcrumbLink>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-        </div>
-      </header>
+    <DashboardLayout
+      breadcrumbs={[
+        { label: "仪表盘", href: "/dashboard" },
+        { label: "友链", href: "/dashboard/config/link" },
+        { label: `编辑友链 #${id}`, href: `/dashboard/config/link/${id}` },
+      ]}
+    >
+      <h1 className="text-2xl font-bold mb-4 text-foreground/90">
+        编辑友链 #{id}
+      </h1>
 
-      <div className="flex flex-1 flex-col gap-4 p-4 pt-0 h-full w-full">
-        <div className="bg-muted/50 dark:bg-muted/50 flex-1 rounded-xl p-4 h-full w-full min-w-0">
-          <div className="bg-white dark:bg-muted/50 rounded-xl p-4 h-full w-full min-w-0 flex flex-col">
+      <Suspense
+        fallback={
+          <div className="space-y-4">
+            <Skeleton className="h-5 w-18" />
+            <Skeleton className="h-10 w-full" />
 
-            <Suspense
-              fallback={
-                <div className="space-y-4">
-                  <Skeleton className="h-5 w-18" />
-                  <Skeleton className="h-10 w-full" />
+            <ImageUrlWithPreview
+              labelName="图标 URL"
+              labelClassName="block mb-1 font-semibold"
+              src={""}
+              setSrc={() => {}}
+              loading={true}
+            />
 
-                  <ImageUrlWithPreview
-                    labelName="图标 URL"
-                    labelClassName="block mb-1 font-semibold"
-                    src={""}
-                    setSrc={() => { }}
-                    loading={true}
-                  />
-
-                  {[...Array(1)].map((_, i) => (
-                    <div key={`skeleton-${i}`}>
-                      <div className="mb-3 border border-foreground/20 shadow-xs rounded-lg p-3 relative transition-border duration-200 focus-within:border-foreground/50">
-                        <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
-                          <div>
-                            <Skeleton className="h-5 w-18 mb-2" />
-                            <Skeleton className="h-8 flex-1 rounded-md" />
-                          </div>
-                          <div>
-                            <Skeleton className="h-5 w-18 mb-2" />
-                            <Skeleton className="h-8 flex-1 rounded-md" />  
-                          </div>
-                          <div>
-                            <Skeleton className="h-5 w-18 mb-2" />
-                            <Skeleton className="h-8 flex-1 rounded-md" />
-                          </div>
-                          <div>
-                            <Skeleton className="h-5 w-18 mb-2" />
-                            <Skeleton className="h-8 flex-1 rounded-md" />
-                          </div>
-                        </div>
-                      </div>
-                      <Skeleton className="h-8 w-24 rounded-md" />
+            {[...Array(1)].map((_, i) => (
+              <div key={`skeleton-${i}`}>
+                <div className="mb-3 border border-foreground/20 shadow-xs rounded-lg p-3 relative transition-border duration-200 focus-within:border-foreground/50">
+                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                    <div>
+                      <Skeleton className="h-5 w-18 mb-2" />
+                      <Skeleton className="h-8 flex-1 rounded-md" />
                     </div>
-                  ))}
-
-                  <Skeleton className="h-5 w-18" />
-                  <Skeleton className="h-24 w-full rounded-md" />
-
-                  <div className="flex items-center space-x-2">
-                    <Skeleton className="h-5 w-5 rounded" />
-                    <Skeleton className="h-5 w-16 rounded-md" />
+                    <div>
+                      <Skeleton className="h-5 w-18 mb-2" />
+                      <Skeleton className="h-8 flex-1 rounded-md" />
+                    </div>
+                    <div>
+                      <Skeleton className="h-5 w-18 mb-2" />
+                      <Skeleton className="h-8 flex-1 rounded-md" />
+                    </div>
+                    <div>
+                      <Skeleton className="h-5 w-18 mb-2" />
+                      <Skeleton className="h-8 flex-1 rounded-md" />
+                    </div>
                   </div>
-
-                  <div className="flex gap-4">
-                    <Skeleton className="h-10 w-24 rounded-md" />
-                    <Skeleton className="h-10 w-24 rounded-md" />
-                  </div>
-
                 </div>
-              }
-            >
-              <ErrorBoundary fallback={null}>
-                <FriendForm friendPromise={friendPromise} id={id} />
-              </ErrorBoundary>
-            </Suspense>
+                <Skeleton className="h-8 w-24 rounded-md" />
+              </div>
+            ))}
 
+            <Skeleton className="h-5 w-18" />
+            <Skeleton className="h-24 w-full rounded-md" />
+
+            <div className="flex items-center space-x-2">
+              <Skeleton className="h-5 w-5 rounded" />
+              <Skeleton className="h-5 w-16 rounded-md" />
+            </div>
+
+            <div className="flex gap-4">
+              <Skeleton className="h-10 w-24 rounded-md" />
+              <Skeleton className="h-10 w-24 rounded-md" />
+            </div>
           </div>
-        </div>
-      </div>
-    </SidebarInset>
-
+        }
+      >
+        <ErrorBoundary fallback={null}>
+          <FriendForm friendPromise={friendPromise} id={id} />
+        </ErrorBoundary>
+      </Suspense>
+    </DashboardLayout>
   );
 }

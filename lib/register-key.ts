@@ -6,12 +6,17 @@ export async function validateRegisterKey(key: string): Promise<boolean> {
     where: {
       key,
       expiresAt: { gt: BigInt(now) },
+      isUsed: false,
     },
     orderBy: { expiresAt: "desc" },
   });
 
   if (!record) return false;
 
-  await prisma.registerKey.delete({ where: { id: record.id } });
+  await prisma.registerKey.update({
+    where: { id: record.id },
+    data: { isUsed: true }
+  });
+  
   return true;
 }

@@ -3,15 +3,6 @@
 import { Suspense, use } from "react";
 import { useState, useMemo } from "react";
 import { useRouter } from "nextjs-toploader/app";
-import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Separator } from "@/components/ui/separator";
 import {
   Table,
   TableBody,
@@ -38,6 +29,7 @@ import {
 import { toast } from "sonner";
 import type { Post, CurrentUser } from "@/types/post";
 import { request } from "@/hooks/use-request";
+import DashboardLayout from "@/ui/dashboard-layout";
 
 interface PostsResponse {
   posts: Post[];
@@ -70,7 +62,6 @@ function PostList({ postsPromise }: { postsPromise: Promise<PostsResponse> }) {
   const router = useRouter();
 
   console.log(posts);
-
 
   const handleEdit = (id: number) => {
     router.push(`/dashboard/post/${id}`);
@@ -185,7 +176,9 @@ function PostList({ postsPromise }: { postsPromise: Promise<PostsResponse> }) {
               ID {renderSortIcon("id")}
             </TableHead>
             <TableHead className="text-foreground/90">Slug</TableHead>
-            {currentUser.isAdmin && <TableHead className="text-foreground/90">作者</TableHead>}
+            {currentUser.isAdmin && (
+              <TableHead className="text-foreground/90">作者</TableHead>
+            )}
             <TableHead className="text-foreground/90">标题</TableHead>
             <TableHead className="text-foreground/90">状态</TableHead>
             <TableHead
@@ -200,13 +193,18 @@ function PostList({ postsPromise }: { postsPromise: Promise<PostsResponse> }) {
             >
               更新时间 {renderSortIcon("updatedAt")}
             </TableHead>
-            <TableHead className="text-foreground/90 text-right">操作</TableHead>
+            <TableHead className="text-foreground/90 text-right">
+              操作
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {sortedPosts.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={currentUser.isAdmin ? 8 : 7} className="text-center text-muted-foreground">
+              <TableCell
+                colSpan={currentUser.isAdmin ? 8 : 7}
+                className="text-center text-muted-foreground"
+              >
                 暂无文章
               </TableCell>
             </TableRow>
@@ -227,7 +225,9 @@ function PostList({ postsPromise }: { postsPromise: Promise<PostsResponse> }) {
                   <span
                     className={cn(
                       "text-xs font-medium px-2 py-1 rounded",
-                      post.published ? "bg-green-100 text-green-600" : "bg-gray-100 text-gray-500"
+                      post.published
+                        ? "bg-green-100 text-green-600"
+                        : "bg-gray-100 text-gray-500"
                     )}
                   >
                     {post.published ? "已发布" : "未发布"}
@@ -236,7 +236,11 @@ function PostList({ postsPromise }: { postsPromise: Promise<PostsResponse> }) {
                 <TableCell>{formatBeijingTime(post.createdAt)}</TableCell>
                 <TableCell>{formatBeijingTime(post.updatedAt)}</TableCell>
                 <TableCell className="text-right space-x-2">
-                  <Button size="sm" variant="outline" onClick={() => handleEdit(post.id)}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleEdit(post.id)}
+                  >
                     编辑
                   </Button>
                   <Button
@@ -261,7 +265,8 @@ function PostList({ postsPromise }: { postsPromise: Promise<PostsResponse> }) {
           <AlertDialogHeader>
             <AlertDialogTitle>
               <p className="text-lg text-foreground/90">
-                确定要删除文章《{posts.find((p) => p.id === deleteId)?.title}》吗？
+                确定要删除文章《{posts.find((p) => p.id === deleteId)?.title}
+                》吗？
               </p>
             </AlertDialogTitle>
             <AlertDialogDescription className="text-muted-foreground">
@@ -283,13 +288,17 @@ function PostList({ postsPromise }: { postsPromise: Promise<PostsResponse> }) {
       <AlertDialog open={errorDialogOpen} onOpenChange={setErrorDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-foreground/90">操作失败</AlertDialogTitle>
+            <AlertDialogTitle className="text-foreground/90">
+              操作失败
+            </AlertDialogTitle>
             <AlertDialogDescription className="text-muted-foreground">
               {errorMessage}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogAction onClick={() => setErrorDialogOpen(false)}>知道了</AlertDialogAction>
+            <AlertDialogAction onClick={() => setErrorDialogOpen(false)}>
+              知道了
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -302,102 +311,75 @@ export default function DashboardPostSuspenseWrapper() {
   const router = useRouter();
 
   return (
-    <SidebarInset>
-      <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
-        <div className="flex items-center gap-2 px-4">
-          <SidebarTrigger className="-ml-1" />
-          <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4 bg-foreground/30" />
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink
-                  className="cursor-pointer"
-                  onClick={() => router.push("/dashboard")}
-                >
-                  仪表盘
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator className="text-foreground/80" />
-              <BreadcrumbItem>
-                <BreadcrumbLink
-                  className="cursor-pointer"
-                  onClick={() => router.push("/dashboard/post")}
-                >
-                  文章管理
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-        </div>
-      </header>
-
-      <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-        <div className="bg-muted/50 flex-1 rounded-xl p-4">
-          <div className="w-full h-full bg-white dark:bg-muted/50 p-4 rounded-xl">
-            <div className="flex items-center justify-between mb-4 ml-2 mr-2">
-              <h1 className="text-2xl font-bold text-foreground/90">文章列表</h1>
-              <Button onClick={() => router.push("/dashboard/post/new")}>
-                <Pencil className="mr-1 h-4 w-4" />
-                新建文章
-              </Button>
-            </div>
-
-            <div className="rounded-xl bg-muted/50 p-4">
-              <Suspense
-                fallback={
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="text-foreground/90">ID</TableHead>
-                        <TableHead className="text-foreground/90">Slug</TableHead>
-                        <TableHead className="text-foreground/90">作者</TableHead>
-                        <TableHead className="text-foreground/90">标题</TableHead>
-                        <TableHead className="text-foreground/90">状态</TableHead>
-                        <TableHead className="text-foreground/90">创建时间</TableHead>
-                        <TableHead className="text-foreground/90">更新时间</TableHead>
-                        <TableHead className="text-foreground/90 text-right">操作</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {[1, 2, 3].map((i) => (
-                        <TableRow key={i}>
-                          <TableCell>
-                            <Skeleton className="h-4 w-8" />
-                          </TableCell>
-                          <TableCell>
-                            <Skeleton className="h-4 w-8" />
-                          </TableCell>
-                          <TableCell>
-                            <Skeleton className="h-4 w-40" />
-                          </TableCell>
-                          <TableCell>
-                            <Skeleton className="h-4 w-15" />
-                          </TableCell>
-                          <TableCell>
-                            <Skeleton className="h-6 w-16 rounded" />
-                          </TableCell>
-                          <TableCell>
-                            <Skeleton className="h-6 w-28 rounded" />
-                          </TableCell>
-                          <TableCell>
-                            <Skeleton className="h-6 w-28 rounded" />
-                          </TableCell>
-                          <TableCell className="text-right space-x-2">
-                            <Skeleton className="h-8 w-16 inline-block" />
-                            <Skeleton className="h-8 w-16 inline-block" />
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                }
-              >
-                <PostList postsPromise={postsPromise} />
-              </Suspense>
-            </div>
-          </div>
-        </div>
+    <DashboardLayout
+      breadcrumbs={[
+        { label: "仪表盘", href: "/dashboard" },
+        { label: "文章管理", href: "/dashboard/post" },
+      ]}
+    >
+      <div className="flex items-center justify-between mb-4 ml-2 mr-2">
+        <h1 className="text-2xl font-bold text-foreground/90">文章列表</h1>
+        <Button onClick={() => router.push("/dashboard/post/new")}>
+          <Pencil className="mr-1 h-4 w-4" />
+          新建文章
+        </Button>
       </div>
-    </SidebarInset>
+
+      <div className="rounded-xl bg-muted/50 p-4">
+        <Suspense
+          fallback={
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-foreground/90">ID</TableHead>
+                  <TableHead className="text-foreground/90">Slug</TableHead>
+                  <TableHead className="text-foreground/90">作者</TableHead>
+                  <TableHead className="text-foreground/90">标题</TableHead>
+                  <TableHead className="text-foreground/90">状态</TableHead>
+                  <TableHead className="text-foreground/90">创建时间</TableHead>
+                  <TableHead className="text-foreground/90">更新时间</TableHead>
+                  <TableHead className="text-foreground/90 text-right">
+                    操作
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {[1, 2, 3].map((i) => (
+                  <TableRow key={i}>
+                    <TableCell>
+                      <Skeleton className="h-4 w-8" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-8" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-40" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-15" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-6 w-16 rounded" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-6 w-28 rounded" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-6 w-28 rounded" />
+                    </TableCell>
+                    <TableCell className="text-right space-x-2">
+                      <Skeleton className="h-8 w-16 inline-block" />
+                      <Skeleton className="h-8 w-16 inline-block" />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          }
+        >
+          <PostList postsPromise={postsPromise} />
+        </Suspense>
+      </div>
+    </DashboardLayout>
   );
 }

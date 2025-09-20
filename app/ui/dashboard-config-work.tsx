@@ -3,15 +3,6 @@
 import { Suspense, use } from "react";
 import { useState, useMemo } from "react";
 import { useRouter } from "nextjs-toploader/app";
-import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Separator } from "@/components/ui/separator";
 import {
   Table,
   TableBody,
@@ -38,7 +29,7 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { request } from "@/hooks/use-request";
 import type { Project } from "@/types/config";
-
+import DashboardLayout from "@/app/ui/dashboard-layout";
 
 type SortField = "id" | "name" | "description" | "link" | "none";
 type SortOrder = "asc" | "desc";
@@ -56,7 +47,11 @@ async function fetchProjectsData(): Promise<Project[]> {
   return Array.isArray(res) ? res : [];
 }
 
-function ProjectList({ projectsPromise }: { projectsPromise: Promise<Project[]> }) {
+function ProjectList({
+  projectsPromise,
+}: {
+  projectsPromise: Promise<Project[]>;
+}) {
   const initialProjects = use(projectsPromise);
   const [projects, setProjects] = useState(initialProjects);
 
@@ -82,7 +77,7 @@ function ProjectList({ projectsPromise }: { projectsPromise: Promise<Project[]> 
         throw new Error("删除失败");
       }
 
-      setProjects(prev => prev.filter(project => project.id !== deleteId));
+      setProjects((prev) => prev.filter((project) => project.id !== deleteId));
 
       toast.success(`ID 为 ${deleteId} 的作品已被删除`);
     } catch (err) {
@@ -180,20 +175,27 @@ function ProjectList({ projectsPromise }: { projectsPromise: Promise<Project[]> 
             >
               链接 {renderSortIcon("link")}
             </TableHead>
-            <TableHead className="text-right text-foreground/90">操作</TableHead>
+            <TableHead className="text-right text-foreground/90">
+              操作
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {sortedProjects.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={6} className="text-center text-muted-foreground dark:text-muted">
+              <TableCell
+                colSpan={6}
+                className="text-center text-muted-foreground dark:text-muted"
+              >
                 暂无作品
               </TableCell>
             </TableRow>
           ) : (
             sortedProjects.map((project) => (
               <TableRow key={project.id}>
-                <TableCell className="text-foreground/90">{project.id}</TableCell>
+                <TableCell className="text-foreground/90">
+                  {project.id}
+                </TableCell>
                 <TableCell>
                   <Image
                     src={project.iconLight}
@@ -214,8 +216,12 @@ function ProjectList({ projectsPromise }: { projectsPromise: Promise<Project[]> 
                     priority
                   />
                 </TableCell>
-                <TableCell className="text-foreground/90">{project.name}</TableCell>
-                <TableCell className="text-foreground/90">{project.description}</TableCell>
+                <TableCell className="text-foreground/90">
+                  {project.name}
+                </TableCell>
+                <TableCell className="text-foreground/90">
+                  {project.description}
+                </TableCell>
                 <TableCell>
                   <a
                     href={project.link}
@@ -230,7 +236,9 @@ function ProjectList({ projectsPromise }: { projectsPromise: Promise<Project[]> 
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => router.push(`/dashboard/config/work/${project.id}`)}
+                    onClick={() =>
+                      router.push(`/dashboard/config/work/${project.id}`)
+                    }
                   >
                     编辑
                   </Button>
@@ -274,99 +282,75 @@ export default function DashboardConfigWorkSuspenseWrapper() {
   const router = useRouter();
 
   return (
-    <SidebarInset>
-      <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
-        <div className="flex items-center gap-2 px-4">
-          <SidebarTrigger className="-ml-1" />
-          <Separator
-            orientation="vertical"
-            className="mr-2 data-[orientation=vertical]:h-4 bg-foreground/30"
-          />
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem className="cursor-pointer">
-                <BreadcrumbLink onClick={() => router.push("/dashboard")}>
-                  仪表盘
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator className="text-foreground/80" />
-              <BreadcrumbItem className="cursor-pointer">
-                <BreadcrumbLink onClick={() => router.push("/dashboard/config/work")}>
-                  作品
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-        </div>
-      </header>
-
-      <div className="flex flex-1 flex-col gap-4 p-4 pt-0 h-full w-full">
-        <div className="bg-muted/50 dark:bg-muted/50 flex-1 rounded-xl p-4 h-full w-full min-w-0">
-          <div className="w-full h-full bg-white dark:bg-muted/50 p-4 rounded-xl">
-            <div className="flex items-center justify-between mb-4 ml-2 mr-2">
-              <h1 className="text-2xl font-bold text-foreground/90">作品列表</h1>
-              <Button onClick={() => router.push("/dashboard/config/work/new")}>
-                <Pencil className="mr-1 h-4 w-4" />
-                新建作品
-              </Button>
-            </div>
-
-            <div className="rounded-xl bg-muted/50 dark:bg-muted/50 p-4">
-              <Suspense
-                fallback={
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="cursor-pointer select-none text-foreground/90">
-                          ID
-                        </TableHead>
-                        <TableHead className="text-foreground/90">图标</TableHead>
-                        <TableHead className="cursor-pointer select-none text-foreground/90">
-                          名称
-                        </TableHead>
-                        <TableHead className="cursor-pointer select-none text-foreground/90">
-                          描述
-                        </TableHead>
-                        <TableHead className="cursor-pointer select-none text-foreground/90">
-                          链接
-                        </TableHead>
-                        <TableHead className="text-right text-foreground/90">操作</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {Array.from({ length: 3 }).map((_, i) => (
-                        <TableRow key={i}>
-                          <TableCell>
-                            <Skeleton className="h-4 w-6 rounded" />
-                          </TableCell>
-                          <TableCell>
-                            <Skeleton className="h-12 w-12 rounded" />
-                          </TableCell>
-                          <TableCell>
-                            <Skeleton className="h-4 w-24 rounded" />
-                          </TableCell>
-                          <TableCell>
-                            <Skeleton className="h-4 w-48 rounded" />
-                          </TableCell>
-                          <TableCell>
-                            <Skeleton className="h-4 w-32 rounded" />
-                          </TableCell>
-                          <TableCell className="text-right space-x-2">
-                            <Skeleton className="h-8 w-16 inline-block rounded" />
-                            <Skeleton className="h-8 w-16 inline-block rounded" />
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                }
-              >
-                <ProjectList projectsPromise={projectsPromise} />
-              </Suspense>
-            </div>
-          </div>
-        </div>
+    <DashboardLayout
+      breadcrumbs={[
+        { label: "仪表盘", href: "/dashboard" },
+        { label: "作品", href: "/dashboard/config/work" },
+      ]}
+    >
+      <div className="flex items-center justify-between mb-4 ml-2 mr-2">
+        <h1 className="text-2xl font-bold text-foreground/90">作品列表</h1>
+        <Button onClick={() => router.push("/dashboard/config/work/new")}>
+          <Pencil className="mr-1 h-4 w-4" />
+          新建作品
+        </Button>
       </div>
-    </SidebarInset>
+
+      <div className="rounded-xl bg-muted/50 dark:bg-muted/50 p-4">
+        <Suspense
+          fallback={
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="cursor-pointer select-none text-foreground/90">
+                    ID
+                  </TableHead>
+                  <TableHead className="text-foreground/90">图标</TableHead>
+                  <TableHead className="cursor-pointer select-none text-foreground/90">
+                    名称
+                  </TableHead>
+                  <TableHead className="cursor-pointer select-none text-foreground/90">
+                    描述
+                  </TableHead>
+                  <TableHead className="cursor-pointer select-none text-foreground/90">
+                    链接
+                  </TableHead>
+                  <TableHead className="text-right text-foreground/90">
+                    操作
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <TableRow key={i}>
+                    <TableCell>
+                      <Skeleton className="h-4 w-6 rounded" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-12 w-12 rounded" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-24 rounded" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-48 rounded" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-32 rounded" />
+                    </TableCell>
+                    <TableCell className="text-right space-x-2">
+                      <Skeleton className="h-8 w-16 inline-block rounded" />
+                      <Skeleton className="h-8 w-16 inline-block rounded" />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          }
+        >
+          <ProjectList projectsPromise={projectsPromise} />
+        </Suspense>
+      </div>
+    </DashboardLayout>
   );
 }

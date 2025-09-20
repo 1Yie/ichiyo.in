@@ -3,15 +3,6 @@
 import { Suspense, use } from "react";
 import { useState, useMemo } from "react";
 import { useRouter } from "nextjs-toploader/app";
-import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Separator } from "@/components/ui/separator";
 import {
   Table,
   TableBody,
@@ -38,6 +29,7 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { request } from "@/hooks/use-request";
 import type { Pic } from "@/types/config";
+import DashboardLayout from "@/app/ui/dashboard-layout";
 
 type SortField = "id" | "title" | "button" | "link" | "none";
 type SortOrder = "asc" | "desc";
@@ -76,7 +68,7 @@ function PicList({ picsPromise }: { picsPromise: Promise<Pic[]> }) {
       });
       if (!res) throw new Error("删除失败");
 
-      setPics(prev => prev.filter(pic => pic.id !== deleteId));
+      setPics((prev) => prev.filter((pic) => pic.id !== deleteId));
 
       toast.success(`ID 为 ${deleteId} 的图片已被删除`);
     } catch (err) {
@@ -173,13 +165,18 @@ function PicList({ picsPromise }: { picsPromise: Promise<Pic[]> }) {
               链接 {renderSortIcon("link")}
             </TableHead>
             <TableHead className="text-foreground/90">打开方式</TableHead>
-            <TableHead className="text-right text-foreground/90">操作</TableHead>
+            <TableHead className="text-right text-foreground/90">
+              操作
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {sortedPics.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={7} className="text-center text-muted-foreground dark:text-muted">
+              <TableCell
+                colSpan={7}
+                className="text-center text-muted-foreground dark:text-muted"
+              >
                 暂无图片
               </TableCell>
             </TableRow>
@@ -198,8 +195,12 @@ function PicList({ picsPromise }: { picsPromise: Promise<Pic[]> }) {
                     priority
                   />
                 </TableCell>
-                <TableCell className="text-foreground/90">{pic.title}</TableCell>
-                <TableCell className="text-foreground/90">{pic.button ?? "-"}</TableCell>
+                <TableCell className="text-foreground/90">
+                  {pic.title}
+                </TableCell>
+                <TableCell className="text-foreground/90">
+                  {pic.button ?? "-"}
+                </TableCell>
                 <TableCell className="text-foreground/90">
                   {pic.link ? (
                     <a
@@ -215,13 +216,19 @@ function PicList({ picsPromise }: { picsPromise: Promise<Pic[]> }) {
                   )}
                 </TableCell>
                 <TableCell className="text-foreground/90">
-                  {pic.button === null ? "-" : pic.newTab ? "新标签" : "当前标签"}
+                  {pic.button === null
+                    ? "-"
+                    : pic.newTab
+                    ? "新标签"
+                    : "当前标签"}
                 </TableCell>
                 <TableCell className="text-right space-x-2">
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => router.push(`/dashboard/config/pic/${pic.id}`)}
+                    onClick={() =>
+                      router.push(`/dashboard/config/pic/${pic.id}`)
+                    }
                   >
                     编辑
                   </Button>
@@ -265,99 +272,73 @@ export default function DashboardConfigPicSuspenseWrapper() {
   const router = useRouter();
 
   return (
-    <SidebarInset>
-      <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
-        <div className="flex items-center gap-2 px-4">
-          <SidebarTrigger className="-ml-1" />
-          <Separator
-            orientation="vertical"
-            className="mr-2 data-[orientation=vertical]:h-4 bg-foreground/30"
-          />
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem className="cursor-pointer">
-                <BreadcrumbLink onClick={() => router.push("/dashboard")}>
-                  仪表盘
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator className="text-foreground/80" />
-              <BreadcrumbItem className="cursor-pointer">
-                <BreadcrumbLink onClick={() => router.push("/dashboard/config/pic")}>
-                  图片
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-        </div>
-      </header>
-
-      <div className="flex flex-1 flex-col gap-4 p-4 pt-0 h-full w-full">
-        <div className="bg-muted/50 dark:bg-muted/50 flex-1 rounded-xl p-4 h-full w-full min-w-0">
-          <div className="w-full h-full bg-white dark:bg-muted/50 p-4 rounded-xl">
-            <div className="flex items-center justify-between mb-4 ml-2 mr-2">
-              <h1 className="text-2xl font-bold text-foreground/90">图片列表</h1>
-              <Button onClick={() => router.push("/dashboard/config/pic/new")}>
-                <Pencil className="mr-1 h-4 w-4" />
-                新建图片
-              </Button>
-            </div>
-
-            <div className="rounded-xl bg-muted/50 dark:bg-muted/50 p-4">
-              <Suspense
-                fallback={
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead
-                          className="cursor-pointer select-none text-foreground/90"
-                        >
-                          ID
-                        </TableHead>
-                        <TableHead className="text-foreground/90">预览</TableHead>
-                        <TableHead className="text-foreground/90">标题</TableHead>
-                        <TableHead className="text-foreground/90">按钮文字</TableHead>
-                        <TableHead className="text-foreground/90">链接</TableHead>
-                        <TableHead className="text-foreground/90">打开方式</TableHead>
-                        <TableHead className="text-right text-foreground/90">操作</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {Array.from({ length: 3 }).map((_, i) => (
-                        <TableRow key={i}>
-                          <TableCell>
-                            <Skeleton className="h-4 w-6 rounded" />
-                          </TableCell>
-                          <TableCell>
-                            <Skeleton className="h-20 w-32 rounded" />
-                          </TableCell>
-                          <TableCell>
-                            <Skeleton className="h-4 w-24 rounded" />
-                          </TableCell>
-                          <TableCell>
-                            <Skeleton className="h-4 w-24 rounded" />
-                          </TableCell>
-                          <TableCell>
-                            <Skeleton className="h-4 w-24 rounded" />
-                          </TableCell>
-                          <TableCell>
-                            <Skeleton className="h-4 w-24 rounded" />
-                          </TableCell>
-                          <TableCell className="text-right space-x-2">
-                            <Skeleton className="inline-block h-8 w-12 rounded" />
-                            <Skeleton className="inline-block h-8 w-12 rounded" />
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                }
-              >
-                <PicList picsPromise={picsPromise} />
-              </Suspense>
-            </div>
-          </div>
-        </div>
+    <DashboardLayout
+      breadcrumbs={[
+        { label: "配置", href: "/dashboard/config" },
+        { label: "图片", href: "/dashboard/config/pic" },
+      ]}
+    >
+      <div className="flex items-center justify-between mb-4 ml-2 mr-2">
+        <h1 className="text-2xl font-bold text-foreground/90">图片列表</h1>
+        <Button onClick={() => router.push("/dashboard/config/pic/new")}>
+          <Pencil className="mr-1 h-4 w-4" />
+          新建图片
+        </Button>
       </div>
-    </SidebarInset>
+
+      <div className="rounded-xl bg-muted/50 dark:bg-muted/50 p-4">
+        <Suspense
+          fallback={
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="cursor-pointer select-none text-foreground/90">
+                    ID
+                  </TableHead>
+                  <TableHead className="text-foreground/90">预览</TableHead>
+                  <TableHead className="text-foreground/90">标题</TableHead>
+                  <TableHead className="text-foreground/90">按钮文字</TableHead>
+                  <TableHead className="text-foreground/90">链接</TableHead>
+                  <TableHead className="text-foreground/90">打开方式</TableHead>
+                  <TableHead className="text-right text-foreground/90">
+                    操作
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <TableRow key={i}>
+                    <TableCell>
+                      <Skeleton className="h-4 w-6 rounded" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-20 w-32 rounded" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-24 rounded" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-24 rounded" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-24 rounded" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-24 rounded" />
+                    </TableCell>
+                    <TableCell className="text-right space-x-2">
+                      <Skeleton className="inline-block h-8 w-12 rounded" />
+                      <Skeleton className="inline-block h-8 w-12 rounded" />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          }
+        >
+          <PicList picsPromise={picsPromise} />
+        </Suspense>
+      </div>
+    </DashboardLayout>
   );
 }

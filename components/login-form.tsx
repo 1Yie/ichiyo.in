@@ -18,6 +18,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 const errorMessages: Record<string, string> = {
   MISSING_FIELDS: "请输入邮箱和密码",
@@ -35,6 +36,7 @@ export function LoginForm({
   const [loading, setLoading] = useState(false);
   const [errorDialogOpen, setErrorDialogOpen] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [loginSuccess, setLoginSuccess] = useState(false);
 
   const router = useRouter();
 
@@ -53,9 +55,9 @@ export function LoginForm({
       const data = await res.json();
 
       if (res.ok) {
+        setLoginSuccess(true);
         toast.success("登录成功");
         router.refresh();
-
       } else {
         const msg =
           errorMessages[data.code as string] ||
@@ -65,6 +67,7 @@ export function LoginForm({
         setErrorDialogOpen(true);
       }
     } catch (err) {
+      setLoginSuccess(false);
       console.error("请求错误:", err);
       setErrorMsg("请求失败，请检查网络");
       setErrorDialogOpen(true);
@@ -107,8 +110,15 @@ export function LoginForm({
                     disabled={loading}
                   />
                 </div>
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? "登录中..." : "登录"}
+                <Button
+                  type="submit"
+                  className="w-full flex items-center justify-center gap-2"
+                  disabled={loading}
+                >
+                  {loading && <Loader2 className="animate-spin w-4 h-4" />}
+                  <span>
+                    {loading ? "登录中" : loginSuccess ? "登录成功" : "登录"}
+                  </span>
                 </Button>
                 <Link href="/register">
                   <Button type="button" className="w-full" variant="outline">

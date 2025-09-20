@@ -2,16 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "nextjs-toploader/app";
-import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
-
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,6 +16,7 @@ import {
 import { ImageUrlWithPreview } from "@/app/ui/image-url-with-preview";
 import { toast } from "sonner";
 import { request } from "@/hooks/use-request";
+import DashboardLayout from "@/app/ui/dashboard-layout";
 
 export default function DashboardCreateProject() {
   const router = useRouter();
@@ -63,7 +54,8 @@ export default function DashboardCreateProject() {
       router.push("/dashboard/config/work");
     } catch (err) {
       toast.error("创建失败，请重试", {
-        description: err instanceof Error ? err.message : "创建失败，请稍后再试",
+        description:
+          err instanceof Error ? err.message : "创建失败，请稍后再试",
       });
       const msg = err instanceof Error ? err.message : "创建失败，请稍后再试";
       setErrorMessage(msg);
@@ -74,89 +66,64 @@ export default function DashboardCreateProject() {
   };
 
   return (
-    <SidebarInset>
-      <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
-        <div className="flex items-center gap-2 px-4">
-          <SidebarTrigger className="-ml-1" />
-          <Separator
-            orientation="vertical"
-            className="mr-2 data-[orientation=vertical]:h-4 bg-foreground/30"
-          />
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem className="cursor-pointer">
-                <BreadcrumbLink onClick={() => router.push("/dashboard")}>
-                  仪表盘
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator className="text-foreground/80" />
-              <BreadcrumbItem className="cursor-pointer">
-                <BreadcrumbLink onClick={() => router.push("/dashboard/config/work")}>
-                  作品
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator className="text-foreground/80" />
-              <BreadcrumbItem className="cursor-pointer">
-                <BreadcrumbLink onClick={() => router.push("/dashboard/config/work/new")}>
-                  新建作品
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
+    <DashboardLayout
+      breadcrumbs={[
+        { label: "配置", href: "/dashboard/config" },
+        { label: "作品", href: "/dashboard/config/work" },
+        { label: "新建作品", href: "/dashboard/config/work/new" },
+      ]}
+    >
+      <h1 className="text-2xl font-bold mb-4 text-foreground/90">新建作品</h1>
+      <div className="space-y-4">
+        <div>
+          <label className="block mb-1 font-semibold text-foreground/90">
+            名称
+          </label>
+          <Input value={name} onChange={(e) => setName(e.target.value)} />
         </div>
-      </header>
 
-      <div className="flex flex-1 flex-col gap-4 p-4 pt-0 h-full w-full">
-        <div className="bg-muted/50 dark:bg-muted/50 flex-1 rounded-xl p-4 h-full w-full min-w-0">
-          <div className="bg-white dark:bg-muted/50 rounded-xl p-4 h-full w-full min-w-0 flex flex-col">
-            <h1 className="text-2xl font-bold mb-4 text-foreground/90">新建作品</h1>
-            <div className="space-y-4">
-              <div>
-                <label className="block mb-1 font-semibold text-foreground/90">名称</label>
-                <Input value={name} onChange={(e) => setName(e.target.value)} />
-              </div>
+        <ImageUrlWithPreview
+          src={iconLight}
+          setSrc={setIconLight}
+          labelName="图标 URL（浅色）"
+          labelClassName="block mb-1 font-semibold text-foreground/90"
+        />
 
-              <ImageUrlWithPreview
-                src={iconLight}
-                setSrc={setIconLight}
-                labelName="图标 URL（浅色）"
-                labelClassName="block mb-1 font-semibold text-foreground/90"
-              />
+        <ImageUrlWithPreview
+          src={iconDark}
+          setSrc={setIconDark}
+          labelName="图标 URL（深色）"
+          labelClassName="block mb-1 font-semibold text-foreground/90"
+        />
 
-              <ImageUrlWithPreview
-                src={iconDark}
-                setSrc={setIconDark}
-                labelName="图标 URL（深色）"
-                labelClassName="block mb-1 font-semibold text-foreground/90"
-              />
+        <div>
+          <label className="block mb-1 font-semibold text-foreground/90">
+            描述
+          </label>
+          <Input
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+        </div>
 
-              <div>
-                <label className="block mb-1 font-semibold text-foreground/90">描述</label>
-                <Input
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                />
-              </div>
+        <div>
+          <label className="block mb-1 font-semibold text-foreground/90">
+            链接 URL
+          </label>
+          <Input value={link} onChange={(e) => setLink(e.target.value)} />
+        </div>
 
-              <div>
-                <label className="block mb-1 font-semibold text-foreground/90">链接 URL</label>
-                <Input value={link} onChange={(e) => setLink(e.target.value)} />
-              </div>
-
-              <div className="flex gap-2">
-                <Button onClick={handleCreate} disabled={saving}>
-                  {saving ? "创建中..." : "创建"}
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => router.push("/dashboard/config/work")}
-                  disabled={saving}
-                >
-                  取消
-                </Button>
-              </div>
-            </div>
-          </div>
+        <div className="flex gap-2">
+          <Button onClick={handleCreate} disabled={saving}>
+            {saving ? "创建中..." : "创建"}
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => router.push("/dashboard/config/work")}
+            disabled={saving}
+          >
+            取消
+          </Button>
         </div>
       </div>
 
@@ -171,6 +138,6 @@ export default function DashboardCreateProject() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </SidebarInset>
+    </DashboardLayout>
   );
 }

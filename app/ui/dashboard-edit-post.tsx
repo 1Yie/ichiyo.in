@@ -2,17 +2,6 @@
 
 import { Suspense, use, useState, useRef } from "react";
 import { useRouter } from "nextjs-toploader/app";
-
-import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Separator } from "@/components/ui/separator";
-
 import {
   AlertDialog,
   AlertDialogContent,
@@ -46,22 +35,22 @@ import { toast } from "sonner";
 
 import type { PostById, PostData } from "@/types/post";
 import type { User } from "@/types/auth";
-
+import DashboardLayout from "@/app/ui/dashboard-layout";
 
 async function fetchPostData(postId: number): Promise<PostData> {
   try {
     const [postRes, meRes, usersRes] = await Promise.all([
       request<PostById>(`/api/post/byId/${postId}`, {
         credentials: "include",
-        cache: "no-store"
+        cache: "no-store",
       }),
       request<{ authenticated: boolean; user: User }>(`/api/me`, {
         credentials: "include",
-        cache: "no-store"
+        cache: "no-store",
       }),
       request<{ users: User[] }>(`/api/users`, {
         credentials: "include",
-        cache: "no-store"
+        cache: "no-store",
       }),
     ]);
 
@@ -86,7 +75,7 @@ async function fetchPostData(postId: number): Promise<PostData> {
     };
   } catch (error) {
     toast.error("获取文章数据时出错", {
-      description: error instanceof Error ? error.message : "未知错误"
+      description: error instanceof Error ? error.message : "未知错误",
     });
     console.error("获取文章数据时出错:", error);
     throw new Error(
@@ -119,7 +108,9 @@ function DashboardEditPostInner({
     return authorsUid;
   });
 
-  const [selectedTags, setSelectedTags] = useState<string[]>(post.tags?.map((t) => t.name) || []);
+  const [selectedTags, setSelectedTags] = useState<string[]>(
+    post.tags?.map((t) => t.name) || []
+  );
   const [tagInput, setTagInput] = useState("");
 
   const [showErrorDialog, setShowErrorDialog] = useState(false);
@@ -185,9 +176,14 @@ function DashboardEditPostInner({
 
   return (
     <>
-      <h1 className="text-2xl font-bold mb-4 text-foreground/90">编辑文章 #{post.id}</h1>
+      <h1 className="text-2xl font-bold mb-4 text-foreground/90">
+        编辑文章 #{post.id}
+      </h1>
       <div className="mb-4">
-        <label htmlFor="title" className="block mb-1 font-semibold text-foreground/90">
+        <label
+          htmlFor="title"
+          className="block mb-1 font-semibold text-foreground/90"
+        >
           标题
         </label>
         <Input
@@ -201,7 +197,10 @@ function DashboardEditPostInner({
       </div>
 
       <div className="mb-4">
-        <label htmlFor="slug" className="block mb-1 font-semibold text-foreground/90">
+        <label
+          htmlFor="slug"
+          className="block mb-1 font-semibold text-foreground/90"
+        >
           自定义 URL Slug（可留空）
         </label>
         <Input
@@ -214,7 +213,9 @@ function DashboardEditPostInner({
         />
       </div>
       <div className="mb-4">
-        <label className="block mb-1 font-semibold text-foreground/90">作者</label>
+        <label className="block mb-1 font-semibold text-foreground/90">
+          作者
+        </label>
         <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
           多作者文章可添加多个作者，自己为必选且不可移除
         </p>
@@ -234,11 +235,13 @@ function DashboardEditPostInner({
           <SelectContent>
             <SelectGroup>
               {users.filter(
-                (user) => user.uid !== me.uid && !selectedAuthors.includes(user.uid)
+                (user) =>
+                  user.uid !== me.uid && !selectedAuthors.includes(user.uid)
               ).length > 0 ? (
                 users
                   .filter(
-                    (user) => user.uid !== me.uid && !selectedAuthors.includes(user.uid)
+                    (user) =>
+                      user.uid !== me.uid && !selectedAuthors.includes(user.uid)
                   )
                   .map((user) => (
                     <SelectItem key={user.uid} value={user.uid.toString()}>
@@ -262,8 +265,11 @@ function DashboardEditPostInner({
             return (
               <div
                 key={uid}
-                className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-sm border ${isSelf ? "bg-gray-100 text-gray-700 border-gray-300" : "bg-blue-100 text-blue-700 border-blue-300"
-                  }`}
+                className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-sm border ${
+                  isSelf
+                    ? "bg-gray-100 text-gray-700 border-gray-300"
+                    : "bg-blue-100 text-blue-700 border-blue-300"
+                }`}
               >
                 {user.id}
                 {!isSelf && (
@@ -283,7 +289,10 @@ function DashboardEditPostInner({
       </div>
 
       <div className="mb-4">
-        <label htmlFor="tags" className="block mb-1 font-semibold text-foreground/90">
+        <label
+          htmlFor="tags"
+          className="block mb-1 font-semibold text-foreground/90"
+        >
           标签（可选）
         </label>
         <div className="flex gap-2">
@@ -307,7 +316,9 @@ function DashboardEditPostInner({
         </div>
         <div className="mt-2 flex flex-wrap gap-2">
           {selectedTags.length === 0 ? (
-            <div className="text-sm text-gray-500 dark:text-gray-400">暂无标签，可添加标签</div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">
+              暂无标签，可添加标签
+            </div>
           ) : (
             selectedTags.map((tag) => (
               <div
@@ -330,7 +341,10 @@ function DashboardEditPostInner({
       </div>
 
       <div className="mb-2">
-        <label htmlFor="content" className="block mb-1 font-semibold text-foreground/90">
+        <label
+          htmlFor="content"
+          className="block mb-1 font-semibold text-foreground/90"
+        >
           内容
         </label>
         <FontStyleToggleGroup
@@ -363,10 +377,19 @@ function DashboardEditPostInner({
       </div>
 
       <div className="flex gap-2">
-        <Button onClick={handleSave} disabled={saving} className="disabled:opacity-50">
+        <Button
+          onClick={handleSave}
+          disabled={saving}
+          className="disabled:opacity-50"
+        >
           {saving ? "保存中..." : "保存"}
         </Button>
-        <Button onClick={handleCancel} disabled={saving} className="disabled:opacity-50" variant="outline">
+        <Button
+          onClick={handleCancel}
+          disabled={saving}
+          className="disabled:opacity-50"
+          variant="outline"
+        >
           取消
         </Button>
       </div>
@@ -382,95 +405,70 @@ function DashboardEditPostInner({
         </AlertDialogContent>
       </AlertDialog>
     </>
-
   );
 }
 
-export default function DashboardEditPostSuspenseWrapper({ postId }: { postId: number }) {
-  const router = useRouter();
+export default function DashboardEditPostSuspenseWrapper({
+  postId,
+}: {
+  postId: number;
+}) {
   const postDataPromise = fetchPostData(postId);
 
   return (
-    <SidebarInset>
-      <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
-        <div className="flex items-center gap-2 px-4">
-          <SidebarTrigger className="-ml-1" />
-          <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4 bg-foreground/30" />
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink className="cursor-pointer" onClick={() => router.push("/dashboard")}>
-                  仪表盘
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator className="text-foreground/80" />
-              <BreadcrumbItem>
-                <BreadcrumbLink className="cursor-pointer" onClick={() => router.push("/dashboard/post")}>
-                  文章管理
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator className="text-foreground/80" />
-              <BreadcrumbItem>
-                <BreadcrumbLink className="cursor-pointer" onClick={() => router.push(`/dashboard/post/${postId}`)}>
-                  编辑文章 #{postId}
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-        </div>
-      </header>
-      <div className="flex flex-1 flex-col gap-4 p-4 pt-0 h-full w-full">
-        <div className="bg-muted/50 flex-1 rounded-xl p-4 h-full w-full min-w-0">
-          <div className="bg-white dark:bg-muted/50 rounded-xl p-4 h-full w-full min-w-0 flex flex-col overflow-auto">
-            <Suspense
-              fallback={
-                <>
-                  <Skeleton className="h-10 w-24 rounded-md mb-4" />
-                  <div className="space-y-4">
-                    <Skeleton className="h-5 w-24 rounded-md" />
-                    <Skeleton className="h-10 w-full rounded-md" />
+    <DashboardLayout
+      breadcrumbs={[
+        { label: "仪表盘", href: "/dashboard" },
+        { label: "文章管理", href: "/dashboard/post" },
+        { label: `编辑文章 #${postId}`, href: `/dashboard/post/${postId}` },
+      ]}
+    >
+      <Suspense
+        fallback={
+          <>
+            <Skeleton className="h-10 w-24 rounded-md mb-4" />
+            <div className="space-y-4">
+              <Skeleton className="h-5 w-24 rounded-md" />
+              <Skeleton className="h-10 w-full rounded-md" />
 
-                    <Skeleton className="h-5 w-24 rounded-md" />
-                    <Skeleton className="h-10 w-full rounded-md" />
+              <Skeleton className="h-5 w-24 rounded-md" />
+              <Skeleton className="h-10 w-full rounded-md" />
 
-                    <Skeleton className="h-5 w-24 rounded-md" />
-                    <Skeleton className="h-10 w-32 rounded-md" />
+              <Skeleton className="h-5 w-24 rounded-md" />
+              <Skeleton className="h-10 w-32 rounded-md" />
 
-                    <Skeleton className="h-5 w-24 rounded-md" />
+              <Skeleton className="h-5 w-24 rounded-md" />
 
-                    <div className="flex gap-4">
-                      <Skeleton className="h-10 w-32 rounded-md" />
-                      <Skeleton className="h-10 w-24 rounded-md" />
-                    </div>
-                    <Skeleton className="h-5 w-24 rounded-md" />
-                    <div className="flex gap-4">
-                      <Skeleton className="h-10 w-1/6 rounded-md" />
-                      <Skeleton className="h-10 w-1/7 rounded-md" />
-                      <Skeleton className="h-10 w-1/8 rounded-md" />
-                    </div>
+              <div className="flex gap-4">
+                <Skeleton className="h-10 w-32 rounded-md" />
+                <Skeleton className="h-10 w-24 rounded-md" />
+              </div>
+              <Skeleton className="h-5 w-24 rounded-md" />
+              <div className="flex gap-4">
+                <Skeleton className="h-10 w-1/6 rounded-md" />
+                <Skeleton className="h-10 w-1/7 rounded-md" />
+                <Skeleton className="h-10 w-1/8 rounded-md" />
+              </div>
 
-                    <Skeleton className="h-20 w-full rounded-md" />
+              <Skeleton className="h-20 w-full rounded-md" />
 
-                    <div className="flex items-center space-x-2">
-                      <Skeleton className="h-5 w-5 rounded" />
-                      <Skeleton className="h-5 w-16 rounded-md" />
-                    </div>
+              <div className="flex items-center space-x-2">
+                <Skeleton className="h-5 w-5 rounded" />
+                <Skeleton className="h-5 w-16 rounded-md" />
+              </div>
 
-                    <div className="flex gap-4">
-                      <Skeleton className="h-10 w-24 rounded-md" />
-                      <Skeleton className="h-10 w-24 rounded-md" />
-                    </div>
-                  </div>
-                </>
-              }
-            >
-              <ErrorBoundary fallback={null}>
-                <DashboardEditPostInner postData={postDataPromise} postId={postId} />
-              </ErrorBoundary>
-            </Suspense>
-          </div>
-        </div>
-      </div>
-    </SidebarInset>
+              <div className="flex gap-4">
+                <Skeleton className="h-10 w-24 rounded-md" />
+                <Skeleton className="h-10 w-24 rounded-md" />
+              </div>
+            </div>
+          </>
+        }
+      >
+        <ErrorBoundary fallback={null}>
+          <DashboardEditPostInner postData={postDataPromise} postId={postId} />
+        </ErrorBoundary>
+      </Suspense>
+    </DashboardLayout>
   );
 }
