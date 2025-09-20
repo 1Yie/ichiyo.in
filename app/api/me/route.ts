@@ -24,6 +24,7 @@ export async function GET() {
         id: true,
         email: true,
         isAdmin: true,
+        isSuperAdmin: true,
       },
     });
 
@@ -38,6 +39,7 @@ export async function GET() {
         email: userFromDb.email,
         uid: payload.uid,
         isAdmin: userFromDb.isAdmin,
+        isSuperAdmin: userFromDb.isSuperAdmin,
       },
     });
   } catch (error) {

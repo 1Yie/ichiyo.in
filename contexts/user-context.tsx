@@ -12,6 +12,7 @@ export interface UserInfo {
     email: string;
     avatar: string;
     isAdmin?: boolean;
+    isSuperAdmin?: boolean;
 }
 
 interface UserContextType {
@@ -96,12 +97,15 @@ export function UserProvider({ children }: UserProviderProps) {
                     const name = data.user.id || data.user.name || "用户";
                     const emailHash = md5(email.trim().toLowerCase());
                     const gravatarUrl = `https://dn-qiniu-avatar.qbox.me/avatar/${emailHash}?d=identicon`;
+                    const isAdmin = data.user.isAdmin || false;
+                    const isSuperAdmin = data.user.isSuperAdmin || false;
 
                     const userData: UserInfo = {
                         name,
                         email,
                         avatar: gravatarUrl,
-                        isAdmin: data.user.isAdmin || false,
+                        isAdmin,
+                        isSuperAdmin,
                     };
 
                     setUserInfo(userData);
@@ -189,6 +193,7 @@ export function useAdminCheck() {
 
     return {
         isAdmin: isAuthenticated && userInfo?.isAdmin === true,
+        isSuperAdmin: isAuthenticated && userInfo?.isSuperAdmin === true,
         isAuthenticated,
         userInfo,
     };

@@ -24,7 +24,12 @@ export async function GET() {
         uid: true,
         id: true,
         email: true,
+        isAdmin: true,
+        isSuperAdmin: true,
       },
+      orderBy: {
+        uid: 'desc'
+      }
     });
 
     return NextResponse.json({ users });

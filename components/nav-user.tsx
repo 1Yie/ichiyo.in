@@ -20,11 +20,10 @@ import { IoDesktopOutline } from "react-icons/io5";
 import { MdOutlineDarkMode, MdOutlineLightMode } from "react-icons/md";
 import { IoSettingsOutline } from "react-icons/io5";
 import { useRouter } from "nextjs-toploader/app";
-
+import { Badge } from "@/components/ui/badge";
 import { useUser } from "@/contexts/user-context";
 
 export function NavUser() {
-
   const router = useRouter();
   const { isMobile } = useSidebar();
   const { theme, setTheme } = useTheme();
@@ -48,14 +47,18 @@ export function NavUser() {
     );
   }
 
-  const adminFlag = userInfo?.isAdmin ? (
-    <span className="text-xs font-semibold text-red-600 bg-red-100 px-1 rounded">
+  const adminFlag = userInfo?.isSuperAdmin ? (
+    <Badge className="text-xs font-semibold text-yellow-700 bg-yellow-100 px-1 py-0 rounded">
+      超级管理员
+    </Badge>
+  ) : userInfo?.isAdmin ? (
+    <Badge className="text-xs font-semibold text-red-600 bg-red-100 px-1 py-0 rounded">
       管理员
-    </span>
+    </Badge>
   ) : (
-    <span className="text-xs font-semibold text-gray-400 bg-gray-100 px-1 rounded">
+    <Badge className="text-xs font-semibold text-gray-400 bg-gray-100 px-1 py-0 rounded">
       成员
-    </span>
+    </Badge>
   );
 
   const themeOptions = [
@@ -77,7 +80,6 @@ export function NavUser() {
   ];
 
   return (
-    
     <SidebarMenu>
       <SidebarMenuItem>
         <DropdownMenu>
@@ -106,7 +108,7 @@ export function NavUser() {
                     </Avatar>
                     <div className="grid flex-1 text-left text-sm leading-tight px-2">
                       <span className="truncate font-medium flex items-center gap-1">
-                        {userInfo.name} 
+                        {userInfo.name}
                         {adminFlag}
                       </span>
                       <span className="truncate text-xs">{userInfo.email}</span>
@@ -172,10 +174,11 @@ export function NavUser() {
                       onClick={() =>
                         setTheme(value as "system" | "light" | "dark")
                       }
-                      className={`p-1.5 rounded-md transition-colors ${theme === value
-                        ? "bg-accent text-accent-foreground"
-                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                        }`}
+                      className={`p-1.5 rounded-md transition-colors ${
+                        theme === value
+                          ? "bg-accent text-accent-foreground"
+                          : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                      }`}
                     >
                       {icon}
                     </button>
