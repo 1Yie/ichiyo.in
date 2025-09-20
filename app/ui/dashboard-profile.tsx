@@ -805,24 +805,31 @@ export default function DashboardProfile() {
                 <SelectValue placeholder="请选择用户" />
               </SelectTrigger>
               <SelectContent>
-                {allUsers
-                  .filter((u) => u.email !== userInfo.email && !u.isSuperAdmin)
-                  .map((user) => (
-                    <SelectItem key={user.uid} value={user.uid}>
-                      {user.email}{" "}
-                      <span>
-                        {user.isAdmin ? (
-                          <span className="text-ms text-primary/90">
-                            (管理员)
-                          </span>
-                        ) : (
-                          <span className="text-ms text-foreground/40">
-                            (普通用户)
-                          </span>
-                        )}
-                      </span>
-                    </SelectItem>
-                  ))}
+                {allUsers.filter((u) => u.email !== userInfo.email && !u.isSuperAdmin)
+                  .length === 0 ? (
+                  <div className="p-2 text-center text-sm text-muted-foreground/70">
+                    暂无可管理的用户
+                  </div>
+                ) : (
+                  allUsers
+                    .filter((u) => u.email !== userInfo.email && !u.isSuperAdmin)
+                    .map((user) => (
+                      <SelectItem key={user.uid} value={user.uid}>
+                        {user.email}{" "}
+                        <span>
+                          {user.isAdmin ? (
+                            <span className="text-ms text-primary/90">
+                              (管理员)
+                            </span>
+                          ) : (
+                            <span className="text-ms text-foreground/40">
+                              (普通用户)
+                            </span>
+                          )}
+                        </span>
+                      </SelectItem>
+                    ))
+                )}
               </SelectContent>
             </Select>
 
