@@ -550,7 +550,7 @@ export default function DashboardProfile() {
                   <div className="flex flex-col gap-2">
                     <h2 className="font-bold text-foreground/90">初始化 API</h2>
                     <p className="text-sm text-foreground/70">
-                      控制系统初始化API的启用状态。禁用后将无法通过API创建管理员账号。
+                      控制系统初始化 API 的启用状态。禁用后将无法通过 API 创建管理员账号。
                     </p>
                   </div>
                   <Button
