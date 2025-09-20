@@ -94,7 +94,10 @@ pnpmx prisma generate
 
 ### 初始化权限
 
-访问 `/api/init` 初始化权限
+访问 **`POST`** `/api/init` 初始化权限
+
+访问 **`GET`** `/api/init` 查看初始化状态
+
 - 初始后，如果数据库内没有用户，会创建一个默认的超级管理员用户
   - 邮箱：`admin@admin.com`
   - 名称：`admin`
