@@ -8,6 +8,17 @@ interface Params {
   params: Promise<{ id: string }>;
 }
 
+function sanitizeUser(user: {
+  uid: number;
+  id: string;
+  email: string;
+  isAdmin: boolean;
+  hashpassword?: string;
+}) {
+  const { uid, id, email, isAdmin } = user;
+  return { uid, id, email, isAdmin };
+}
+
 export async function GET(request: Request, props: Params) {
   const params = await props.params;
   const postId = Number(params.id);
@@ -50,7 +61,7 @@ export async function GET(request: Request, props: Params) {
   }
 
   // 扁平化 authors
-  const authors = post.authors.map((a) => a.user);
+  const authors = post.authors.map((a) => sanitizeUser(a.user));
 
   return NextResponse.json({ ...post, authors });
 }
@@ -118,8 +129,10 @@ export async function PATCH(request: Request, props: Params) {
     slug !== post.slug;
 
   if (hasContentChanged) {
-    if (!title?.trim()) return NextResponse.json({ error: "标题不能为空" }, { status: 400 });
-    if (!content?.trim()) return NextResponse.json({ error: "内容不能为空" }, { status: 400 });
+    if (!title?.trim())
+      return NextResponse.json({ error: "标题不能为空" }, { status: 400 });
+    if (!content?.trim())
+      return NextResponse.json({ error: "内容不能为空" }, { status: 400 });
   }
 
   const validUsers = await prisma.user.findMany({
@@ -145,7 +158,8 @@ export async function PATCH(request: Request, props: Params) {
 
     const existingTagNames = existingTags.map((t) => t.name);
     const newTagNames = tagNames.filter(
-      (name): name is string => typeof name === "string" && !existingTagNames.includes(name)
+      (name): name is string =>
+        typeof name === "string" && !existingTagNames.includes(name)
     );
 
     const newTags = await Promise.all(
@@ -173,7 +187,7 @@ export async function PATCH(request: Request, props: Params) {
   });
 
   // 扁平化 authors
-  const flatAuthors = updatedPost.authors.map((a) => a.user);
+  const flatAuthors = updatedPost.authors.map((a) => sanitizeUser(a.user));
 
   return NextResponse.json({ ...updatedPost, authors: flatAuthors });
 }
@@ -181,14 +195,16 @@ export async function PATCH(request: Request, props: Params) {
 export async function DELETE(request: Request, props: Params) {
   const params = await props.params;
   const postId = Number(params.id);
-  if (isNaN(postId)) return NextResponse.json({ error: "无效文章ID" }, { status: 400 });
+  if (isNaN(postId))
+    return NextResponse.json({ error: "无效文章ID" }, { status: 400 });
 
   const cookieStore = await cookies();
   const token = (await cookieStore).get("token")?.value;
   if (!token) return NextResponse.json({ error: "未登录" }, { status: 401 });
 
   const payload = await authenticateToken(token);
-  if (!payload) return NextResponse.json({ error: "无效身份" }, { status: 401 });
+  if (!payload)
+    return NextResponse.json({ error: "无效身份" }, { status: 401 });
 
   const post = await prisma.post.findUnique({
     where: { id: postId },
@@ -204,7 +220,8 @@ export async function DELETE(request: Request, props: Params) {
 
   const isOwnerOrAdmin =
     post.authors.some((a) => a.userId === payload.uid) || user?.isAdmin;
-  if (!isOwnerOrAdmin) return NextResponse.json({ error: "无权限操作此文章" }, { status: 403 });
+  if (!isOwnerOrAdmin)
+    return NextResponse.json({ error: "无权限操作此文章" }, { status: 403 });
 
   await prisma.post.delete({ where: { id: postId } });
 
