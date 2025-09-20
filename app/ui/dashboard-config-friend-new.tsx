@@ -99,7 +99,7 @@ export default function DashboardConfigFriendNew() {
   return (
     <DashboardLayout
       breadcrumbs={[
-        { label: "配置", href: "/dashboard/config" },
+        { label: "仪表盘", href: "/dashboard" },
         { label: "友链", href: "/dashboard/config/link" },
         { label: "新建友链", href: "/dashboard/config/link/new" },
       ]}

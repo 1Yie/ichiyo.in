@@ -66,7 +66,7 @@ export default function DashboardConfigPicNew() {
   return (
     <DashboardLayout
       breadcrumbs={[
-        { label: "配置", href: "/dashboard/config" },
+         { label: "仪表盘", href: "/dashboard" },
         { label: "图片", href: "/dashboard/config/pic" },
         { label: "新建图片", href: "/dashboard/config/pic/new" },
       ]}

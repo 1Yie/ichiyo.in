@@ -171,7 +171,7 @@ export default function DashboardEditProjectSuspenseWrapper({
   return (
     <DashboardLayout
       breadcrumbs={[
-        { label: "配置", href: "/dashboard/config" },
+         { label: "仪表盘", href: "/dashboard" },
         { label: "作品", href: "/dashboard/config/work" },
         {
           label: `编辑作品 #${projectId}`,

@@ -259,7 +259,7 @@ export default function DashboardConfigFriendSuspenseWrapper() {
   return (
     <DashboardLayout
       breadcrumbs={[
-        { label: "配置", href: "/dashboard/config" },
+        { label: "仪表盘", href: "/dashboard" },
         { label: "友链", href: "/dashboard/config/link" },
       ]}
     >

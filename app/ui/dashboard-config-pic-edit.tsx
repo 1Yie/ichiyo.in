@@ -203,7 +203,7 @@ export default function DashboardConfigPicEdit({
   return (
     <DashboardLayout
       breadcrumbs={[
-        { label: "配置", href: "/dashboard/config" },
+         { label: "仪表盘", href: "/dashboard" },
         { label: "图片", href: "/dashboard/config/pic" },
         { label: `编辑图片 #${id}`, href: `/dashboard/config/pic/${id}` },
       ]}

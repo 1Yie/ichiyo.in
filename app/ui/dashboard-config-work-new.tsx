@@ -68,7 +68,7 @@ export default function DashboardCreateProject() {
   return (
     <DashboardLayout
       breadcrumbs={[
-        { label: "配置", href: "/dashboard/config" },
+        { label: "仪表盘", href: "/dashboard" },
         { label: "作品", href: "/dashboard/config/work" },
         { label: "新建作品", href: "/dashboard/config/work/new" },
       ]}

@@ -274,7 +274,7 @@ export default function DashboardConfigPicSuspenseWrapper() {
   return (
     <DashboardLayout
       breadcrumbs={[
-        { label: "配置", href: "/dashboard/config" },
+         { label: "仪表盘", href: "/dashboard" },
         { label: "图片", href: "/dashboard/config/pic" },
       ]}
     >
