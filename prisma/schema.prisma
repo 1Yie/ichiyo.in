@@ -99,3 +99,11 @@ model RegisterKey {
   isUsed     Boolean  @default(false)
   createdAt  DateTime @default(now())
 }
+
+model SystemSettings {
+  id                Int     @id @default(autoincrement())
+  key               String  @unique
+  value             String
+  description       String?
+  updatedAt         DateTime @updatedAt
+}

@@ -12,6 +12,7 @@
 - TypeScript
 - Prisma
 
+
 ## 部署
 
 ### 本地部署
@@ -90,6 +91,17 @@ yarnx prisma generate
 # pnpm
 pnpmx prisma generate
 ```
+
+### 初始化权限
+
+访问 `/api/init` 初始化权限
+- 初始后，如果数据库内没有用户，会创建一个默认的超级管理员用户
+  - 邮箱：`admin@admin.com`
+  - 名称：`admin`
+  - 密码：`password`
+**请及时修改账号密码**
+
+- 初始后，如果数据库内有用户，则会将 `UID 1` 设为超级管理员
 
 ### 构建
 

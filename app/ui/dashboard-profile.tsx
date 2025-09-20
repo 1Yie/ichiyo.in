@@ -29,6 +29,7 @@ import ms from "ms";
 
 export default function DashboardProfile() {
   const { userInfo, logout, refreshUser, isAuthenticated } = useUser();
+  const { isAdmin, isSuperAdmin } = useAdminCheck();
 
   // 编辑用户名相关状态
   const [formName, setFormName] = useState(userInfo?.name || "");
@@ -68,6 +69,10 @@ export default function DashboardProfile() {
   // 密钥加载状态
   const [loadingKey, setLoadingKey] = useState(false);
   const [remainingTime, setRemainingTime] = useState<string>("");
+
+  // 初始化API开关状态
+  const [initApiEnabled, setInitApiEnabled] = useState(true);
+  const [loadingInitSetting, setLoadingInitSetting] = useState(false);
 
   // 所有用户列表
   const [allUsers, setAllUsers] = useState<
@@ -156,6 +161,27 @@ export default function DashboardProfile() {
 
     loadUserData();
   }, [usersLoaded]);
+
+  // 加载初始化API开关状态
+  useEffect(() => {
+    const loadInitSetting = async () => {
+      if (!isSuperAdmin) return;
+
+      try {
+        const res = await fetch("/api/settings/init", {
+          credentials: "include",
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setInitApiEnabled(data.enabled);
+        }
+      } catch (error) {
+        console.error("加载初始化设置失败:", error);
+      }
+    };
+
+    loadInitSetting();
+  }, [isSuperAdmin]);
 
   // 编辑用户名提交
   const handleSubmitName = async () => {
@@ -408,7 +434,32 @@ export default function DashboardProfile() {
     }
   };
 
-  const { isAdmin, isSuperAdmin } = useAdminCheck();
+  // 切换初始化API开关
+  const handleToggleInitApi = async (enabled: boolean) => {
+    setLoadingInitSetting(true);
+    try {
+      const res = await fetch("/api/settings/init", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ enabled }),
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.message || "更新设置失败");
+      }
+
+      setInitApiEnabled(enabled);
+      toast.success(`初始化 API 已${enabled ? "启用" : "禁用"}`);
+    } catch (error) {
+      toast.error(
+        "更新设置失败: " + (error instanceof Error ? error.message : "")
+      );
+    } finally {
+      setLoadingInitSetting(false);
+    }
+  };
 
   if (isAuthenticated === undefined || userInfo === undefined) {
     return null;
@@ -493,25 +544,55 @@ export default function DashboardProfile() {
           <div className="bg-muted/50 rounded-2xl p-3 flex flex-col gap-4">
             {/* 管理员设置 - 只有超级管理员才能看到 */}
             {isSuperAdmin && (
-              <div className="flex justify-between items-center">
-                <div>
-                  <h2 className="font-bold text-foreground/90">管理员设置</h2>
-                  <p className="text-sm text-foreground/70">
-                    为其他用户设置管理员权限。
-                  </p>
+              <>
+                {/* 初始化API开关 */}
+                <div className="flex justify-between items-center">
+                  <div className="flex flex-col gap-2">
+                    <h2 className="font-bold text-foreground/90">初始化 API</h2>
+                    <p className="text-sm text-foreground/70">
+                      控制系统初始化API的启用状态。禁用后将无法通过API创建管理员账号。
+                    </p>
+                  </div>
+                  <Button
+                    onClick={() => handleToggleInitApi(!initApiEnabled)}
+                    disabled={loadingInitSetting}
+                    variant={initApiEnabled ? "destructive" : "default"}
+                    className="flex items-center justify-center gap-2"
+                  >
+                    {loadingInitSetting && (
+                      <Loader2 className="animate-spin w-4 h-4" />
+                    )}
+                    <span>
+                      {loadingInitSetting
+                        ? "更新中"
+                        : initApiEnabled
+                        ? "禁用接口"
+                        : "启用接口"}
+                    </span>
+                  </Button>
                 </div>
-                <Button
-                  onClick={() => setShowAdminDialog(true)}
-                  className="flex items-center justify-center gap-2"
-                >
-                  设置权限
-                </Button>
-              </div>
+
+                {/* 设置管理员权限 */}
+                <div className="flex justify-between items-center">
+                  <div className="flex flex-col gap-2">
+                    <h2 className="font-bold text-foreground/90">管理员设置</h2>
+                    <p className="text-sm text-foreground/70">
+                      为其他用户设置管理员权限。
+                    </p>
+                  </div>
+                  <Button
+                    onClick={() => setShowAdminDialog(true)}
+                    className="flex items-center justify-center gap-2"
+                  >
+                    设置权限
+                  </Button>
+                </div>
+              </>
             )}
 
             {/* 注册密钥 */}
             <div className="flex justify-between items-center">
-              <div>
+              <div className="flex flex-col gap-2">
                 <h2 className="font-bold text-foreground/90">注册密钥</h2>
                 <p className="text-sm text-foreground/70">
                   有效期为 {getKeyTTLDisplay()}
