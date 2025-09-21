@@ -1,5 +1,5 @@
 import { NextResponse, NextRequest } from "next/server";
-import { authenticateToken, verifyPassword } from "@/lib/auth";
+import { authenticateToken, verifyPassword, generateToken, getTokenExpirationInSeconds } from "@/lib/auth";
 import { cookies } from "next/headers";
 import prisma from "@/lib/prisma";
 
@@ -89,11 +89,30 @@ export async function PATCH(req: NextRequest) {
       },
     });
 
-    return NextResponse.json({
+    // 重新生成JWT token，因为邮箱信息已更新
+    const newToken = await generateToken({
+      uid: updatedUser.uid,
+      email: updatedUser.email,
+      id: updatedUser.id,
+    });
+
+    const response = NextResponse.json({
       success: true,
       message: "邮箱更换成功",
       user: updatedUser,
     });
+
+    // 更新cookie中的token
+    const expiresInSeconds = getTokenExpirationInSeconds();
+    response.cookies.set("token", newToken, {
+      httpOnly: true,
+      path: "/",
+      maxAge: expiresInSeconds,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    });
+
+    return response;
   } catch (error) {
     console.error("PATCH /api/me/email error:", error);
     return NextResponse.json({ error: "服务器错误" }, { status: 500 });

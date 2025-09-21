@@ -667,7 +667,7 @@ export default function DashboardProfile() {
                   type="password"
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
-                  placeholder="更换邮箱需要验证当前密码"
+                  placeholder="验证当前密码"
                 />
               </div>
             )}
@@ -853,7 +853,7 @@ export default function DashboardProfile() {
                 );
               }}
             >
-              <SelectTrigger className="w-1/3">
+              <SelectTrigger>
                 <SelectValue placeholder="请选择权限" />
               </SelectTrigger>
               <SelectContent>

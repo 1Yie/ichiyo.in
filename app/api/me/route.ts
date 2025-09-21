@@ -1,5 +1,5 @@
 import { NextResponse, NextRequest } from "next/server";
-import { authenticateToken, hashPassword, verifyToken } from "@/lib/auth";
+import { authenticateToken, hashPassword, verifyToken, generateToken, getTokenExpirationInSeconds } from "@/lib/auth";
 import { cookies } from "next/headers";
 import prisma from "@/lib/prisma";
 
@@ -107,6 +107,29 @@ export async function PATCH(req: NextRequest) {
         email: true,
       },
     });
+
+    // 如果更新了用户名，需要重新生成JWT token
+    if (newId) {
+      const newToken = await generateToken({
+        uid: updatedUser.uid,
+        email: updatedUser.email,
+        id: updatedUser.id,
+      });
+
+      const response = NextResponse.json({ success: true, user: updatedUser });
+
+      // 更新cookie中的token
+      const expiresInSeconds = getTokenExpirationInSeconds();
+      response.cookies.set("token", newToken, {
+        httpOnly: true,
+        path: "/",
+        maxAge: expiresInSeconds,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+      });
+
+      return response;
+    }
 
     return NextResponse.json({ success: true, user: updatedUser });
   } catch (error) {
