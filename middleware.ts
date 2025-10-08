@@ -23,7 +23,7 @@ export async function middleware(request: NextRequest) {
     loginUrl.searchParams.set("from", pathname);
 
     const res = NextResponse.redirect(loginUrl);
-    res.cookies.set("token", "", { maxAge: 0 });
+    res.cookies.delete("token");
     return res;
   }
 
@@ -37,7 +37,6 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
-  // 默认放行
   return NextResponse.next();
 }
 
