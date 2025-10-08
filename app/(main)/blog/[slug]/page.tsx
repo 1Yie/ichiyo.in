@@ -1,31 +1,21 @@
-"use server";
-
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import { use } from "react";
 import BlogSlug from "@/ui/blog-slug";
 import { request, baseUrl } from "@/hooks/use-request";
 import type { Post, PostBySlug } from "@/types/post";
 import { parseMarkdown } from "@/lib/markdown";
 
-
 async function fetchPost(slug: string): Promise<Post | null> {
   try {
-    return await request<Post>(`/api/post/bySlug/${slug}`, {
-      cache: "no-cache"
+    const post = await request<Post>(`/api/post/bySlug/${slug}`, {
+      cache: "no-cache",
     });
+    return post ?? null;
   } catch (error) {
     console.error("获取文章数据失败:", error);
     return null;
   }
-}
-
-const postCache = new Map<string, Promise<Post | null>>();
-
-async function getPost(slug: string) {
-  if (!postCache.has(slug)) {
-    postCache.set(slug, fetchPost(slug));
-  }
-  return postCache.get(slug)!;
 }
 
 function transformPost(post: Post | PostBySlug): PostBySlug {
@@ -35,16 +25,19 @@ function transformPost(post: Post | PostBySlug): PostBySlug {
   };
 }
 
-export async function generateMetadata(props: { params: Promise<{ slug: string }> }): Promise<Metadata> {
-  const params = await props.params;
-  const post = await getPost(params.slug);
-  if (!post) return { title: "ichiyo | 404" };
+export async function generateMetadata(props: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await props.params;
+  const post = await fetchPost(slug);
+  if (!post || !post.published) return { title: "ichiyo | 404" };
 
-  const description = post.content.slice(0, 150) + (post.content.length > 150 ? "..." : "");
+  const description =
+    post.content.slice(0, 150) + (post.content.length > 150 ? "..." : "");
   return {
     title: `${post.title} | ichiyo`,
     description,
-    keywords: post.tags.map(tag => tag.name),
+    keywords: post.tags.map((tag) => tag.name),
     openGraph: {
       title: post.title,
       description,
@@ -54,14 +47,17 @@ export async function generateMetadata(props: { params: Promise<{ slug: string }
   };
 }
 
-export default async function Page(props: { params: Promise<{ slug: string }> }) {
-  const params = await props.params;
-  const post = await getPost(params.slug);
-  if (!post) notFound();
+export default function Page({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = use(params);
+  const post = use(fetchPost(slug));
+  if (!post || !post.published) notFound();
 
   const transformedPost = transformPost(post);
-
-  const htmlContent = await parseMarkdown(transformedPost.content);
+  const htmlContent = use(parseMarkdown(transformedPost.content));
 
   return <BlogSlug post={transformedPost} htmlContent={htmlContent} />;
 }
