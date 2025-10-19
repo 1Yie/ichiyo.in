@@ -6,7 +6,7 @@ import ClientThemeWrapper from "@/app/(main)/client-wrapper";
 
 import NextTopLoader from "nextjs-toploader";
 import ImageZoom from "@/ui/img-zoom";
-import { Toaster } from "@/components/ui/sonner"
+import { Toaster } from "@/components/ui/sonner";
 
 import Header from "@/app/ui/header";
 import Footer from "@/app/ui/footer";
@@ -14,9 +14,48 @@ import { ThemeProvider } from "next-themes";
 import FaviconSwitcher from "@/lib/favicon-switcher";
 import { UserProvider } from "@/contexts/user-context";
 
-
 export const metadata: Metadata = {
   title: "ichiyo (@1Yie)",
+  description: "存活于二十一世纪の互联网 / ichiyo (@1Yie).",
+  keywords: [
+    "ichiyo",
+    "1Yie",
+    "personal website",
+    "developer",
+    "designer",
+    "一叶",
+  ],
+  openGraph: {
+    title: "ichiyo (@1Yie)",
+    description: "存活于二十一世纪の互联网 / ichiyo (@1Yie).",
+    url: "https://ichiyo.in",
+    siteName: "ichiyo (@1Yie)",
+    images: [
+      {
+        url: "https://ichiyo.in/logo_light.svg",
+        width: 1200,
+        height: 630,
+        alt: "ichiyo (@1Yie)",
+      },
+    ],
+    locale: "zh_CN",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "ichiyo (@1Yie)",
+    description: "存活于二十一世纪の互联网 / ichiyo (@1Yie).",
+    images: ["https://ichiyo.in/logo_light.svg"],
+  },
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/favicon.ico",
+  },
+  metadataBase: new URL("https://ichiyo.in"),
+  alternates: {
+    canonical: "https://ichiyo.in",
+  },
 };
 
 const ubuntu = Ubuntu_Sans({
@@ -43,13 +82,42 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const jsonLdWebsite = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "ichiyo (@1Yie)",
+    url: "https://ichiyo.in",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: "https://ichiyo.in/search?q={search_term_string}",
+      "query-input": "required name=search_term_string",
+    },
+  };
+
+  const jsonLdNav = {
+    "@context": "https://schema.org",
+    "@type": "SiteNavigationElement",
+    name: ["首页", "博客", "关于", "友链"],
+    url: [
+      "https://ichiyo.in",
+      "https://ichiyo.in/blog",
+      "https://ichiyo.in/about",
+      "https://ichiyo.in/link",
+    ],
+  };
+
   return (
-    <html className="scroll-smooth">
+    <html className="scroll-smooth" lang="zh-CN">
       <body
         className={`antialiased ${ubuntu.className} ${sourceCodePro.className} ${raleway.className}`}
       >
         <ClientThemeWrapper>
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem enableColorScheme={false}>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            enableColorScheme={false}
+          >
             <UserProvider>
               <FaviconSwitcher />
               <ImageZoom />
@@ -72,6 +140,16 @@ export default async function RootLayout({
             </UserProvider>
           </ThemeProvider>
         </ClientThemeWrapper>
+
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdWebsite) }}
+        />
+
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdNav) }}
+        />
       </body>
     </html>
   );

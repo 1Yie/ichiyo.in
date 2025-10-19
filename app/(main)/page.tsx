@@ -3,8 +3,7 @@ import Home from "@/app/ui/home-title";
 // import HomeProject from "@/app/ui/home-project";
 
 export const metadata: Metadata = {
-  title: "ichiyo (@1Yie)",
-  description: "Hi! I am ichiyo",
+  title: "ichiyo (@1Yie)"
 };
 
 export default function HomePage() {
