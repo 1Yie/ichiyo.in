@@ -16,9 +16,15 @@ type SocialIconLinkProps = {
   children: React.ReactNode;
 };
 
+// const ICP = {
+//   name: "萌ICP备20256090号",
+//   url: "https://icp.gov.moe/?keyword=20256090",
+// };
+
+
 const ICP = {
-  name: "萌ICP备20256090号",
-  url: "https://icp.gov.moe/?keyword=20256090",
+  name: "",
+  url: "",
 };
 
 export default function Footer() {

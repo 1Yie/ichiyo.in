@@ -37,7 +37,8 @@ async function processMarkdown(
         .use(remarkRehype, { allowDangerousHtml: true, math: true })
         .use(rehypeKatex)
         .use(rehypeHighlight)
-        .use(addHeadingAnchors);
+        .use(addHeadingAnchors)
+        .use(transformFootnoteLinks);
     } else {
       processor.use(remarkRehype, { allowDangerousHtml: true });
     }
@@ -104,6 +105,38 @@ function addHeadingAnchors() {
           },
           children: [{ type: "text", value: "#" }],
         });
+      }
+    });
+  };
+}
+
+function transformFootnoteLinks() {
+  return (tree: Root) => {
+    visit(tree, "element", (node: HastElement) => {
+      if (
+        node.properties?.id &&
+        typeof node.properties.id === "string" &&
+        node.properties.id.startsWith("user-content-")
+      ) {
+        node.properties.id = node.properties.id.replace("user-content-", "");
+      }
+
+      if (
+        node.tagName === "a" &&
+        node.properties?.href &&
+        typeof node.properties.href === "string" &&
+        node.properties.href.startsWith("#")
+      ) {
+        let targetId = node.properties.href.slice(1);
+
+        if (targetId.startsWith("user-content-")) {
+          targetId = targetId.replace("user-content-", "");
+        }
+
+        delete node.properties.href;
+
+        node.properties.onclick = `event.preventDefault();const el=document.getElementById('${targetId}');if(el){el.scrollIntoView({behavior:'smooth',block:'center'});history.replaceState(null,'','#${targetId}');}`;
+        node.properties.style = "cursor:pointer;";
       }
     });
   };
