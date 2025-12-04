@@ -17,6 +17,7 @@ import {
 	SiNodedotjs,
 	SiMysql,
 } from 'react-icons/si';
+import Image from 'next/image';
 
 import { RiJavaLine } from 'react-icons/ri';
 
@@ -87,7 +88,11 @@ function SkillStack() {
 		{
 			name: 'Bun',
 			icon: (
-				<BunLogo className="text-accent-foreground h-6 w-6 sm:h-12 sm:w-12" />
+				<Image
+					src={BunLogo}
+					alt="Bun Logo"
+					className="h-6 w-6 sm:h-12 sm:w-12"
+				/>
 			),
 		},
 		{

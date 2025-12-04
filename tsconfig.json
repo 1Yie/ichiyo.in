@@ -11,7 +11,7 @@
 		"moduleResolution": "bundler",
 		"resolveJsonModule": true,
 		"isolatedModules": true,
-		"jsx": "preserve",
+		"jsx": "react-jsx",
 		"incremental": true,
 		"plugins": [
 			{
@@ -30,7 +30,8 @@
 		"**/*.tsx",
 		".next/types/**/*.ts",
 		"app/api/login/[...nextauth].js",
-		"app/ui/tags-params-title.tsx"
+		"app/ui/tags-params-title.tsx",
+		".next/dev/types/**/*.ts"
 	],
 	"exclude": ["node_modules"]
 }

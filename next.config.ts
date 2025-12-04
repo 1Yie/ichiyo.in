@@ -2,18 +2,43 @@ import type { NextConfig } from 'next';
 import { join } from 'path';
 import { writeFileSync } from 'fs';
 
+const version = new Date().toISOString().replace(/[:.-]/g, '');
+writeFileSync(
+	join(process.cwd(), 'public', 'version.json'),
+	JSON.stringify({ version }),
+	'utf-8'
+);
+
 const nextConfig: NextConfig = {
+	reactCompiler: true,
+
+	turbopack: {},
+
 	images: {
-		domains: [
-			'file.ichiyo.in',
-			'dn-qiniu-avatar.qbox.me',
-			'images.unsplash.com',
-			'iph.href.lu',
+		remotePatterns: [
+			{
+				protocol: 'https',
+				hostname: 'file.ichiyo.in',
+				pathname: '/**',
+			},
+			{
+				protocol: 'https',
+				hostname: 'dn-qiniu-avatar.qbox.me',
+				pathname: '/**',
+			},
+			{
+				protocol: 'https',
+				hostname: 'images.unsplash.com',
+				pathname: '/**',
+			},
+			{
+				protocol: 'https',
+				hostname: 'iph.href.lu',
+				pathname: '/**',
+			},
 		],
 	},
-	experimental: {
-		reactCompiler: true,
-	},
+
 	compiler: {
 		removeConsole:
 			process.env.NODE_ENV === 'production'
@@ -22,44 +47,19 @@ const nextConfig: NextConfig = {
 					}
 				: false,
 	},
+
 	env: {
 		NEXT_PUBLIC_KEY_TTL_MS: process.env.KEY_TTL_MS,
 	},
+
 	async rewrites() {
 		return [
-			{
-				source: '/rss',
-				destination: '/feed.xml',
-			},
-			{
-				source: '/rss.xml',
-				destination: '/feed.xml',
-			},
-			{
-				source: '/feed',
-				destination: '/feed.xml',
-			},
+			{ source: '/rss', destination: '/feed.xml' },
+			{ source: '/rss.xml', destination: '/feed.xml' },
+			{ source: '/feed', destination: '/feed.xml' },
 		];
 	},
-	webpack(config, { isServer }) {
-		config.module.rules.push({
-			test: /\.svg$/,
-			issuer: {
-				and: [/\.(js|ts)x?$/],
-			},
-			use: ['@svgr/webpack'],
-		});
-		if (!isServer) {
-			const version = new Date().toISOString().replace(/[:.-]/g, '');
-			const filePath = join(__dirname, 'public', 'version.json');
-			// const content = JSON.stringify({ version, timestamp: Date.now() });
-			const content = JSON.stringify({ version });
 
-			writeFileSync(filePath, content, 'utf-8');
-		}
-
-		return config;
-	},
 	async headers() {
 		return [
 			{
