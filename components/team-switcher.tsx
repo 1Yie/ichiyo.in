@@ -1,48 +1,48 @@
-"use client";
+'use client';
 
-import * as React from "react";
-import { useRouter } from "next/navigation";
+import * as React from 'react';
+import { useRouter } from 'next/navigation';
 import {
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from "@/components/ui/sidebar";
+	SidebarMenu,
+	SidebarMenuButton,
+	SidebarMenuItem,
+} from '@/components/ui/sidebar';
 
 export function TeamSwitcher({
-  teams,
+	teams,
 }: {
-  teams: {
-    name: string;
-    logo: React.ElementType;
-    plan: string;
-  }[];
+	teams: {
+		name: string;
+		logo: React.ElementType;
+		plan: string;
+	}[];
 }) {
-  const router = useRouter();
-  const activeTeam = teams[0];
+	const router = useRouter();
+	const activeTeam = teams[0];
 
-  if (!activeTeam) {
-    return null;
-  }
+	if (!activeTeam) {
+		return null;
+	}
 
-  return (
-    <SidebarMenu>
-      <SidebarMenuItem>
-        <SidebarMenuButton
-          size="lg"
-          className="hover:bg-sidebar-accent cursor-pointer hover:text-sidebar-accent-foreground"
-          onClick={() => router.push("/")}
-        >
-          <div className="bg-accent-foreground text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-            <activeTeam.logo className="size-4" />
-          </div>
-          <div className="grid flex-1 text-left text-sm leading-tight">
-            <span className="truncate font-medium">{activeTeam.name}</span>
-            <span className="truncate text-xs">{activeTeam.plan}</span>
-          </div>
-        </SidebarMenuButton>
-      </SidebarMenuItem>
-    </SidebarMenu>
-  );
+	return (
+		<SidebarMenu>
+			<SidebarMenuItem>
+				<SidebarMenuButton
+					size="lg"
+					className="hover:bg-sidebar-accent hover:text-sidebar-accent-foreground cursor-pointer"
+					onClick={() => router.push('/')}
+				>
+					<div className="bg-accent-foreground text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+						<activeTeam.logo className="size-4" />
+					</div>
+					<div className="grid flex-1 text-left text-sm leading-tight">
+						<span className="truncate font-medium">{activeTeam.name}</span>
+						<span className="truncate text-xs">{activeTeam.plan}</span>
+					</div>
+				</SidebarMenuButton>
+			</SidebarMenuItem>
+		</SidebarMenu>
+	);
 }
 
 // "use client";

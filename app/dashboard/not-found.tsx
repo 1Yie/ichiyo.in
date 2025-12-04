@@ -1,15 +1,15 @@
-import { Metadata } from "next";
+import { Metadata } from 'next';
 
-import DashboardError from "@/ui/dashboard-error";
+import DashboardError from '@/ui/dashboard-error';
 
 export const metadata: Metadata = {
-  title: "ichiyo | 404",
+	title: 'ichiyo | 404',
 };
 
 export default function NotFound() {
-  return (
-    <>
-      <DashboardError />
-    </>
-  );
+	return (
+		<>
+			<DashboardError />
+		</>
+	);
 }

@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import ClientThemeProvider from "@/app/(main)/client-provider";
+import ClientThemeProvider from '@/app/(main)/client-provider';
 
 export default function ClientThemeWrapper({
-  children,
+	children,
 }: {
-  children: React.ReactNode;
+	children: React.ReactNode;
 }) {
-  return <ClientThemeProvider>{children}</ClientThemeProvider>;
+	return <ClientThemeProvider>{children}</ClientThemeProvider>;
 }

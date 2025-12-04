@@ -1,21 +1,21 @@
-import DashboardEditPost from "@/ui/dashboard-edit-post";
-import { Metadata } from "next";
+import DashboardEditPost from '@/ui/dashboard-edit-post';
+import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: "ichiyo | 编辑文章",
+	title: 'ichiyo | 编辑文章',
 };
 
 interface Props {
-  params: Promise<{ id: string }>;
+	params: Promise<{ id: string }>;
 }
 
 export default async function DashboardPostEditPage(props: Props) {
-  const params = await props.params;
-  const postId = Number(params.id);
+	const params = await props.params;
+	const postId = Number(params.id);
 
-  if (isNaN(postId)) {
-    return <p>无效文章ID</p>;
-  }
+	if (isNaN(postId)) {
+		return <p>无效文章ID</p>;
+	}
 
-  return <DashboardEditPost postId={postId} />;
+	return <DashboardEditPost postId={postId} />;
 }

@@ -1,14 +1,14 @@
-import DashboardHome from "@/app/ui/dashboard-home";
-import { Metadata } from "next";
+import DashboardHome from '@/app/ui/dashboard-home';
+import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: "ichiyo | 仪表盘",
+	title: 'ichiyo | 仪表盘',
 };
 
 export default function DashboardPage() {
-  return (
-    <>
-      <DashboardHome />
-    </>
-  );
+	return (
+		<>
+			<DashboardHome />
+		</>
+	);
 }

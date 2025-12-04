@@ -8,7 +8,9 @@ export default function ImageZoom() {
 		const zoom = mediumZoom({ margin: 12 }) as Zoom;
 
 		const attachZoomToImages = () => {
-			const imgs = Array.from(document.querySelectorAll('img[data-zoom="true"]')) as HTMLImageElement[];
+			const imgs = Array.from(
+				document.querySelectorAll('img[data-zoom="true"]')
+			) as HTMLImageElement[];
 
 			imgs.forEach((img) => {
 				if (zoom.getImages().includes(img)) return;

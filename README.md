@@ -12,7 +12,6 @@
 - TypeScript
 - Prisma
 
-
 ## 部署
 
 ### 本地部署
@@ -102,7 +101,7 @@ pnpmx prisma generate
   - 邮箱：`admin@admin.com`
   - 名称：`admin`
   - 密码：`password`
-**请及时修改账号密码**
+    **请及时修改账号密码**
 
 - 初始后，如果数据库内有用户，则会将 `UID 1` 设为超级管理员
 
@@ -153,19 +152,19 @@ pm2 delete "ichiyo.in"
 
 ```js
 module.exports = {
-  apps: [
-    {
-      name: "ichiyo.in",
-      script: "npm",
-      args: "start",
-      cwd: "/opt/ichiyo.in",
-      env: {
-        // NODE_ENV: "production",
-        DATABASE_URL: "file:./prod.db",
-        PORT: "3000",
-      },
-    },
-  ],
+	apps: [
+		{
+			name: 'ichiyo.in',
+			script: 'npm',
+			args: 'start',
+			cwd: '/opt/ichiyo.in',
+			env: {
+				// NODE_ENV: "production",
+				DATABASE_URL: 'file:./prod.db',
+				PORT: '3000',
+			},
+		},
+	],
 };
 ```
 

@@ -1,11 +1,11 @@
-import DashboardConfigPicNew  from "@/ui/dashboard-config-pic-new";
+import DashboardConfigPicNew from '@/ui/dashboard-config-pic-new';
 
-import { Metadata } from "next";
+import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: "ichiyo | 新建图片",
+	title: 'ichiyo | 新建图片',
 };
 
 export default function Page() {
-  return <DashboardConfigPicNew />;
+	return <DashboardConfigPicNew />;
 }
