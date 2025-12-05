@@ -91,7 +91,7 @@ function SkillStack() {
 				<Image
 					src={BunLogo}
 					alt="Bun Logo"
-					className="h-6 w-6 sm:h-12 sm:w-12"
+					className="h-6 w-6 sm:h-12 sm:w-12 dark:invert"
 				/>
 			),
 		},
