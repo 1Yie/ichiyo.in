@@ -1,5 +1,5 @@
 import RSS from 'rss';
-import prisma from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 import { parseMarkdownForFeed } from '@/lib/markdown';
 
 export async function GET() {

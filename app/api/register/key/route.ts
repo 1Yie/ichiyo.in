@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { authenticateToken } from '@/lib/auth';
-import prisma from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 import ms from 'ms';
 
 const KEY_TTL_MS = ms(process.env.KEY_TTL_MS as ms.StringValue);

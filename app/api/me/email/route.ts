@@ -6,7 +6,7 @@ import {
 	getTokenExpirationInSeconds,
 } from '@/lib/auth';
 import { cookies } from 'next/headers';
-import prisma from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 
 export async function PATCH(req: NextRequest) {
 	const cookieStore = await cookies();

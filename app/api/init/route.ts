@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
-
-const prisma = new PrismaClient();
+import { hashPassword } from '@/lib/auth';
 
 export async function POST() {
 	try {
@@ -27,7 +26,7 @@ export async function POST() {
 
 		if (userCount === 0) {
 			// 没有用户，创建默认超级管理员
-			const hashedPassword = await bcrypt.hash('password', 10);
+			const hashedPassword = await hashPassword('password');
 
 			const adminUser = await prisma.user.create({
 				data: {
