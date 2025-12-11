@@ -46,6 +46,8 @@ prisma/*.db
 prisma/prob.db
 prisma/dev.db
 
-# other
+# vscode
+.vscode/*
 
+# other
 commit.md

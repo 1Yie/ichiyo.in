@@ -4,8 +4,8 @@ import Link from 'next/link';
 
 export default function BlogPanel() {
 	return (
-		<div className="bg-diagonal-stripes-sm border-b">
-			<section className="section-base flex flex-col gap-3 px-4 py-3 sm:flex-row sm:justify-between sm:gap-0 sm:py-1.5">
+		<div className="border-b">
+			<section className="section-base bg-diagonal-stripes-sm flex flex-col gap-3 px-4 py-3 sm:flex-row sm:justify-between sm:gap-0 sm:py-1.5">
 				<div className="flex items-center justify-between sm:justify-start">
 					<div className="flex items-center gap-4">
 						<Link
