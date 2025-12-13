@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 export default function BlogPanel() {
 	return (
-		<div className="border-b">
+		<div className="bg-background/80 sticky top-14 z-5 border-b backdrop-blur-sm">
 			<section className="section-base bg-diagonal-stripes-sm flex flex-col gap-3 px-4 py-3 sm:flex-row sm:justify-between sm:gap-0 sm:py-1.5">
 				<div className="flex items-center justify-between sm:justify-start">
 					<div className="flex items-center gap-4">

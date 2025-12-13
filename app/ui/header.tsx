@@ -148,174 +148,178 @@ export default function Header() {
 	};
 
 	return (
-		<header className="z-10 border-b">
-			<section className="section-base">
-				<div className="flex h-14 items-center justify-between px-4">
-					<div className="flex items-center space-x-4 font-['Raleway',sans-serif]">
-						<Link href="/">
-							<p className="text-primary text-lg">ichiyo</p>
-						</Link>
-					</div>
+		<div className="pt-14">
+			<header className="bg-background/80 fixed top-0 right-0 left-0 z-10 border-b backdrop-blur-sm">
+				<section className="section-base">
+					<div className="flex h-14 items-center justify-between px-4">
+						<div className="flex items-center space-x-4 font-['Raleway',sans-serif]">
+							<Link href="/">
+								<p className="text-primary text-lg">ichiyo</p>
+							</Link>
+						</div>
 
-					<nav className="hidden items-center space-x-4 sm:flex">
-						<NavigationMenu>
-							<NavigationMenuList>
-								{navItems.map((item) => (
-									<NavigationMenuItem key={item.href}>
-										<NavigationMenuLink asChild>
+						<nav className="hidden items-center space-x-4 sm:flex">
+							<NavigationMenu>
+								<NavigationMenuList>
+									{navItems.map((item) => (
+										<NavigationMenuItem key={item.href}>
+											<NavigationMenuLink asChild>
+												<Link
+													href={item.href}
+													className={`px-4 py-2 transition-colors duration-200 ${
+														pathname === item.href
+															? 'bg-accent text-accent-foreground'
+															: ''
+													}`}
+												>
+													{item.label}
+												</Link>
+											</NavigationMenuLink>
+										</NavigationMenuItem>
+									))}
+
+									<NavigationMenuItem>
+										<DropdownMenu>
+											<DropdownMenuTrigger className="hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground group flex cursor-pointer items-center gap-1 rounded-md px-2 py-2.5 transition-colors">
+												<ThemeIcon
+													theme={theme as 'system' | 'light' | 'dark'}
+												/>
+												<IoChevronDownSharp
+													size={12}
+													className="transition-transform duration-200 group-data-[state=open]:rotate-180"
+												/>
+											</DropdownMenuTrigger>
+											<DropdownMenuContent
+												align="center"
+												className="mx-2 min-w-[110px] space-y-1"
+											>
+												{themeOptions.map(({ value, label, icon }) => (
+													<DropdownMenuItem
+														key={value}
+														className={`flex cursor-pointer items-center gap-2 transition-colors duration-200 ${
+															theme === value
+																? 'bg-accent text-accent-foreground font-semibold'
+																: 'text-muted-foreground'
+														}`}
+														onClick={() =>
+															setTheme(value as 'system' | 'light' | 'dark')
+														}
+													>
+														{icon}
+														<span>{label}</span>
+													</DropdownMenuItem>
+												))}
+											</DropdownMenuContent>
+										</DropdownMenu>
+									</NavigationMenuItem>
+
+									<NavigationMenuItem>
+										<DropdownMenu>
+											<DropdownMenuTrigger className="hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground group flex cursor-pointer items-center gap-1 rounded-md px-2 py-1 transition-colors">
+												{loading ? (
+													<Skeleton className="h-8 w-8 rounded-full" />
+												) : (
+													<UserAvatar />
+												)}
+											</DropdownMenuTrigger>
+											<DropdownMenuContent
+												align="center"
+												className="mx-2 min-w-[110px] space-y-1"
+											>
+												{loading ? (
+													<div className="p-2">
+														<Skeleton className="mb-2 h-4 w-16" />
+														<Skeleton className="h-4 w-20" />
+													</div>
+												) : (
+													<UserMenuItems />
+												)}
+											</DropdownMenuContent>
+										</DropdownMenu>
+									</NavigationMenuItem>
+								</NavigationMenuList>
+							</NavigationMenu>
+						</nav>
+
+						<nav className="flex items-center gap-1 sm:hidden">
+							<DropdownMenu>
+								<DropdownMenuTrigger className="hover:bg-accent hover:text-accent-foreground cursor-pointer rounded-md p-2 transition-colors">
+									<ThemeIcon theme={theme as 'system' | 'light' | 'dark'} />
+								</DropdownMenuTrigger>
+								<DropdownMenuContent
+									align="center"
+									className="mx-2 min-w-[110px] space-y-1"
+								>
+									{themeOptions.map(({ value, label, icon }) => (
+										<DropdownMenuItem
+											key={value}
+											className={`flex cursor-pointer items-center gap-2 transition-colors duration-200 ${
+												theme === value
+													? 'bg-accent text-accent-foreground font-semibold'
+													: 'text-muted-foreground'
+											}`}
+											onClick={() =>
+												setTheme(value as 'system' | 'light' | 'dark')
+											}
+										>
+											{icon}
+											<span>{label}</span>
+										</DropdownMenuItem>
+									))}
+								</DropdownMenuContent>
+							</DropdownMenu>
+
+							<DropdownMenu>
+								<DropdownMenuTrigger className="hover:bg-accent hover:text-accent-foreground cursor-pointer rounded-md p-1.5 transition-colors">
+									{loading ? (
+										<Skeleton className="h-6 w-6 rounded-full" />
+									) : (
+										<UserAvatar size="small" />
+									)}
+								</DropdownMenuTrigger>
+								<DropdownMenuContent
+									align="center"
+									className="mx-2 min-w-[110px] space-y-1"
+								>
+									{loading ? (
+										<div className="p-2">
+											<Skeleton className="mb-2 h-4 w-16" />
+											<Skeleton className="h-4 w-20" />
+										</div>
+									) : (
+										<UserMenuItems />
+									)}
+								</DropdownMenuContent>
+							</DropdownMenu>
+
+							<DropdownMenu>
+								<DropdownMenuTrigger className="hover:bg-accent hover:text-accent-foreground cursor-pointer rounded-md p-2 transition-colors">
+									<RxHamburgerMenu size={20} />
+								</DropdownMenuTrigger>
+								<DropdownMenuContent
+									align="center"
+									className="mx-2 min-w-[80px] space-y-1"
+								>
+									{navItems.map((item) => (
+										<DropdownMenuItem key={item.href} asChild>
 											<Link
 												href={item.href}
-												className={`px-4 py-2 transition-colors duration-200 ${
+												className={`flex cursor-pointer items-center justify-center transition-colors duration-200 ${
 													pathname === item.href
-														? 'bg-accent text-accent-foreground'
-														: ''
+														? 'bg-accent text-accent-foreground font-semibold'
+														: 'text-muted-foreground'
 												}`}
 											>
 												{item.label}
 											</Link>
-										</NavigationMenuLink>
-									</NavigationMenuItem>
-								))}
-
-								<NavigationMenuItem>
-									<DropdownMenu>
-										<DropdownMenuTrigger className="hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground group flex cursor-pointer items-center gap-1 rounded-md px-2 py-2.5 transition-colors">
-											<ThemeIcon theme={theme as 'system' | 'light' | 'dark'} />
-											<IoChevronDownSharp
-												size={12}
-												className="transition-transform duration-200 group-data-[state=open]:rotate-180"
-											/>
-										</DropdownMenuTrigger>
-										<DropdownMenuContent
-											align="center"
-											className="mx-2 min-w-[110px] space-y-1"
-										>
-											{themeOptions.map(({ value, label, icon }) => (
-												<DropdownMenuItem
-													key={value}
-													className={`flex cursor-pointer items-center gap-2 transition-colors duration-200 ${
-														theme === value
-															? 'bg-accent text-accent-foreground font-semibold'
-															: 'text-muted-foreground'
-													}`}
-													onClick={() =>
-														setTheme(value as 'system' | 'light' | 'dark')
-													}
-												>
-													{icon}
-													<span>{label}</span>
-												</DropdownMenuItem>
-											))}
-										</DropdownMenuContent>
-									</DropdownMenu>
-								</NavigationMenuItem>
-
-								<NavigationMenuItem>
-									<DropdownMenu>
-										<DropdownMenuTrigger className="hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground group flex cursor-pointer items-center gap-1 rounded-md px-2 py-1 transition-colors">
-											{loading ? (
-												<Skeleton className="h-8 w-8 rounded-full" />
-											) : (
-												<UserAvatar />
-											)}
-										</DropdownMenuTrigger>
-										<DropdownMenuContent
-											align="center"
-											className="mx-2 min-w-[110px] space-y-1"
-										>
-											{loading ? (
-												<div className="p-2">
-													<Skeleton className="mb-2 h-4 w-16" />
-													<Skeleton className="h-4 w-20" />
-												</div>
-											) : (
-												<UserMenuItems />
-											)}
-										</DropdownMenuContent>
-									</DropdownMenu>
-								</NavigationMenuItem>
-							</NavigationMenuList>
-						</NavigationMenu>
-					</nav>
-
-					<nav className="flex items-center gap-1 sm:hidden">
-						<DropdownMenu>
-							<DropdownMenuTrigger className="hover:bg-accent hover:text-accent-foreground cursor-pointer rounded-md p-2 transition-colors">
-								<ThemeIcon theme={theme as 'system' | 'light' | 'dark'} />
-							</DropdownMenuTrigger>
-							<DropdownMenuContent
-								align="center"
-								className="mx-2 min-w-[110px] space-y-1"
-							>
-								{themeOptions.map(({ value, label, icon }) => (
-									<DropdownMenuItem
-										key={value}
-										className={`flex cursor-pointer items-center gap-2 transition-colors duration-200 ${
-											theme === value
-												? 'bg-accent text-accent-foreground font-semibold'
-												: 'text-muted-foreground'
-										}`}
-										onClick={() =>
-											setTheme(value as 'system' | 'light' | 'dark')
-										}
-									>
-										{icon}
-										<span>{label}</span>
-									</DropdownMenuItem>
-								))}
-							</DropdownMenuContent>
-						</DropdownMenu>
-
-						<DropdownMenu>
-							<DropdownMenuTrigger className="hover:bg-accent hover:text-accent-foreground cursor-pointer rounded-md p-1.5 transition-colors">
-								{loading ? (
-									<Skeleton className="h-6 w-6 rounded-full" />
-								) : (
-									<UserAvatar size="small" />
-								)}
-							</DropdownMenuTrigger>
-							<DropdownMenuContent
-								align="center"
-								className="mx-2 min-w-[110px] space-y-1"
-							>
-								{loading ? (
-									<div className="p-2">
-										<Skeleton className="mb-2 h-4 w-16" />
-										<Skeleton className="h-4 w-20" />
-									</div>
-								) : (
-									<UserMenuItems />
-								)}
-							</DropdownMenuContent>
-						</DropdownMenu>
-
-						<DropdownMenu>
-							<DropdownMenuTrigger className="hover:bg-accent hover:text-accent-foreground cursor-pointer rounded-md p-2 transition-colors">
-								<RxHamburgerMenu size={20} />
-							</DropdownMenuTrigger>
-							<DropdownMenuContent
-								align="center"
-								className="mx-2 min-w-[80px] space-y-1"
-							>
-								{navItems.map((item) => (
-									<DropdownMenuItem key={item.href} asChild>
-										<Link
-											href={item.href}
-											className={`flex cursor-pointer items-center justify-center transition-colors duration-200 ${
-												pathname === item.href
-													? 'bg-accent text-accent-foreground font-semibold'
-													: 'text-muted-foreground'
-											}`}
-										>
-											{item.label}
-										</Link>
-									</DropdownMenuItem>
-								))}
-							</DropdownMenuContent>
-						</DropdownMenu>
-					</nav>
-				</div>
-			</section>
-		</header>
+										</DropdownMenuItem>
+									))}
+								</DropdownMenuContent>
+							</DropdownMenu>
+						</nav>
+					</div>
+				</section>
+			</header>
+		</div>
 	);
 }

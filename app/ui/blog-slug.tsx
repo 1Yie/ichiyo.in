@@ -281,7 +281,7 @@ function PostContent({
 		<>
 			<div className="border-b">
 				<section className="section-base bg-squares relative p-12">
-					<div className="absolute top-0 right-full max-[768px]:hidden">
+					{/* <div className="absolute top-0 right-full max-[768px]:hidden">
 						<button
 							className="flex h-10 w-10 cursor-pointer items-center justify-center border-b border-l"
 							onClick={() => window.history.back()}
@@ -291,7 +291,7 @@ function PostContent({
 								<ChevronLeft className="h-6 w-6" />
 							</p>
 						</button>
-					</div>
+					</div> */}
 
 					<h1 className="mt-2 mb-2 text-3xl font-bold sm:text-4xl">
 						{post.title}

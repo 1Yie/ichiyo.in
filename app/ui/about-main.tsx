@@ -110,7 +110,7 @@ function SkillStack() {
 			<section className="section-base bg-accent/10 relative">
 				<div className="relative mx-auto max-w-xl p-2">
 					{/* 九宫格 */}
-					<div className="relative z-10 grid grid-cols-3 gap-0">
+					<div className="relative grid grid-cols-3 gap-0">
 						{skills.map((skill, index, arr) => {
 							const cols = 3;
 							const total = arr.length;
