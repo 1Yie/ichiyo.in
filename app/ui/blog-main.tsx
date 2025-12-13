@@ -9,8 +9,10 @@ export default function BlogMain() {
 	const [currentPage, setCurrentPage] = useState(1);
 
 	return (
-		<>
-			<BlogPanel />
+		<div className="relative">
+			<div className="bg-background/80 sticky top-14 z-5 border-b backdrop-blur-sm">
+				<BlogPanel />
+			</div>
 			<Suspense
 				fallback={
 					<div className="border-b">
@@ -32,6 +34,6 @@ export default function BlogMain() {
 			>
 				<PostsList currentPage={currentPage} setCurrentPage={setCurrentPage} />
 			</Suspense>
-		</>
+		</div>
 	);
 }
