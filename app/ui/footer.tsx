@@ -21,23 +21,28 @@ type SocialIconLinkProps = {
 //   url: "https://icp.gov.moe/?keyword=20256090",
 // };
 
+const SocialIconLink = ({ href, children }: SocialIconLinkProps) => (
+	<Link
+		href={href}
+		target="_blank"
+		rel="noopener noreferrer"
+		className="transition-colors hover:text-gray-700 dark:hover:text-gray-300"
+	>
+		{children}
+	</Link>
+);
+
+// const ICP = {
+//   name: "萌ICP备20256090号",
+//   url: "https://icp.gov.moe/?keyword=20256090",
+// };
+
 const ICP = {
 	name: '',
 	url: '',
 };
 
 export default function Footer() {
-	const SocialIconLink = ({ href, children }: SocialIconLinkProps) => (
-		<Link
-			href={href}
-			target="_blank"
-			rel="noopener noreferrer"
-			className="transition-colors hover:text-gray-700 dark:hover:text-gray-300"
-		>
-			{children}
-		</Link>
-	);
-
 	return (
 		<div className="relative">
 			<section className="section-base">

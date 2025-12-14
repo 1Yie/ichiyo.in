@@ -13,6 +13,8 @@ import Footer from '@/app/ui/footer';
 import { ThemeProvider } from 'next-themes';
 import FaviconSwitcher from '@/lib/favicon-switcher';
 import { UserProvider } from '@/contexts/user-context';
+import ScrollToTop from '@/hooks/use-scroll-to-top';
+import ScrollToTopButton from '@/ui/scroll-to-top-button';
 
 export const metadata: Metadata = {
 	title: 'ichiyo (@1Yie)',
@@ -107,7 +109,7 @@ export default async function RootLayout({
 	};
 
 	return (
-		<html className="scroll-smooth" lang="zh-CN">
+		<html lang="zh-CN">
 			<body
 				className={`antialiased ${ubuntu.className} ${sourceCodePro.className} ${raleway.className}`}
 			>
@@ -136,6 +138,7 @@ export default async function RootLayout({
 							<Header />
 							<Toaster richColors position="top-center" />
 							{children}
+							<ScrollToTopButton />
 							<Footer />
 						</UserProvider>
 					</ThemeProvider>

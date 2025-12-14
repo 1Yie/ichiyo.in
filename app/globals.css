@@ -191,7 +191,6 @@ code:not(pre code) {
 	body {
 		@apply bg-background text-foreground;
 		@apply !font-['Ubuntu_Sans','Noto_Sans_CJK_KR',sans-serif];
-		@apply scroll-smooth;
 	}
 }
 
