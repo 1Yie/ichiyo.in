@@ -149,7 +149,7 @@ export default function Header() {
 
 	return (
 		<div className="h-14">
-			<header className="bg-background/80 fixed top-0 right-0 left-0 z-10 border-b backdrop-blur-sm">
+			<header className="bg-background/80 fixed top-0 right-0 left-0 z-10 border-b pr-[var(--removed-body-scroll-bar-size,0px)] backdrop-blur-sm">
 				<section className="section-base">
 					<div className="flex h-14 items-center justify-between px-4">
 						<div className="flex items-center space-x-4 font-['Raleway',sans-serif]">
