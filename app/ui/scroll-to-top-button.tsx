@@ -18,6 +18,9 @@ export default function ScrollToTopButton() {
 				setIsVisible(true);
 			} else {
 				setIsVisible(false);
+				// 核心逻辑：
+				// 当页面回到顶部（按钮消失）时，自动把“方块锁定状态”解除。
+				// 这样下次按钮出现时，又会恢复成默认的三角形。
 				setIsClicked(false);
 			}
 		};
@@ -35,25 +38,21 @@ export default function ScrollToTopButton() {
 	};
 
 	const handleClick = () => {
+		// 1. 核心修改：无论 PC 还是移动端，点击瞬间都锁定为“方块”
+		// 这样在滚动过程中，它会一直保持方块形状，直到滚到顶部消失
+		setIsClicked(true);
+
 		if (isMobile) {
-			// 移动端：设置为点击状态(变方+居中) -> 延迟滚动 -> 延迟重置
-			setIsClicked(true);
+			// 移动端：保留延迟，为了展示变身动画
 			setTimeout(() => {
 				scrollToTop();
-				setTimeout(() => setIsClicked(false), 800);
 			}, 400);
 		} else {
-			// PC端：直接滚动
+			// PC 端：立即滚动
+			// 此时 isClicked 已经是 true，所以按钮会以“方块”姿态向上滚动
 			scrollToTop();
 		}
 	};
-
-	// 定义路径字符串 (避免拼写错误)
-	// 三角形路径 (顶点下沉 13.4%)
-	const trianglePath =
-		'[clip-path:polygon(50%_13.4%,0_100%,100%_100%,50%_13.4%)]';
-	// 正方形路径
-	const squarePath = '[clip-path:polygon(0_0,0_100%,100%_100%,100%_0)]';
 
 	return (
 		<div
@@ -61,12 +60,21 @@ export default function ScrollToTopButton() {
 		>
 			<Button
 				onClick={handleClick}
-				className={`bg-primary text-primary-foreground hover:bg-primary /* --- 形状逻辑 (修复点) --- */ /* 如果被点击 (移动端): 强制显示正方形 */ /* 如果没被点击: 默认显示三角形，hover 时变正方形 */ h-12 w-12 rounded-none p-0 transition-all duration-500 ease-in-out ${isClicked ? squarePath : `${trianglePath} group-hover:${squarePath}`} `}
+				className={`bg-primary text-primary-foreground hover:bg-primary /* --- 形状逻辑 --- */ h-12 w-12 rounded-none p-0 transition-all duration-500 ease-in-out ${
+					isClicked
+						? '[clip-path:polygon(0_0,0_100%,100%_100%,100%_0)]' // 点击锁定状态：全程保持正方形
+						: '[clip-path:polygon(50%_13.4%,0_100%,100%_100%,50%_13.4%)] group-hover:[clip-path:polygon(0_0,0_100%,100%_100%,100%_0)] hover:[clip-path:polygon(0_0,0_100%,100%_100%,100%_0)]'
+					// 默认状态：三角 -> 悬浮变正方
+				} `}
 				size="icon"
 				aria-label="回到顶部"
 			>
 				<ArrowUp
-					className={`/* --- 箭头位置逻辑 (修复点) --- */ /* 如果被点击 (移动端): 强制居中 (!translate-y-0) */ /* 如果没被点击: 默认下沉 (translate-y-2.5)，hover 时居中 */ h-6 w-6 transition-transform duration-500 ease-in-out ${isClicked ? '!translate-y-0' : 'translate-y-2.5 group-hover:translate-y-0'} `}
+					className={`/* --- 图标位置逻辑 --- */ h-6 w-6 transition-transform duration-500 ease-in-out ${
+						isClicked
+							? '!translate-y-0' // 点击锁定状态：强制居中
+							: 'translate-y-2.5 group-hover:translate-y-0 hover:translate-y-0' // 默认状态：下沉 -> 悬浮居中
+					} `}
 				/>
 			</Button>
 		</div>
