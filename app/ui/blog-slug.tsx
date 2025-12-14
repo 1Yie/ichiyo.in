@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import ErrorBoundary from '@/ui/error-boundary';
 import type { PostBySlug } from '@/types/post';
+import ScrollToTopButton from '@/ui/scroll-to-top-button';
 
 function dayDiff(d1: Date, d2: Date) {
 	const date1 = new Date(d1.getFullYear(), d1.getMonth(), d1.getDate());
@@ -279,6 +280,7 @@ function PostContent({
 }) {
 	return (
 		<>
+			<ScrollToTopButton />
 			<div className="border-b">
 				<section className="section-base bg-squares relative p-12">
 					<h1 className="mt-2 mb-2 text-3xl font-bold sm:text-4xl">
