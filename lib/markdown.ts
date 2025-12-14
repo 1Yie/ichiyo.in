@@ -101,7 +101,7 @@ function addHeadingAnchors() {
 					tagName: 'span',
 					properties: {
 						class: 'anchor-link',
-						onclick: `const el=document.getElementById('${text}');if(el){el.scrollIntoView({behavior:'smooth'});history.replaceState(null,'','#${text}');}`,
+						onclick: `const el=document.getElementById('${text}');if(el){const rect=el.getBoundingClientRect();const offsetTop=window.pageYOffset+rect.top-80;window.scrollTo({top:offsetTop,behavior:'smooth'});history.replaceState(null,'','#${text}');}`,
 					},
 					children: [{ type: 'text', value: '#' }],
 				});
@@ -135,7 +135,7 @@ function transformFootnoteLinks() {
 
 				delete node.properties.href;
 
-				node.properties.onclick = `event.preventDefault();const el=document.getElementById('${targetId}');if(el){el.scrollIntoView({behavior:'smooth',block:'center'});history.replaceState(null,'','#${targetId}');}`;
+				node.properties.onclick = `event.preventDefault();const el=document.getElementById('${targetId}');if(el){const rect=el.getBoundingClientRect();const offsetTop=window.pageYOffset+rect.top-80;window.scrollTo({top:offsetTop,behavior:'smooth'});history.replaceState(null,'','#${targetId}');}`;
 				node.properties.style = 'cursor:pointer;';
 			}
 		});

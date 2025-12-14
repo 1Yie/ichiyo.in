@@ -32,11 +32,11 @@ export default function ScrollToTopButton() {
 
 	return (
 		<div
-			className={`group fixed right-8 bottom-8 z-50 flex items-center justify-center drop-shadow-xl transition-all duration-500 ease-in-out ${isVisible ? 'pointer-events-auto translate-y-0 opacity-100' : 'pointer-events-none translate-y-8 opacity-0'} `}
+			className={`group fixed right-8 bottom-8 z-50 flex items-center justify-center drop-shadow-[0_5px_15px_rgba(0,0,0,0.5)] transition-all duration-500 ease-in-out ${isVisible ? 'pointer-events-auto translate-y-0 opacity-100' : 'pointer-events-none translate-y-8 opacity-0'}`}
 		>
 			<Button
 				onClick={scrollToTop}
-				className="bg-primary text-primary-foreground hover:bg-primary/90 h-12 w-12 rounded-none p-0 transition-all duration-500 ease-in-out [clip-path:polygon(50%_13.4%,0_100%,100%_100%,50%_13.4%)] group-hover:[clip-path:polygon(0_0,0_100%,100%_100%,100%_0)]"
+				className="bg-primary text-primary-foreground hover:bg-primary h-12 w-12 rounded-none p-0 transition-all duration-500 ease-in-out [clip-path:polygon(50%_13.4%,0_100%,100%_100%,50%_13.4%)] group-hover:[clip-path:polygon(0_0,0_100%,100%_100%,100%_0)]"
 				size="icon"
 				aria-label="回到顶部"
 			>

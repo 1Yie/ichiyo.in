@@ -5,7 +5,7 @@ import mediumZoom, { Zoom } from 'medium-zoom';
 
 export default function ImageZoom() {
 	useEffect(() => {
-		const zoom = mediumZoom({ margin: 12 }) as Zoom;
+		const zoom = mediumZoom({ margin: 32 }) as Zoom;
 
 		const attachZoomToImages = () => {
 			const imgs = Array.from(
