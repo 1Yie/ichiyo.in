@@ -1,4 +1,3 @@
-// auth.ts
 import NextAuth from 'next-auth';
 import GitHub from 'next-auth/providers/github';
 import { PrismaAdapter } from '@auth/prisma-adapter';
@@ -13,9 +12,28 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 	],
 
 	callbacks: {
+		async signIn({ user }) {
+			if (!user.email) return false;
+
+			try {
+				const dbUser = await prisma.user.findUnique({
+					where: { email: user.email },
+				});
+
+				if (dbUser && dbUser.isAdmin) {
+					return true; // 允许登录
+				}
+				return false;
+			} catch (error) {
+				console.error('SignIn 验证出错:', error);
+				return false;
+			}
+		},
+
 		async session({ session, user }) {
 			if (session.user && user) {
 				(session.user as any).uid = (user as any).uid;
+				(session.user as any).isAdmin = (user as any).isAdmin;
 			}
 			return session;
 		},
