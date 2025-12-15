@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
+import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
-import { verifyToken } from '@/lib/auth';
 
 export async function GET() {
 	try {
@@ -26,24 +25,22 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-	const cookieStore = await cookies();
-	const token = cookieStore.get('token')?.value;
-
-	if (!token) {
-		return NextResponse.json({ error: '未登录' }, { status: 401 });
-	}
-
-	let payload;
 	try {
-		payload = verifyToken(token);
-		if (!payload) {
-			return NextResponse.json({ error: '无效身份' }, { status: 401 });
+		const session = await auth();
+
+		if (!session || !session.user?.id) {
+			return NextResponse.json({ error: '未登录' }, { status: 401 });
 		}
-	} catch {
-		return NextResponse.json({ error: '无效身份' }, { status: 401 });
-	}
 
-	try {
+		const user = await prisma.user.findUnique({
+			where: { id: session.user.id },
+			select: { isAdmin: true },
+		});
+
+		if (!user?.isAdmin) {
+			return NextResponse.json({ error: '权限不足' }, { status: 403 });
+		}
+
 		const body = await req.json();
 		const { name, description, link, iconLight, iconDark } = body;
 

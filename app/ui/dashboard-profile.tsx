@@ -34,20 +34,7 @@ export default function DashboardProfile() {
 	// 编辑用户名相关状态
 	const [formName, setFormName] = useState(userInfo?.name || '');
 	const [showEditDialog, setShowEditDialog] = useState(false);
-
-	// 修改密码相关状态
-	const [showPasswordDialog, setShowPasswordDialog] = useState(false);
-	const [newPassword, setNewPassword] = useState('');
-	const [confirmPassword, setConfirmPassword] = useState('');
-	const [passwordError, setPasswordError] = useState('');
-
-	// 更换邮箱相关状态
-	const [newEmail, setNewEmail] = useState('');
-	const [currentPassword, setCurrentPassword] = useState('');
-	const [emailError, setEmailError] = useState('');
-
-	// 邮箱修改加载状态
-	const [isChangingEmail, setIsChangingEmail] = useState(false);
+	const [isSubmittingName, setIsSubmittingName] = useState(false);
 
 	// 管理员设置弹窗状态
 	const [showAdminDialog, setShowAdminDialog] = useState(false);
@@ -108,39 +95,20 @@ export default function DashboardProfile() {
 		const timer = setInterval(updateRemainingTime, 1000);
 
 		return () => clearInterval(timer);
-	}, [
-		showKeyDialog,
-		registerKey.expiresAt,
-		currentPassword,
-		newEmail,
-		refreshUser,
-	]);
+	}, [showKeyDialog, registerKey.expiresAt]);
 
 	// 同步 userInfo 到本地编辑状态
 	useEffect(() => {
 		if (userInfo?.name) setFormName(userInfo.name);
-		if (userInfo?.email) setNewEmail(userInfo.email);
 	}, [userInfo]);
 
 	// 关闭编辑用户名弹窗时重置状态
 	useEffect(() => {
 		if (!showEditDialog) {
 			setFormName(userInfo?.name || '');
-			setNewEmail(userInfo?.email || '');
-			setCurrentPassword('');
-			setEmailError('');
-			setIsChangingEmail(false);
+			setIsSubmittingName(false);
 		}
 	}, [showEditDialog, userInfo]);
-
-	// 关闭密码弹窗清理
-	useEffect(() => {
-		if (!showPasswordDialog) {
-			setNewPassword('');
-			setConfirmPassword('');
-			setPasswordError('');
-		}
-	}, [showPasswordDialog]);
 
 	// 加载所有用户列表
 	useEffect(() => {
@@ -194,6 +162,7 @@ export default function DashboardProfile() {
 			return;
 		}
 
+		setIsSubmittingName(true);
 		try {
 			const res = await fetch('/api/me', {
 				method: 'PATCH',
@@ -202,9 +171,10 @@ export default function DashboardProfile() {
 				body: JSON.stringify({ id: formName.trim() }),
 			});
 
+			const data = await res.json();
+
 			if (!res.ok) {
-				const err = await res.text();
-				throw new Error(err || '修改用户名失败');
+				throw new Error(data.error || '修改用户名失败');
 			}
 
 			// 先关闭对话框
@@ -218,87 +188,8 @@ export default function DashboardProfile() {
 			toast.error(
 				'修改用户名失败: ' + (error instanceof Error ? error.message : '')
 			);
-		}
-	};
-
-	// 更换邮箱提交
-	const handleChangeEmail = async () => {
-		// 验证邮箱格式
-		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-		if (!emailRegex.test(newEmail)) {
-			setEmailError('邮箱格式不正确');
-			return false;
-		}
-
-		// 验证密码不为空
-		if (!currentPassword) {
-			setEmailError('请输入当前密码');
-			return false;
-		}
-
-		setIsChangingEmail(true);
-		try {
-			const res = await fetch('/api/me/email', {
-				method: 'PATCH',
-				headers: { 'Content-Type': 'application/json' },
-				credentials: 'include',
-				body: JSON.stringify({
-					newEmail: newEmail,
-					currentPassword: currentPassword,
-				}),
-			});
-
-			const data = await res.json();
-
-			if (!res.ok) {
-				throw new Error(data.error || '更换邮箱失败');
-			}
-
-			toast.success('邮箱更换成功');
-			// 刷新用户信息
-			await refreshUser();
-			return true;
-		} catch (error) {
-			setEmailError(error instanceof Error ? error.message : '更换邮箱失败');
-			return false;
 		} finally {
-			setIsChangingEmail(false);
-		}
-	};
-	// 修改密码提交
-	const handleChangePassword = async () => {
-		// 验证密码长度
-		if (newPassword.length < 6) {
-			setPasswordError('密码长度至少6位');
-			return false;
-		}
-
-		// 验证密码一致性
-		if (newPassword !== confirmPassword) {
-			setPasswordError('两次密码输入不一致');
-			return false;
-		}
-
-		try {
-			const res = await fetch('/api/me', {
-				method: 'PATCH',
-				headers: { 'Content-Type': 'application/json' },
-				credentials: 'include',
-				body: JSON.stringify({ password: newPassword }),
-			});
-
-			if (!res.ok) {
-				const err = await res.text();
-				throw new Error(err || '修改密码失败');
-			}
-
-			toast.success('密码修改成功');
-			setShowPasswordDialog(false);
-			logout();
-			return true;
-		} catch (error) {
-			setPasswordError(error instanceof Error ? error.message : '修改密码失败');
-			return false;
+			setIsSubmittingName(false);
 		}
 	};
 
@@ -498,11 +389,11 @@ export default function DashboardProfile() {
 			<div className="bg-muted/50 flex items-center justify-between rounded-2xl p-3">
 				<div className="flex items-center gap-4">
 					<Image
-						src={userInfo.avatar}
+						src={userInfo.avatar || '/avatar-placeholder.png'} // 适配 next-auth image 字段
 						alt="头像"
 						className="border-foreground/20 h-12 w-12 shrink-0 rounded-full border"
-						width={13}
-						height={13}
+						width={48}
+						height={48}
 						priority
 						quality={100}
 						unoptimized
@@ -521,110 +412,17 @@ export default function DashboardProfile() {
 				<Button onClick={() => setShowEditDialog(true)}>编辑信息</Button>
 			</div>
 
-			<hr className="bg-foreground/30 my-4" />
-
-			{/* 安全 */}
-			<h1 className="text-foreground/90 mb-4 text-2xl font-bold">安全</h1>
-			<div className="bg-muted/50 flex justify-between rounded-2xl p-3">
-				<div className="flex items-center gap-4">
-					<div className="shrink-0">密码</div>
-					<p className="text-foreground/60 text-lg">********</p>
-				</div>
-				<Button onClick={() => setShowPasswordDialog(true)}>修改密码</Button>
-			</div>
-
-			{/* 高级设置 - 只有管理员才能看到 */}
-			{isAdmin && (
-				<>
-					<hr className="bg-foreground/30 my-4" />
-					<h1 className="text-foreground/90 mb-4 text-2xl font-bold">
-						高级设置
-					</h1>
-
-					<div className="bg-muted/50 flex flex-col gap-4 rounded-2xl p-3">
-						{/* 管理员设置 - 只有超级管理员才能看到 */}
-						{isSuperAdmin && (
-							<>
-								{/* 初始化API开关 */}
-								<div className="flex items-center justify-between">
-									<div className="flex flex-col gap-2">
-										<h2 className="text-foreground/90 font-bold">初始化 API</h2>
-										<p className="text-foreground/70 text-sm">
-											控制系统初始化 API 的启用状态。禁用后将无法通过 API
-											创建管理员账号。
-										</p>
-									</div>
-									<Button
-										onClick={() => handleToggleInitApi(!initApiEnabled)}
-										disabled={loadingInitSetting}
-										variant={initApiEnabled ? 'destructive' : 'default'}
-										className="flex items-center justify-center gap-2"
-									>
-										{loadingInitSetting && (
-											<Loader2 className="h-4 w-4 animate-spin" />
-										)}
-										<span>
-											{loadingInitSetting
-												? '更新中'
-												: initApiEnabled
-													? '禁用接口'
-													: '启用接口'}
-										</span>
-									</Button>
-								</div>
-
-								{/* 设置管理员权限 */}
-								<div className="flex items-center justify-between">
-									<div className="flex flex-col gap-2">
-										<h2 className="text-foreground/90 font-bold">管理员设置</h2>
-										<p className="text-foreground/70 text-sm">
-											为其他用户设置管理员权限。
-										</p>
-									</div>
-									<Button
-										onClick={() => setShowAdminDialog(true)}
-										className="flex items-center justify-center gap-2"
-									>
-										设置权限
-									</Button>
-								</div>
-							</>
-						)}
-
-						{/* 注册密钥 */}
-						<div className="flex items-center justify-between">
-							<div className="flex flex-col gap-2">
-								<h2 className="text-foreground/90 font-bold">注册密钥</h2>
-								<p className="text-foreground/70 text-sm">
-									有效期为 {getKeyTTLDisplay()}
-									。当密钥被使用后，需等待上一个密钥过期后才能生成新密钥。
-								</p>
-							</div>
-							<Button
-								onClick={handleGenerateKey}
-								disabled={loadingKey}
-								className="flex items-center justify-center gap-2"
-							>
-								{loadingKey && <Loader2 className="h-4 w-4 animate-spin" />}
-								<span>{loadingKey ? '生成中' : '生成密钥'}</span>
-							</Button>
-						</div>
-					</div>
-				</>
-			)}
-
 			{/* 编辑用户名弹窗 */}
 			<AlertDialog open={showEditDialog} onOpenChange={setShowEditDialog}>
 				<AlertDialogContent>
 					<AlertDialogHeader>
-						<AlertDialogTitle>编辑信息</AlertDialogTitle>
+						<AlertDialogTitle>修改用户名</AlertDialogTitle>
 						<AlertDialogDescription>
-							你可以修改你的用户名和邮箱。
+							设置一个唯一的用户名 (ID)。
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 
 					<div className="mt-4 space-y-4">
-						{/* 用户名输入 */}
 						<div>
 							<Label className="text-foreground/90 mb-2 block text-sm font-medium">
 								用户名
@@ -634,304 +432,28 @@ export default function DashboardProfile() {
 								onChange={(e) => setFormName(e.target.value)}
 								placeholder="请输入新用户名"
 							/>
+							{/* <p className="text-muted-foreground mt-1 text-xs">
+								当前邮箱: {userInfo.email} (OAuth 登录不可修改)
+							</p> */}
 						</div>
-
-						{/* 邮箱输入 */}
-						<div>
-							<Label
-								htmlFor="email"
-								className="text-foreground/90 mb-2 block text-sm font-medium"
-							>
-								邮箱
-							</Label>
-							<Input
-								type="email"
-								value={newEmail}
-								onChange={(e) => setNewEmail(e.target.value)}
-								placeholder="请输入新邮箱"
-							/>
-						</div>
-
-						{/* 当前密码输入（更换邮箱时需要） */}
-						{newEmail && newEmail !== userInfo?.email && (
-							<div>
-								<Label
-									htmlFor="currentPassword"
-									className="text-foreground/90 mb-2 block text-sm font-medium"
-								>
-									当前密码
-								</Label>
-								<p className="text-foreground/70 mb-2 text-sm">
-									为了保护您的账号安全，更换邮箱需要验证当前密码。请在下方输入您的登录密码。
-								</p>
-								<Input
-									type="password"
-									value={currentPassword}
-									onChange={(e) => setCurrentPassword(e.target.value)}
-									placeholder="验证当前密码"
-								/>
-							</div>
-						)}
-
-						{/* 错误提示 */}
-						{emailError && (
-							<p className="rounded-md bg-red-50 px-2 py-1 text-sm text-red-500">
-								{emailError}
-							</p>
-						)}
 					</div>
 
 					<AlertDialogFooter className="mt-6">
 						<AlertDialogCancel>关闭</AlertDialogCancel>
 						<Button
 							disabled={
-								// 检查是否有任何内容发生变化或正在加载
-								(formName.trim() === (userInfo?.name || '') &&
-									newEmail === (userInfo?.email || '')) ||
-								isChangingEmail
+								formName.trim() === (userInfo?.name || '') ||
+								!formName.trim() ||
+								isSubmittingName
 							}
 							onClick={async (e) => {
-								e.preventDefault(); // 阻止默认行为
-
-								// 清除之前的错误信息
-								setEmailError('');
-
-								// 如果邮箱有变化，先处理邮箱更换
-								if (newEmail && newEmail !== userInfo?.email) {
-									const emailSuccess = await handleChangeEmail();
-									if (!emailSuccess) return; // 邮箱验证失败，停止提交
-								}
-
-								// 处理用户名更新
-								if (formName.trim() !== userInfo?.name) {
-									await handleSubmitName();
-								} else {
-									// 如果用户名没有变化且邮箱也没有变化，直接关闭弹窗
-									setShowEditDialog(false);
-								}
+								e.preventDefault();
+								await handleSubmitName();
 							}}
 						>
-							{isChangingEmail && <Loader2 className="h-4 w-4 animate-spin" />}
-							{isChangingEmail ? '验证中' : '提交'}
+							{isSubmittingName && <Loader2 className="h-4 w-4 animate-spin" />}
+							{isSubmittingName ? '保存中' : '保存'}
 						</Button>
-					</AlertDialogFooter>
-				</AlertDialogContent>
-			</AlertDialog>
-
-			{/* 修改密码弹窗 */}
-			<AlertDialog
-				open={showPasswordDialog}
-				onOpenChange={(open) => {
-					if (!open) {
-						setShowPasswordDialog(false);
-						setNewPassword('');
-						setConfirmPassword('');
-						setPasswordError('');
-					}
-				}}
-			>
-				<AlertDialogContent>
-					<AlertDialogHeader>
-						<AlertDialogTitle>修改密码</AlertDialogTitle>
-						<AlertDialogDescription>
-							请输入新密码，密码长度至少6位。
-						</AlertDialogDescription>
-					</AlertDialogHeader>
-
-					<div className="mt-4 flex flex-col gap-4">
-						<Label>新密码</Label>
-						<Input
-							type="password"
-							placeholder="请输入新密码"
-							value={newPassword}
-							onChange={(e) => {
-								setNewPassword(e.target.value);
-								setPasswordError('');
-							}}
-						/>
-						<Label>确认密码</Label>
-						<Input
-							type="password"
-							placeholder="请确认密码"
-							value={confirmPassword}
-							onChange={(e) => {
-								setConfirmPassword(e.target.value);
-								setPasswordError('');
-							}}
-						/>
-						{passwordError && (
-							<p className="rounded-md bg-red-50 px-2 py-1 text-sm text-red-500">
-								{passwordError}
-							</p>
-						)}
-					</div>
-
-					<AlertDialogFooter className="mt-6">
-						<AlertDialogCancel>取消</AlertDialogCancel>
-						<Button
-							onClick={async (e) => {
-								e.preventDefault(); // 阻止默认行为
-								await handleChangePassword();
-							}}
-							disabled={!newPassword || !confirmPassword}
-						>
-							提交
-						</Button>
-					</AlertDialogFooter>
-				</AlertDialogContent>
-			</AlertDialog>
-
-			{/* 管理员设置弹窗 */}
-			<AlertDialog open={showAdminDialog} onOpenChange={setShowAdminDialog}>
-				<AlertDialogContent>
-					<AlertDialogHeader>
-						<AlertDialogTitle>设置管理员</AlertDialogTitle>
-						<AlertDialogDescription>
-							选择一个用户并修改账号权限。
-						</AlertDialogDescription>
-					</AlertDialogHeader>
-
-					<div className="mt-4 flex flex-wrap items-center gap-4">
-						{/* 左侧用户选择 */}
-						<Select
-							value={selectedUserUid || ''}
-							onValueChange={(val) => {
-								setSelectedUserUid(val);
-								// 保存选中用户的原始权限状态
-								const selectedUser = allUsers.find((u) => u.uid === val);
-								setOriginalUserPermission(selectedUser?.isAdmin || false);
-							}}
-						>
-							<SelectTrigger className="w-full">
-								<SelectValue placeholder="请选择用户" />
-							</SelectTrigger>
-							<SelectContent>
-								{allUsers.filter(
-									(u) => u.email !== userInfo.email && !u.isSuperAdmin
-								).length === 0 ? (
-									<div className="text-muted-foreground/70 p-2 text-center text-sm">
-										暂无可管理的用户
-									</div>
-								) : (
-									allUsers
-										.filter(
-											(u) => u.email !== userInfo.email && !u.isSuperAdmin
-										)
-										.map((user) => (
-											<SelectItem key={user.uid} value={user.uid}>
-												{user.email}{' '}
-												<span>
-													{user.isAdmin ? (
-														<span className="text-ms text-primary/90">
-															(管理员)
-														</span>
-													) : (
-														<span className="text-ms text-foreground/40">
-															(普通用户)
-														</span>
-													)}
-												</span>
-											</SelectItem>
-										))
-								)}
-							</SelectContent>
-						</Select>
-
-						{/* 右侧权限选择 */}
-						<Select
-							value={
-								selectedUserUid
-									? allUsers.find((u) => u.uid === selectedUserUid)?.isAdmin
-										? 'true'
-										: 'false'
-									: ''
-							}
-							onValueChange={(val) => {
-								if (!selectedUserUid) return;
-								setAllUsers((prev) =>
-									prev.map((u) =>
-										u.uid === selectedUserUid
-											? { ...u, isAdmin: val === 'true' }
-											: u
-									)
-								);
-							}}
-						>
-							<SelectTrigger>
-								<SelectValue placeholder="请选择权限" />
-							</SelectTrigger>
-							<SelectContent>
-								<SelectItem value="false">普通用户</SelectItem>
-								<SelectItem value="true">管理员</SelectItem>
-							</SelectContent>
-						</Select>
-					</div>
-
-					<AlertDialogFooter className="mt-6">
-						<AlertDialogCancel>关闭</AlertDialogCancel>
-						<Button
-							disabled={
-								// 检查是否选择了用户且权限发生了变化
-								!selectedUserUid ||
-								originalUserPermission === null ||
-								(selectedUserUid &&
-									allUsers.find((u) => u.uid === selectedUserUid)?.isAdmin) ===
-									originalUserPermission
-							}
-							onClick={(e) => {
-								e.preventDefault(); // 阻止默认行为
-								handleSaveUserPermission();
-							}}
-						>
-							保存
-						</Button>
-					</AlertDialogFooter>
-				</AlertDialogContent>
-			</AlertDialog>
-
-			{/* 注册密钥弹窗 */}
-			<AlertDialog open={showKeyDialog} onOpenChange={setShowKeyDialog}>
-				<AlertDialogContent>
-					<AlertDialogHeader>
-						<AlertDialogTitle>注册密钥</AlertDialogTitle>
-						<AlertDialogDescription>
-							当前有效的注册密钥，有效期为 {getKeyTTLDisplay()}
-							<br />
-							当密钥被使用后，需等待上一个密钥过期后才能生成新密钥。
-						</AlertDialogDescription>
-					</AlertDialogHeader>
-
-					<div className="mt-4 space-y-4">
-						<div className="bg-muted/50 rounded-lg p-4">
-							<p className="font-['Source_Code_Pro',monospace] text-lg break-all select-all">
-								{remainingTime === '已过期' ? '(X^X)' : registerKey.value}
-							</p>
-						</div>
-
-						<div className="flex items-center justify-between">
-							<Button
-								variant="outline"
-								size="sm"
-								onClick={() => {
-									if (remainingTime === '已过期') {
-										toast.error('密钥已过期');
-										return;
-									}
-									navigator.clipboard.writeText(registerKey.value);
-									toast.success('已复制到剪贴板');
-								}}
-								disabled={remainingTime === '已过期'}
-							>
-								复制密钥
-							</Button>
-							<span className="text-muted-foreground text-sm">
-								{remainingTime ? `剩余时间: ${remainingTime}` : '正在计算...'}
-							</span>
-						</div>
-					</div>
-
-					<AlertDialogFooter className="mt-4">
-						<AlertDialogCancel>关闭</AlertDialogCancel>
 					</AlertDialogFooter>
 				</AlertDialogContent>
 			</AlertDialog>

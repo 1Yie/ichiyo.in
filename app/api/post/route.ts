@@ -1,15 +1,12 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { authenticateToken } from '@/lib/auth';
-import { cookies } from 'next/headers';
+import { auth } from '@/auth';
 import { generateSlug } from '@/lib/slug';
 
 export async function GET(request: Request) {
 	try {
-		const cookieStore = await cookies();
-		const token = cookieStore.get('token')?.value;
-
-		const payload = await authenticateToken(token);
+		const session = await auth();
+		const payload = session?.user;
 
 		if (!payload) {
 			return NextResponse.json({ error: '未登录' }, { status: 401 });
@@ -23,7 +20,7 @@ export async function GET(request: Request) {
 
 		if (payload) {
 			const user = await prisma.user.findUnique({
-				where: { uid: payload.uid },
+				where: { uid: payload.uid as any },
 				select: { isAdmin: true, uid: true },
 			});
 
@@ -76,7 +73,7 @@ export async function GET(request: Request) {
 			} else {
 				if (summary) {
 					posts = await prisma.post.findMany({
-						where: { authors: { some: { userId: payload.uid } } },
+						where: { authors: { some: { userId: payload.uid as any } } },
 						orderBy: { id: 'desc' },
 						select: {
 							id: true,
@@ -101,7 +98,7 @@ export async function GET(request: Request) {
 					});
 				} else {
 					posts = await prisma.post.findMany({
-						where: { authors: { some: { userId: payload.uid } } },
+						where: { authors: { some: { userId: payload.uid as any } } },
 						orderBy: { id: 'desc' },
 						include: {
 							tags: true,
@@ -183,14 +180,12 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
 	try {
-		const cookieStore = await cookies();
-		const token = (await cookieStore).get('token')?.value;
+		const session = await auth();
+		const payload = session?.user;
 
-		if (!token) {
+		if (!payload) {
 			return NextResponse.json({ error: '未登录' }, { status: 401 });
 		}
-
-		const payload = await authenticateToken(token);
 
 		if (!payload) {
 			return NextResponse.json({ error: '无效身份' }, { status: 401 });
@@ -235,7 +230,7 @@ export async function POST(request: Request) {
 		}
 
 		const uniqueAuthors = Array.from(
-			new Set([payload.uid, ...(authors ?? [])])
+			new Set([payload.uid as any, ...(authors ?? [])])
 		);
 
 		const tagData =

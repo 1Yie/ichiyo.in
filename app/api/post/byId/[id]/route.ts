@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
-import { authenticateToken } from '@/lib/auth';
+import { auth } from '@/auth';
 import { generateSlug } from '@/lib/slug';
 
 interface Params {
@@ -13,7 +12,7 @@ function sanitizeUser(user: {
 	id: string;
 	email: string;
 	isAdmin: boolean;
-	hashpassword?: string;
+	hashpassword?: string | null;
 }) {
 	const { uid, id, email, isAdmin } = user;
 	return { uid, id, email, isAdmin };
@@ -26,15 +25,11 @@ export async function GET(request: Request, props: Params) {
 		return NextResponse.json({ error: '无效文章ID' }, { status: 400 });
 	}
 
-	const cookieStore = await cookies();
-	const token = cookieStore.get('token')?.value;
-	if (!token) {
-		return NextResponse.json({ error: '未登录' }, { status: 401 });
-	}
+	const session = await auth();
+	const payload = session?.user;
 
-	const payload = await authenticateToken(token);
 	if (!payload) {
-		return NextResponse.json({ error: '无效身份' }, { status: 401 });
+		return NextResponse.json({ error: '未登录' }, { status: 401 });
 	}
 
 	const post = await prisma.post.findUnique({
@@ -50,12 +45,13 @@ export async function GET(request: Request, props: Params) {
 	}
 
 	const user = await prisma.user.findUnique({
-		where: { uid: payload.uid },
+		where: { uid: payload.uid as any }, // 类型断言适配 session
 		select: { isAdmin: true },
 	});
 
 	const isOwnerOrAdmin =
-		post.authors.some((a) => a.userId === payload.uid) || user?.isAdmin;
+		post.authors.some((a) => a.userId === (payload.uid as any)) ||
+		user?.isAdmin;
 	if (!isOwnerOrAdmin) {
 		return NextResponse.json({ error: '无权限访问此文章' }, { status: 403 });
 	}
@@ -73,16 +69,16 @@ export async function PATCH(request: Request, props: Params) {
 		return NextResponse.json({ error: '无效文章ID' }, { status: 400 });
 	}
 
-	const cookieStore = await cookies();
-	const token = (await cookieStore).get('token')?.value;
-	if (!token) {
+	// --- 验证部分替换开始 ---
+	const session = await auth();
+	const payload = session?.user;
+	// --- 验证部分替换结束 ---
+
+	if (!payload) {
 		return NextResponse.json({ error: '未登录' }, { status: 401 });
 	}
 
-	const payload = await authenticateToken(token);
-	if (!payload) {
-		return NextResponse.json({ error: '无效身份' }, { status: 401 });
-	}
+	// 原代码再次检查 payload，省略
 
 	const post = await prisma.post.findUnique({
 		where: { id: postId },
@@ -94,12 +90,13 @@ export async function PATCH(request: Request, props: Params) {
 	}
 
 	const user = await prisma.user.findUnique({
-		where: { uid: payload.uid },
+		where: { uid: payload.uid as any },
 		select: { isAdmin: true },
 	});
 
 	const isOwnerOrAdmin =
-		post.authors.some((a) => a.userId === payload.uid) || user?.isAdmin;
+		post.authors.some((a) => a.userId === (payload.uid as any)) ||
+		user?.isAdmin;
 	if (!isOwnerOrAdmin) {
 		return NextResponse.json({ error: '无权限操作此文章' }, { status: 403 });
 	}
@@ -144,7 +141,7 @@ export async function PATCH(request: Request, props: Params) {
 		return NextResponse.json({ error: '存在无效作者' }, { status: 400 });
 	}
 
-	if (!authors.includes(payload.uid)) authors.push(payload.uid);
+	if (!authors.includes(payload.uid as any)) authors.push(payload.uid as any);
 
 	let tagRecords: { id: number; name: string }[] = [];
 	if (tags && tags.length > 0) {
@@ -198,13 +195,14 @@ export async function DELETE(request: Request, props: Params) {
 	if (isNaN(postId))
 		return NextResponse.json({ error: '无效文章ID' }, { status: 400 });
 
-	const cookieStore = await cookies();
-	const token = (await cookieStore).get('token')?.value;
-	if (!token) return NextResponse.json({ error: '未登录' }, { status: 401 });
+	// --- 验证部分替换开始 ---
+	const session = await auth();
+	const payload = session?.user;
+	// --- 验证部分替换结束 ---
 
-	const payload = await authenticateToken(token);
-	if (!payload)
-		return NextResponse.json({ error: '无效身份' }, { status: 401 });
+	if (!payload) return NextResponse.json({ error: '未登录' }, { status: 401 });
+
+	// 再次 check payload 省略
 
 	const post = await prisma.post.findUnique({
 		where: { id: postId },
@@ -214,12 +212,13 @@ export async function DELETE(request: Request, props: Params) {
 	if (!post) return NextResponse.json({ error: '文章不存在' }, { status: 404 });
 
 	const user = await prisma.user.findUnique({
-		where: { uid: payload.uid },
+		where: { uid: payload.uid as any },
 		select: { isAdmin: true },
 	});
 
 	const isOwnerOrAdmin =
-		post.authors.some((a) => a.userId === payload.uid) || user?.isAdmin;
+		post.authors.some((a) => a.userId === (payload.uid as any)) ||
+		user?.isAdmin;
 	if (!isOwnerOrAdmin)
 		return NextResponse.json({ error: '无权限操作此文章' }, { status: 403 });
 

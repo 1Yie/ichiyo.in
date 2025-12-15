@@ -1,21 +1,12 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
-import { verifyToken } from '@/lib/auth';
+import { auth } from '@/auth';
 
 export async function GET() {
-	const cookieStore = await cookies();
-	const cookieStoreInstance = await cookieStore;
-	const token = cookieStoreInstance.get('token')?.value;
+	const session = await auth();
 
-	if (!token) {
+	if (!session) {
 		return NextResponse.json({ error: '未登录' }, { status: 401 });
-	}
-
-	try {
-		verifyToken(token);
-	} catch {
-		return NextResponse.json({ error: '无效 token' }, { status: 401 });
 	}
 
 	try {

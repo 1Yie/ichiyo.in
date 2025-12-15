@@ -1,42 +1,16 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
+import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
-import { verifyToken } from '@/lib/auth';
 
 interface Params {
 	params: Promise<{ id: string }>;
 }
 
-async function validateToken() {
-	const cookieStore = await cookies();
-	const token = cookieStore.get('token')?.value;
-	if (!token) {
-		return {
-			valid: false,
-			response: NextResponse.json({ error: '未登录' }, { status: 401 }),
-		};
-	}
-
-	try {
-		const payload = verifyToken(token);
-		if (!payload) {
-			return {
-				valid: false,
-				response: NextResponse.json({ error: '无效身份' }, { status: 401 }),
-			};
-		}
-		return { valid: true, payload };
-	} catch {
-		return {
-			valid: false,
-			response: NextResponse.json({ error: '无效身份' }, { status: 401 }),
-		};
-	}
-}
-
 export async function GET(req: Request, props: Params) {
-	const validation = await validateToken();
-	if (!validation.valid) return validation.response;
+	const session = await auth();
+	if (!session) {
+		return NextResponse.json({ error: '未登录' }, { status: 401 });
+	}
 
 	const params = await props.params;
 	const { id } = params;
@@ -57,8 +31,19 @@ export async function GET(req: Request, props: Params) {
 }
 
 export async function PATCH(req: Request, props: Params) {
-	const validation = await validateToken();
-	if (!validation.valid) return validation.response;
+	const session = await auth();
+	if (!session || !session.user?.id) {
+		return NextResponse.json({ error: '未登录' }, { status: 401 });
+	}
+
+	const user = await prisma.user.findUnique({
+		where: { id: session.user.id },
+		select: { isAdmin: true },
+	});
+
+	if (!user?.isAdmin) {
+		return NextResponse.json({ error: '权限不足' }, { status: 403 });
+	}
 
 	const params = await props.params;
 	const { id } = params;
@@ -93,8 +78,19 @@ export async function PATCH(req: Request, props: Params) {
 }
 
 export async function DELETE(req: Request, props: Params) {
-	const validation = await validateToken();
-	if (!validation.valid) return validation.response;
+	const session = await auth();
+	if (!session || !session.user?.id) {
+		return NextResponse.json({ error: '未登录' }, { status: 401 });
+	}
+
+	const user = await prisma.user.findUnique({
+		where: { id: session.user.id },
+		select: { isAdmin: true },
+	});
+
+	if (!user?.isAdmin) {
+		return NextResponse.json({ error: '权限不足' }, { status: 403 });
+	}
 
 	const params = await props.params;
 	const { id } = params;

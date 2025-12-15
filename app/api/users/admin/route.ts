@@ -1,25 +1,19 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
-import { authenticateToken } from '@/lib/auth';
+import { auth } from '@/auth';
 
 export async function PATCH(request: Request) {
 	try {
-		const cookieStore = await cookies();
-		const token = cookieStore.get('token')?.value;
+		const session = await auth();
+		const payload = session?.user;
 
-		if (!token) {
-			return NextResponse.json({ error: '未登录' }, { status: 401 });
-		}
-
-		const payload = await authenticateToken(token);
 		if (!payload) {
-			return NextResponse.json({ error: '无效身份' }, { status: 401 });
+			return NextResponse.json({ error: '未登录' }, { status: 401 });
 		}
 
 		// 检查当前用户是否为超级管理员
 		const currentUser = await prisma.user.findUnique({
-			where: { uid: payload.uid },
+			where: { uid: payload.uid as any },
 			select: { isAdmin: true, isSuperAdmin: true },
 		});
 
@@ -47,7 +41,7 @@ export async function PATCH(request: Request) {
 		}
 
 		// 防止用户修改自己的管理员权限
-		if (targetUser.uid === payload.uid) {
+		if (targetUser.uid === (payload.uid as any)) {
 			return NextResponse.json(
 				{ error: '不能修改自己的管理员权限' },
 				{ status: 400 }

@@ -378,10 +378,6 @@ export type PicSumOrderByAggregateInput = {
 	id?: Prisma.SortOrder;
 };
 
-export type NullableStringFieldUpdateOperationsInput = {
-	set?: string | null;
-};
-
 export type NullableBoolFieldUpdateOperationsInput = {
 	set?: boolean | null;
 };

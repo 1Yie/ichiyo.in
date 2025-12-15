@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
+import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
-import { verifyToken } from '@/lib/auth';
 
 export async function GET() {
 	try {
@@ -22,28 +21,15 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-	const cookieStore = await cookies();
-	const token = cookieStore.get('token')?.value;
+	const session = await auth();
 
-	if (!token) {
+	if (!session) {
 		return NextResponse.json({ error: '未登录' }, { status: 401 });
 	}
 
-	let payload;
-	try {
-		payload = verifyToken(token);
-		if (!payload) {
-			return NextResponse.json({ error: '无效身份' }, { status: 401 });
-		}
-	} catch {
-		return NextResponse.json({ error: '无效身份' }, { status: 401 });
-	}
-
-	// 解析请求体
 	const body = await request.json();
 	const { title, src, button, link, newTab } = body;
 
-	// 简单校验
 	if (!title || !src) {
 		return NextResponse.json(
 			{ error: '缺少必要字段 title 或 src' },

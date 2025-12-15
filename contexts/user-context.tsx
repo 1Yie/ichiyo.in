@@ -9,9 +9,9 @@ import {
 } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { signOut } from 'next-auth/react';
 
 import md5 from 'md5';
-import { request } from '@/hooks/use-request';
 
 export interface UserInfo {
 	name: string;
@@ -38,7 +38,6 @@ const CACHE_DURATION = 10 * 60 * 1000;
 
 const getCachedUser = (): UserInfo | null => {
 	if (typeof window === 'undefined') return null;
-
 	try {
 		const cached = localStorage.getItem(USER_CACHE_KEY);
 		if (cached) {
@@ -58,7 +57,6 @@ const getCachedUser = (): UserInfo | null => {
 
 const setCachedUser = (userData: UserInfo) => {
 	if (typeof window === 'undefined') return;
-
 	try {
 		const cacheData = {
 			data: userData,
@@ -144,20 +142,21 @@ export function UserProvider({ children }: UserProviderProps) {
 	const logout = async () => {
 		try {
 			setLoading(true);
-			toast.success('退出成功');
 
-			await request('/api/logout', {
-				method: 'POST',
-				credentials: 'include',
-			});
-		} catch (error) {
-			console.error('退出请求失败:', error);
-		} finally {
 			setUserInfo(null);
 			clearCachedUser();
 			setError(null);
+
+			toast.success('退出成功');
+
+			await signOut({ redirect: false });
+		} catch (error) {
+			console.error('退出请求失败:', error);
+			toast.error('退出遇到问题');
+		} finally {
 			setLoading(false);
 			router.refresh();
+			router.push('/');
 		}
 	};
 
@@ -190,17 +189,14 @@ export function UserProvider({ children }: UserProviderProps) {
 
 export function useUser() {
 	const context = useContext(UserContext);
-
 	if (!context) {
 		throw new Error('useUser 必须在 UserProvider 内部使用');
 	}
-
 	return context;
 }
 
 export function useAdminCheck() {
 	const { userInfo, isAuthenticated } = useUser();
-
 	return {
 		isAdmin: isAuthenticated && userInfo?.isAdmin === true,
 		isSuperAdmin: isAuthenticated && userInfo?.isSuperAdmin === true,

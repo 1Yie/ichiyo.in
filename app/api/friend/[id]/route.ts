@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
-import { verifyToken } from '@/lib/auth';
+import { auth } from '@/auth';
 
 interface Params {
 	params: Promise<{ id: string }>;
@@ -38,21 +37,9 @@ export async function PATCH(request: Request, props: Params) {
 		return NextResponse.json({ error: '无效的好友ID' }, { status: 400 });
 	}
 
-	// 校验 token
-	const cookieStore = await cookies();
-	const token = cookieStore.get('token')?.value;
-	if (!token) {
+	const session = await auth();
+	if (!session) {
 		return NextResponse.json({ error: '未登录' }, { status: 401 });
-	}
-
-	let payload;
-	try {
-		payload = verifyToken(token);
-		if (!payload) {
-			return NextResponse.json({ error: '无效身份' }, { status: 401 });
-		}
-	} catch {
-		return NextResponse.json({ error: '无效身份' }, { status: 401 });
 	}
 
 	try {
@@ -85,7 +72,7 @@ export async function PATCH(request: Request, props: Params) {
 			where: { friendId: id },
 		});
 
-		// 创建新的 Social 记录，确保使用正确的字段名
+		// 创建新的 Social 记录
 		if (socialLinks.length > 0) {
 			await prisma.social.createMany({
 				data: socialLinks.map(
@@ -125,21 +112,9 @@ export async function DELETE(request: Request, props: Params) {
 		return NextResponse.json({ error: '无效的好友ID' }, { status: 400 });
 	}
 
-	// 校验 token
-	const cookieStore = await cookies();
-	const token = cookieStore.get('token')?.value;
-	if (!token) {
+	const session = await auth();
+	if (!session) {
 		return NextResponse.json({ error: '未登录' }, { status: 401 });
-	}
-
-	let payload;
-	try {
-		payload = verifyToken(token);
-		if (!payload) {
-			return NextResponse.json({ error: '无效身份' }, { status: 401 });
-		}
-	} catch {
-		return NextResponse.json({ error: '无效身份' }, { status: 401 });
 	}
 
 	try {

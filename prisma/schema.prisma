@@ -8,14 +8,67 @@ datasource db {
 }
 
 model User {
-  uid          Int     @id @default(autoincrement())
-  id           String  @unique
-  email        String  @unique
-  hashpassword String
-  isAdmin      Boolean @default(false)
-  isSuperAdmin Boolean @default(false)
+  uid          Int       @id @default(autoincrement()) 
+  id           String    @unique
 
-  posts PostAuthor[]
+  name         String?
+  email        String    @unique
+  emailVerified DateTime?
+  image        String?
+  
+  hashpassword String?   
+
+  isAdmin      Boolean   @default(false)
+  isSuperAdmin Boolean   @default(false)
+
+  accounts     Account[]
+  sessions     Session[]
+  
+  posts        PostAuthor[]
+
+  createdAt    DateTime  @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String  
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String? 
+  access_token       String? 
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String? 
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String   
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
 }
 
 model Post {

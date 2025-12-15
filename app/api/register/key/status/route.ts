@@ -1,23 +1,18 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { authenticateToken } from '@/lib/auth';
+import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 
 export async function GET() {
 	try {
-		const cookieStore = await cookies();
-		const token = cookieStore.get('token')?.value;
-		if (!token)
+		const session = await auth();
+
+		if (!session || !session.user?.id)
 			return NextResponse.json({ message: '未登录' }, { status: 401 });
 
-		const payload = await authenticateToken(token);
-		if (!payload?.uid)
-			return NextResponse.json({ message: '无效的 token' }, { status: 401 });
-
 		const user = await prisma.user.findUnique({
-			where: { uid: payload.uid },
-			select: { isAdmin: true },
+			where: { id: session.user.id },
 		});
+
 		if (!user?.isAdmin)
 			return NextResponse.json({ message: '权限不足' }, { status: 403 });
 
@@ -42,7 +37,7 @@ export async function GET() {
 			exists: true,
 			id: latestKey.id,
 			key: latestKey.key,
-			expiresAt: latestKey.expiresAt.toString(),
+			expiresAt: latestKey.expiresAt.toString(), // BigInt 序列化处理
 			isExpired,
 			isUsed,
 			isValid: !isExpired && !isUsed,

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
+import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
-import { verifyToken } from '@/lib/auth';
 
 export async function GET(
 	request: NextRequest,
@@ -12,19 +11,8 @@ export async function GET(
 	if (isNaN(id))
 		return NextResponse.json({ error: '无效的图片ID' }, { status: 400 });
 
-	// token 校验
-	const cookieStore = await cookies();
-	const token = cookieStore.get('token')?.value;
-	if (!token) return NextResponse.json({ error: '未登录' }, { status: 401 });
-
-	let payload;
-	try {
-		payload = verifyToken(token);
-		if (!payload)
-			return NextResponse.json({ error: '无效身份' }, { status: 401 });
-	} catch {
-		return NextResponse.json({ error: '无效身份' }, { status: 401 });
-	}
+	const session = await auth();
+	if (!session) return NextResponse.json({ error: '未登录' }, { status: 401 });
 
 	const pic = await prisma.pic.findUnique({ where: { id } });
 	if (!pic) return NextResponse.json({ error: '图片未找到' }, { status: 404 });
@@ -41,21 +29,11 @@ export async function PATCH(
 	if (isNaN(id))
 		return NextResponse.json({ error: '无效的图片ID' }, { status: 400 });
 
-	// token 校验
-	const cookieStore = await cookies();
-	const token = cookieStore.get('token')?.value;
-	if (!token) return NextResponse.json({ error: '未登录' }, { status: 401 });
-
-	let payload;
-	try {
-		payload = verifyToken(token);
-		if (!payload)
-			return NextResponse.json({ error: '无效身份' }, { status: 401 });
-	} catch {
-		return NextResponse.json({ error: '无效身份' }, { status: 401 });
-	}
+	const session = await auth();
+	if (!session) return NextResponse.json({ error: '未登录' }, { status: 401 });
 
 	const body = await request.json();
+
 	const dataToUpdate: Partial<{
 		title: string;
 		src: string;
@@ -63,6 +41,7 @@ export async function PATCH(
 		link: unknown;
 		newTab: boolean;
 	}> = {};
+
 	if (typeof body.title === 'string') dataToUpdate.title = body.title;
 	if (typeof body.src === 'string') dataToUpdate.src = body.src;
 	if (body.button !== undefined) dataToUpdate.button = body.button;
@@ -99,19 +78,8 @@ export async function DELETE(
 	if (isNaN(id))
 		return NextResponse.json({ error: '无效的图片ID' }, { status: 400 });
 
-	// token 校验
-	const cookieStore = await cookies();
-	const token = cookieStore.get('token')?.value;
-	if (!token) return NextResponse.json({ error: '未登录' }, { status: 401 });
-
-	let payload;
-	try {
-		payload = verifyToken(token);
-		if (!payload)
-			return NextResponse.json({ error: '无效身份' }, { status: 401 });
-	} catch {
-		return NextResponse.json({ error: '无效身份' }, { status: 401 });
-	}
+	const session = await auth();
+	if (!session) return NextResponse.json({ error: '未登录' }, { status: 401 });
 
 	try {
 		await prisma.pic.delete({ where: { id } });

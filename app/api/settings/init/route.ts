@@ -1,23 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { authenticateToken } from '@/lib/auth';
+import { auth } from '@/auth';
 
 export async function POST(request: NextRequest) {
 	try {
-		// 获取用户认证信息
-		const token = request.cookies.get('token')?.value;
-		const user = await authenticateToken(token);
-
-		if (!user) {
+		const session = await auth();
+		if (!session || !session.user?.email) {
 			return NextResponse.json(
 				{ success: false, message: '未登录' },
 				{ status: 401 }
 			);
 		}
 
-		// 检查用户是否为超级管理员
 		const userRecord = await prisma.user.findUnique({
-			where: { email: user.email },
+			where: { email: session.user.email },
 			select: { isSuperAdmin: true },
 		});
 
@@ -30,7 +26,6 @@ export async function POST(request: NextRequest) {
 
 		const { enabled } = await request.json();
 
-		// 更新初始化API开关设置
 		await prisma.systemSettings.upsert({
 			where: { key: 'init_api_enabled' },
 			update: {
@@ -64,20 +59,16 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
 	try {
-		// 获取用户认证信息
-		const token = request.cookies.get('token')?.value;
-		const user = await authenticateToken(token);
+		const session = await auth();
 
-		if (!user) {
+		if (!session || !session.user?.email) {
 			return NextResponse.json(
 				{ success: false, message: '未登录' },
 				{ status: 401 }
 			);
 		}
-
-		// 检查用户是否为超级管理员
 		const userRecord = await prisma.user.findUnique({
-			where: { email: user.email },
+			where: { email: session.user.email },
 			select: { isSuperAdmin: true },
 		});
 
@@ -88,7 +79,6 @@ export async function GET(request: NextRequest) {
 			);
 		}
 
-		// 获取初始化API开关状态
 		const initSetting = await prisma.systemSettings.findUnique({
 			where: { key: 'init_api_enabled' },
 		});

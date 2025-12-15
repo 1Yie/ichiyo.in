@@ -109,7 +109,7 @@ export function NavUser() {
 										<div className="grid flex-1 px-2 text-left text-sm leading-tight">
 											<span className="flex items-center gap-1 truncate font-medium">
 												{userInfo.name}
-												{adminFlag}
+												{/* {adminFlag} */}
 											</span>
 											<span className="truncate text-xs">{userInfo.email}</span>
 										</div>
@@ -147,7 +147,7 @@ export function NavUser() {
 										<div className="grid flex-1 text-left text-sm leading-tight">
 											<span className="flex items-center gap-1 truncate font-medium">
 												{userInfo.name}
-												{adminFlag}
+												{/* {adminFlag} */}
 											</span>
 											<span className="truncate text-xs">{userInfo.email}</span>
 										</div>

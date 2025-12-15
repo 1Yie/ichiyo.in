@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { authenticateToken } from '@/lib/auth';
+import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import ms from 'ms';
 
@@ -13,21 +12,20 @@ function generateKey(): string {
 
 export async function GET() {
 	try {
-		const cookieStore = await cookies();
-		const token = cookieStore.get('token')?.value;
-		if (!token)
-			return NextResponse.json({ message: '未登录' }, { status: 401 });
+		const session = await auth();
 
-		const payload = await authenticateToken(token);
-		if (!payload?.uid)
-			return NextResponse.json({ message: '无效的 token' }, { status: 401 });
+		if (!session || !session.user?.id) {
+			return NextResponse.json({ message: '未登录' }, { status: 401 });
+		}
 
 		const user = await prisma.user.findUnique({
-			where: { uid: payload.uid },
+			where: { id: session.user.id },
 			select: { isAdmin: true },
 		});
-		if (!user?.isAdmin)
+
+		if (!user?.isAdmin) {
 			return NextResponse.json({ message: '权限不足' }, { status: 403 });
+		}
 
 		const now = Date.now();
 

@@ -429,10 +429,6 @@ export type PostOrderByRelationAggregateInput = {
 	_count?: Prisma.SortOrder;
 };
 
-export type DateTimeFieldUpdateOperationsInput = {
-	set?: Date | string;
-};
-
 export type PostCreateNestedOneWithoutAuthorsInput = {
 	create?: Prisma.XOR<
 		Prisma.PostCreateWithoutAuthorsInput,

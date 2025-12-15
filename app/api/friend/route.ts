@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
-import { verifyToken } from '@/lib/auth';
+import { auth } from '@/auth';
 
 export async function GET() {
 	try {
@@ -17,21 +16,10 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-	const cookieStore = await cookies();
-	const token = cookieStore.get('token')?.value;
+	const session = await auth();
 
-	if (!token) {
+	if (!session) {
 		return NextResponse.json({ error: '未登录' }, { status: 401 });
-	}
-
-	let payload;
-	try {
-		payload = verifyToken(token);
-		if (!payload) {
-			return NextResponse.json({ error: '无效身份' }, { status: 401 });
-		}
-	} catch {
-		return NextResponse.json({ error: '无效身份' }, { status: 401 });
 	}
 
 	try {
