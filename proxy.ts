@@ -9,12 +9,12 @@ export default auth((req) => {
 	const { nextUrl } = req;
 	const pathname = nextUrl.pathname;
 
-	const isLoginPage = pathname === '/login';
+	const isLoginPage = pathname === '/auth/login';
 	const isDashboardPage = pathname.startsWith('/dashboard');
 
 	// 未登录用户访问受保护页面 (Dashboard) -> 重定向到登录页
 	if (isDashboardPage && !isLoggedIn) {
-		const loginUrl = new URL('/login', nextUrl);
+		const loginUrl = new URL('/auth/login', nextUrl);
 		// 记录用户原本想去的页面，登录后跳回
 		loginUrl.searchParams.set('from', pathname);
 		return NextResponse.redirect(loginUrl);

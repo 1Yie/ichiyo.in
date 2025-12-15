@@ -8,10 +8,7 @@ export default function robots(): MetadataRoute.Robots {
 			disallow: [
 				'/dashboard',
 				'/dashboard/*',
-				'/login/',
-				'/login/*',
-				'/register',
-				'/register/*',
+				'/auth/*',
 				'/api/',
 				'/api/*',
 				'/private/',
