@@ -16,13 +16,14 @@ import { Loader2, Github } from 'lucide-react';
 export function LoginForm({
 	className,
 	...props
-}: React.ComponentProps<'div'>) {
+}: React.ComponentProps<'div'> & { callbackUrl?: string }) {
 	const [loading, setLoading] = useState(false);
+	const { callbackUrl } = props;
 
 	const handleGithubLogin = async () => {
 		setLoading(true);
 		try {
-			await signIn('github', { callbackUrl: '/dashboard' });
+			await signIn('github', { callbackUrl });
 		} catch (error) {
 			console.error('Login failed:', error);
 			setLoading(false);

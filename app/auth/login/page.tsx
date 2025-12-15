@@ -10,10 +10,11 @@ export const metadata: Metadata = {
 };
 
 export default async function LoginPage(props: {
-	searchParams: Promise<{ error?: string }>;
+	searchParams: Promise<{ error?: string; callbackUrl?: string }>;
 }) {
 	const searchParams = await props.searchParams;
 	const error = searchParams.error;
+	const callbackUrl = searchParams.callbackUrl;
 
 	const Content = error ? AuthErrorCard : LoginForm;
 
@@ -22,7 +23,7 @@ export default async function LoginPage(props: {
 			<div className="flex w-full max-w-sm flex-col gap-6">
 				<LogoWithThemeIcon />
 
-				<Content />
+				<Content callbackUrl={callbackUrl} />
 			</div>
 		</div>
 	);
