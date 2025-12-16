@@ -150,6 +150,12 @@ export default async function RootLayout({
 					type="application/ld+json"
 					dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdNav) }}
 				/>
+
+				<script
+					defer
+					src="https://umami.ichiyo.in/script.js"
+					data-website-id="a4be15b0-e02e-47f1-b4ab-f21e813c612a"
+				></script>
 			</body>
 		</html>
 	);
