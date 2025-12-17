@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 export function debouncePromise<T extends (...args: any[]) => Promise<any>>(
 	fn: T,
 	delay: number

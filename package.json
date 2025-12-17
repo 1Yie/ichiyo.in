@@ -89,7 +89,6 @@
 	"devDependencies": {
 		"@commitlint/cli": "^20.1.0",
 		"@commitlint/config-conventional": "^20.0.0",
-		"@eslint/eslintrc": "^3",
 		"@next/swc-linux-x64-gnu": "^16.0.10",
 		"@tailwindcss/postcss": "^4",
 		"@types/jsonwebtoken": "^9.0.10",

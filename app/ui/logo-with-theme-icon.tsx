@@ -3,17 +3,20 @@
 import { useTheme } from 'next-themes';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState, useEffect } from 'react';
+import { useSyncExternalStore } from 'react';
+
+const emptySubscribe = () => () => {};
 
 export function LogoWithThemeIcon() {
 	const { theme, systemTheme } = useTheme();
-	const [mounted, setMounted] = useState(false);
 
-	useEffect(() => {
-		setMounted(true);
-	}, []);
+	const isMounted = useSyncExternalStore(
+		emptySubscribe,
+		() => true,
+		() => false
+	);
 
-	if (!mounted) return null;
+	if (!isMounted) return null;
 
 	const currentTheme = theme === 'system' ? systemTheme : theme;
 
