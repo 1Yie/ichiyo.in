@@ -1,21 +1,23 @@
 'use client';
-import React, { useEffect } from 'react';
+import React, { useSyncExternalStore } from 'react';
 import { useThemeSwitcher } from '@/lib/use-theme-switcher';
 import { useSiteUpdateToast } from '@/hooks/use-site-update';
+
+const emptySubscribe = () => () => {};
 
 const ClientThemeProvider: React.FC<{ children: React.ReactNode }> = ({
 	children,
 }) => {
-	const [mounted, setMounted] = React.useState(false);
+	const isMounted = useSyncExternalStore(
+		emptySubscribe,
+		() => true,
+		() => false
+	);
 
 	useThemeSwitcher();
 	useSiteUpdateToast();
 
-	useEffect(() => {
-		setMounted(true);
-	}, []);
-
-	if (!mounted) return null;
+	if (!isMounted) return null;
 
 	return <>{children}</>;
 };

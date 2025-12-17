@@ -1,3 +1,5 @@
+'use client';
+
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import Image from 'next/image';
@@ -21,21 +23,16 @@ export function ImageUrlWithPreview({
 	const [hasError, setHasError] = useState(false);
 
 	const hasPreview = preview.trim() !== '';
-	// 防抖更新 preview
-	useEffect(() => {
-		setImageLoaded(false);
 
-		const timeout = setTimeout(() => {
+	useEffect(() => {
+		const timer: NodeJS.Timeout = setTimeout(() => {
 			setPreview(src);
+			setImageLoaded(false);
+			setHasError(false);
 		}, 300);
 
-		return () => clearTimeout(timeout);
+		return () => clearTimeout(timer);
 	}, [src]);
-
-	// 每次预览地址变更，清除错误状态
-	useEffect(() => {
-		setHasError(false);
-	}, [preview]);
 
 	return (
 		<div className="flex items-start gap-4">
@@ -63,37 +60,31 @@ export function ImageUrlWithPreview({
 
 			{/* 图片预览区域 */}
 			<div className="bg-muted border-foreground/20 relative flex h-32 w-48 items-center justify-center overflow-hidden rounded-lg border">
-				{/* 正常显示图片 */}
 				{!loading && preview && !hasError && (
 					<Image
+						key={preview}
 						src={preview}
 						alt="图片预览"
 						fill
 						className="object-contain"
 						unoptimized
 						onLoad={() => setImageLoaded(true)}
-						onError={() => {
-							setHasError(true);
-							setImageLoaded(false);
-						}}
+						onError={() => setHasError(true)}
 					/>
 				)}
 
-				{/* 骨架屏遮罩 */}
 				{(loading || (hasPreview && !imageLoaded && !hasError)) && (
 					<div className="absolute inset-0">
 						<Skeleton className="h-full w-full" />
 					</div>
 				)}
 
-				{/* 加载失败提示 */}
 				{hasError && !loading && (
 					<span className="absolute px-2 text-center text-xs text-red-400">
 						图片加载失败
 					</span>
 				)}
 
-				{/* 无图片预览时 */}
 				{!hasPreview && !loading && (
 					<span className="text-muted-foreground absolute text-xs">无预览</span>
 				)}

@@ -60,8 +60,10 @@ export default function TagParams({ data }: { data: TagData }) {
 	}, [sortedPosts, currentPage]);
 
 	return (
-		<>
-			<BlogPanel />
+		<div className="relative">
+			<div className="bg-background/80 sticky top-14 z-5 border-b backdrop-blur-sm">
+				<BlogPanel />
+			</div>
 			<div className="border-b">
 				<section className="section-base">
 					{currentPosts.length === 0 ? (
@@ -202,6 +204,6 @@ export default function TagParams({ data }: { data: TagData }) {
 					</div>
 				)}
 			</div>
-		</>
+		</div>
 	);
 }
