@@ -428,7 +428,7 @@ scrollbar-thumb {
 			align-items: center;
 			gap: 8px;
 			/* background: var(--accent); */
-			color: var(--accent-foreground);
+			color: var(--muted-foreground);
 			padding: 4px 8px;
 			font-size: 12px;
 			font-family: var(--font-jetbrains-mono-nerd-font), monospace;
