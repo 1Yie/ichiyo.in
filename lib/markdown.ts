@@ -37,6 +37,7 @@ async function processMarkdown(
 				.use(remarkRehype, { allowDangerousHtml: true, math: true })
 				.use(rehypeKatex)
 				.use(rehypeHighlight)
+				.use(addCodeHeaders)
 				.use(addHeadingAnchors)
 				.use(transformFootnoteLinks);
 		} else {
@@ -137,6 +138,91 @@ function transformFootnoteLinks() {
 
 				node.properties.onclick = `event.preventDefault();const el=document.getElementById('${targetId}');if(el){const rect=el.getBoundingClientRect();const offsetTop=window.pageYOffset+rect.top-80;window.scrollTo({top:offsetTop,behavior:'smooth'});history.replaceState(null,'','#${targetId}');}`;
 				node.properties.style = 'cursor:pointer;';
+			}
+		});
+	};
+}
+
+function addCodeHeaders() {
+	return (tree: Root) => {
+		visit(tree, 'element', (node: HastElement) => {
+			if (node.tagName === 'pre') {
+				const code = node.children.find(
+					(child): child is HastElement =>
+						child.type === 'element' && child.tagName === 'code'
+				);
+				if (code && code.properties?.className) {
+					const className = Array.isArray(code.properties.className)
+						? code.properties.className.join(' ')
+						: typeof code.properties.className === 'string'
+							? code.properties.className
+							: '';
+					const match = className.match(/language-(\w+)/);
+					const lang = match ? match[1] : 'text';
+					const displayLang = lang.toUpperCase();
+
+					const header: HastElement = {
+						type: 'element',
+						tagName: 'div',
+						properties: { class: 'code-header' },
+						children: [
+							{
+								type: 'element',
+								tagName: 'span',
+								properties: { class: 'code-lang' },
+								children: [{ type: 'text', value: displayLang }],
+							},
+							{
+								type: 'element',
+								tagName: 'button',
+								properties: {
+									class: 'code-copy',
+									title: '复制代码',
+									onclick: `navigator.clipboard.writeText(this.parentElement.nextElementSibling.textContent).then(() => { if (window.toast) window.toast.success('代码已复制'); }).catch(() => { if (window.toast) window.toast.error('复制失败'); });`,
+								},
+								children: [
+									{
+										type: 'element',
+										tagName: 'svg',
+										properties: {
+											width: '16',
+											height: '16',
+											viewBox: '0 0 24 24',
+											fill: 'none',
+											stroke: 'currentColor',
+											'stroke-width': '2',
+										},
+										children: [
+											{
+												type: 'element',
+												tagName: 'rect',
+												properties: {
+													x: '9',
+													y: '9',
+													width: '13',
+													height: '13',
+													rx: '2',
+													ry: '2',
+												},
+												children: [],
+											},
+											{
+												type: 'element',
+												tagName: 'path',
+												properties: {
+													d: 'M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1',
+												},
+												children: [],
+											},
+										],
+									},
+								],
+							},
+						],
+					};
+
+					node.children.unshift(header);
+				}
 			}
 		});
 	};

@@ -174,7 +174,7 @@
 }
 
 code:not(pre code) {
-	font-family: 'Source Code Pro', monospace;
+	font-family: var(--font-jetbrains-mono-nerd-font), monospace;
 	padding: 0px 4px;
 
 	white-space: pre-wrap;
@@ -406,14 +406,54 @@ scrollbar-thumb {
 			border-top: 2px solid var(--border-color);
 		}
 
+		pre {
+			position: relative;
+		}
+
 		pre code {
-			font-family: 'Source Code Pro', monospace;
+			font-family: var(--font-jetbrains-mono-nerd-font), monospace;
 			padding: 20px;
 			display: flex;
 			background: var(--accent) !important;
 			color: var(--accent-foreground) !important;
 			white-space: no-wrap;
 			word-wrap: break-word;
+		}
+
+		.code-header {
+			position: absolute;
+			top: 0;
+			right: 0;
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			/* background: var(--accent); */
+			color: var(--accent-foreground);
+			padding: 4px 8px;
+			font-size: 12px;
+			font-family: var(--font-jetbrains-mono-nerd-font), monospace;
+			border-bottom-left-radius: 4px;
+		}
+
+		.code-lang {
+			font-weight: bold;
+		}
+
+		.code-copy {
+			background: none;
+			border: none;
+			cursor: pointer;
+			color: inherit;
+			display: flex;
+			align-items: center;
+			padding: 2px;
+			border-radius: 2px;
+			transition: opacity 0.2s;
+		}
+
+		.code-copy:hover {
+			opacity: 0.7;
+			background: rgba(255, 255, 255, 0.1);
 		}
 
 		img {
@@ -525,7 +565,7 @@ scrollbar-thumb {
 			border-radius: 4px;
 			font-size: 16px;
 
-			font-family: 'Source Code Pro', monospace;
+			font-family: var(--font-jetbrains-mono-nerd-font), monospace;
 
 			border-bottom: 2px solid var(--kbd-bg-border-color);
 		}

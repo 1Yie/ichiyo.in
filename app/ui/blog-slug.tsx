@@ -1,11 +1,17 @@
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import Comments from '@/components/ui/comment';
 import { toast } from 'sonner';
 import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
+
+declare global {
+	interface Window {
+		toast: typeof toast;
+	}
+}
 import {
 	Tooltip,
 	TooltipContent,
@@ -278,6 +284,10 @@ function PostContent({
 	post: PostBySlug;
 	htmlContent: string;
 }) {
+	useEffect(() => {
+		window.toast = toast;
+	}, []);
+
 	return (
 		<>
 			<ScrollToTopButton />
