@@ -178,7 +178,7 @@ function addCodeHeaders() {
 								properties: {
 									class: 'code-copy',
 									title: '复制代码',
-									onclick: `navigator.clipboard.writeText(this.parentElement.nextElementSibling.textContent).then(() => { if (window.toast) window.toast.success('代码已复制'); }).catch(() => { if (window.toast) window.toast.error('复制失败'); });`,
+									onclick: `navigator.clipboard.writeText(this.parentElement.nextElementSibling.textContent).then(() => { if (window.toast) window.toast.success('内容已复制到剪贴板'); }).catch(() => { if (window.toast) window.toast.error('复制失败'); });`,
 								},
 								children: [
 									{
