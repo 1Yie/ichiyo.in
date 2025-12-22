@@ -9,7 +9,6 @@ export const dynamic = 'force-dynamic';
  * 格式化版本号为标准 ISO Date
  * 将 20251222T054030547Z 转换为 2025-12-22T05:40:30.547Z
  */
-
 function parseVersionDate(versionStr: string): Date {
 	try {
 		const formatted = versionStr

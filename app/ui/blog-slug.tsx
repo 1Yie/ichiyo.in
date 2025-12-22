@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useEffect } from 'react';
+import { Suspense, useEffect, useState, useMemo } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import Comments from '@/components/ui/comment';
 import { toast } from 'sonner';
@@ -29,6 +29,7 @@ import {
 import ErrorBoundary from '@/ui/error-boundary';
 import type { PostBySlug } from '@/types/post';
 import ScrollToTopButton from '@/ui/scroll-to-top-button';
+import BlogTOC from '@/ui/blog-toc';
 
 function dayDiff(d1: Date, d2: Date) {
 	const date1 = new Date(d1.getFullYear(), d1.getMonth(), d1.getDate());
@@ -284,6 +285,13 @@ function PostContent({
 	post: PostBySlug;
 	htmlContent: string;
 }) {
+	const hasHeadings = useMemo(() => {
+		const headingRegex = /<h[1-6]/i;
+		const footnoteRegex = /class="[^"]*footnotes[^"]*"/i;
+
+		return headingRegex.test(htmlContent) || footnoteRegex.test(htmlContent);
+	}, [htmlContent]);
+
 	useEffect(() => {
 		window.toast = toast;
 	}, []);
@@ -324,9 +332,14 @@ function PostContent({
 			</div>
 
 			<div className="border-b">
-				<section className="section-base">
+				<section className="section-base flex items-start gap-10 px-8 py-10 md:px-12 lg:px-[60px]">
+					{hasHeadings && (
+						<aside className="sticky top-24 hidden w-[200px] shrink-0 lg:block">
+							<BlogTOC />
+						</aside>
+					)}
 					<div
-						className="post-style px-[120px] py-[20px] leading-relaxed max-[768px]:px-[20px] max-[768px]:py-[30px]"
+						className="post-style min-w-0 flex-1 leading-relaxed"
 						dangerouslySetInnerHTML={{
 							__html: htmlContent.replace(/<img/g, '<img data-zoom="true"'),
 						}}
@@ -351,10 +364,10 @@ export default function BlogSlug({
 	htmlContent: string;
 }) {
 	return (
-		<Suspense fallback={<LoadingSkeleton />}>
-			<ErrorBoundary fallback={null}>
+		<ErrorBoundary fallback={null}>
+			<Suspense fallback={<LoadingSkeleton />}>
 				<PostContent post={post} htmlContent={htmlContent} />
-			</ErrorBoundary>
-		</Suspense>
+			</Suspense>
+		</ErrorBoundary>
 	);
 }
