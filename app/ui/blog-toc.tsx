@@ -90,15 +90,24 @@ export default function BlogTOC() {
 
 	if (isLoading) {
 		return (
-			<div className="space-y-4 border-r border-transparent pl-4">
-				<Skeleton className="h-4 w-[120px]" />
-				<div className="space-y-2.5">
-					<Skeleton className="h-3 w-[150px]" />
-					<Skeleton className="ml-3 h-3 w-[130px]" />
-					<Skeleton className="ml-3 h-3 w-[140px]" />
-					<Skeleton className="h-3 w-[110px]" />
+			<>
+				{/* Mobile Skeleton */}
+				<div className="mb-4 flex w-full items-center justify-between rounded-md border px-3 py-2 lg:hidden">
+					<Skeleton className="h-4 w-12" />
+					<Skeleton className="h-4 w-4" />
 				</div>
-			</div>
+
+				{/* Desktop Skeleton */}
+				<div className="hidden space-y-4 border-r border-transparent pl-4 lg:block">
+					<Skeleton className="h-4 w-[120px]" />
+					<div className="space-y-2.5">
+						<Skeleton className="h-3 w-[150px]" />
+						<Skeleton className="ml-3 h-3 w-[130px]" />
+						<Skeleton className="ml-3 h-3 w-[140px]" />
+						<Skeleton className="h-3 w-[110px]" />
+					</div>
+				</div>
+			</>
 		);
 	}
 
@@ -129,17 +138,17 @@ export default function BlogTOC() {
 				</button>
 				{isExpanded && (
 					<nav className="text-sm">
-						<ul className="relative space-y-2.5">
+						<ul className="bg-accent relative mb-8 space-y-2.5 rounded-md p-2">
 							{headings.map((heading) => (
 								<li
 									key={heading.id}
 									data-id={heading.id}
-									className="relative pr-4"
+									className="hover:bg-accent-foreground/5 relative m-2 rounded-md"
 									style={{ paddingLeft: (heading.level - 1) * 12 }}
 								>
 									<button
 										className={cn(
-											'hover:text-foreground block w-full cursor-pointer py-0.5 text-left transition-colors',
+											'hover:text-foreground block w-full cursor-pointer px-2 py-0.5 text-left transition-colors',
 											activeId === heading.id
 												? 'text-foreground font-medium'
 												: 'text-muted-foreground'
