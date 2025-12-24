@@ -14,6 +14,7 @@ export default function BlogTOC() {
 	const [headings, setHeadings] = useState<Heading[]>([]);
 	const [activeId, setActiveId] = useState<string>('');
 	const [isLoading, setIsLoading] = useState(true);
+	const [isExpanded, setIsExpanded] = useState(false);
 
 	const [indicatorStyle, setIndicatorStyle] = useState({ top: 0, height: 0 });
 	const navRef = useRef<HTMLUListElement>(null);
@@ -104,54 +105,123 @@ export default function BlogTOC() {
 	if (headings.length === 0) return null;
 
 	return (
-		<nav className="text-sm">
-			<ul ref={navRef} className="border-muted relative space-y-2.5 border-r">
-				<div
-					className="bg-foreground absolute right-[-1px] w-[2px] transition-all duration-300 ease-in-out"
-					style={{
-						height: indicatorStyle.height,
-						transform: `translateY(${indicatorStyle.top}px)`,
-						top: 0,
-						opacity: activeId ? 1 : 0,
-					}}
-				/>
-
-				{headings.map((heading) => (
-					<li
-						key={heading.id}
-						data-id={heading.id}
-						className="relative pr-4"
-						style={{ paddingLeft: (heading.level - 1) * 12 }}
+		<>
+			{/* Mobile TOC */}
+			<div className="lg:hidden">
+				<button
+					onClick={() => setIsExpanded(!isExpanded)}
+					className="hover:bg-accent mb-4 flex w-full items-center justify-between rounded-md border px-3 py-2 text-sm transition-colors"
+				>
+					<span>目录</span>
+					<svg
+						className={`h-4 w-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+						fill="none"
+						stroke="currentColor"
+						viewBox="0 0 24 24"
 					>
-						<button
-							className={cn(
-								'hover:text-foreground block w-full cursor-pointer py-0.5 text-left transition-colors',
-								activeId === heading.id
-									? 'text-foreground font-medium'
-									: 'text-muted-foreground'
-							)}
-							onClick={() => {
-								const el = document.getElementById(heading.id);
-								if (el) {
-									isManualScrolling.current = true;
-									setActiveId(heading.id);
+						<path
+							strokeLinecap="round"
+							strokeLinejoin="round"
+							strokeWidth={2}
+							d="M19 9l-7 7-7-7"
+						/>
+					</svg>
+				</button>
+				{isExpanded && (
+					<nav className="text-sm">
+						<ul className="relative space-y-2.5">
+							{headings.map((heading) => (
+								<li
+									key={heading.id}
+									data-id={heading.id}
+									className="relative pr-4"
+									style={{ paddingLeft: (heading.level - 1) * 12 }}
+								>
+									<button
+										className={cn(
+											'hover:text-foreground block w-full cursor-pointer py-0.5 text-left transition-colors',
+											activeId === heading.id
+												? 'text-foreground font-medium'
+												: 'text-muted-foreground'
+										)}
+										onClick={() => {
+											const el = document.getElementById(heading.id);
+											if (el) {
+												isManualScrolling.current = true;
+												setActiveId(heading.id);
 
-									const offsetTop =
-										window.pageYOffset + el.getBoundingClientRect().top - 80;
-									window.scrollTo({ top: offsetTop, behavior: 'smooth' });
-									history.replaceState(null, '', `#${heading.id}`);
+												const offsetTop =
+													window.pageYOffset +
+													el.getBoundingClientRect().top -
+													80;
+												window.scrollTo({ top: offsetTop, behavior: 'smooth' });
+												history.replaceState(null, '', `#${heading.id}`);
 
-									setTimeout(() => {
-										isManualScrolling.current = false;
-									}, 800);
-								}
-							}}
+												setTimeout(() => {
+													isManualScrolling.current = false;
+												}, 800);
+											}
+										}}
+									>
+										<span className="line-clamp-2">{heading.text}</span>
+									</button>
+								</li>
+							))}
+						</ul>
+					</nav>
+				)}
+			</div>
+
+			{/* Desktop TOC */}
+			<nav className="hidden text-sm lg:block">
+				<ul ref={navRef} className="border-muted relative space-y-2.5 border-r">
+					<div
+						className="bg-foreground absolute right-[-1px] w-[2px] transition-all duration-300 ease-in-out"
+						style={{
+							height: indicatorStyle.height,
+							transform: `translateY(${indicatorStyle.top}px)`,
+							top: 0,
+							opacity: activeId ? 1 : 0,
+						}}
+					/>
+
+					{headings.map((heading) => (
+						<li
+							key={heading.id}
+							data-id={heading.id}
+							className="relative pr-4"
+							style={{ paddingLeft: (heading.level - 1) * 12 }}
 						>
-							<span className="line-clamp-2">{heading.text}</span>
-						</button>
-					</li>
-				))}
-			</ul>
-		</nav>
+							<button
+								className={cn(
+									'hover:text-foreground block w-full cursor-pointer py-0.5 text-left transition-colors',
+									activeId === heading.id
+										? 'text-foreground font-medium'
+										: 'text-muted-foreground'
+								)}
+								onClick={() => {
+									const el = document.getElementById(heading.id);
+									if (el) {
+										isManualScrolling.current = true;
+										setActiveId(heading.id);
+
+										const offsetTop =
+											window.pageYOffset + el.getBoundingClientRect().top - 80;
+										window.scrollTo({ top: offsetTop, behavior: 'smooth' });
+										history.replaceState(null, '', `#${heading.id}`);
+
+										setTimeout(() => {
+											isManualScrolling.current = false;
+										}, 800);
+									}
+								}}
+							>
+								<span className="line-clamp-2">{heading.text}</span>
+							</button>
+						</li>
+					))}
+				</ul>
+			</nav>
+		</>
 	);
 }

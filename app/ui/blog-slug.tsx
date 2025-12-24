@@ -1,10 +1,9 @@
 'use client';
 
-import { Suspense, useEffect, useState, useMemo } from 'react';
+import { Suspense, useEffect, useMemo } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import Comments from '@/components/ui/comment';
 import { toast } from 'sonner';
-import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 
 declare global {
@@ -332,9 +331,9 @@ function PostContent({
 			</div>
 
 			<div className="border-b">
-				<section className="section-base flex items-start gap-10 px-8 py-10 md:px-12 lg:px-[60px]">
+				<section className="section-base flex flex-col items-start gap-10 px-8 py-10 md:px-12 lg:flex-row lg:px-[60px]">
 					{hasHeadings && (
-						<aside className="sticky top-24 hidden w-[200px] shrink-0 lg:block">
+						<aside className="w-full shrink-0 lg:sticky lg:top-24 lg:w-[200px]">
 							<BlogTOC />
 						</aside>
 					)}

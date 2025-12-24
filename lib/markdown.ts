@@ -39,6 +39,7 @@ async function processMarkdown(
 				.use(rehypeHighlight)
 				.use(addCodeHeaders)
 				.use(addHeadingAnchors)
+				.use(addFirstHeadingMargin)
 				.use(transformFootnoteLinks);
 		} else {
 			processor.use(remarkRehype, { allowDangerousHtml: true });
@@ -223,6 +224,20 @@ function addCodeHeaders() {
 
 					node.children.unshift(header);
 				}
+			}
+		});
+	};
+}
+
+function addFirstHeadingMargin() {
+	return (tree: Root) => {
+		let firstHeadingFound = false;
+		visit(tree, 'element', (node: HastElement) => {
+			if (!firstHeadingFound && /^h[1-6]$/.test(node.tagName)) {
+				node.properties = node.properties || {};
+				node.properties.style =
+					(node.properties.style || '') + 'margin-top: 0;';
+				firstHeadingFound = true;
 			}
 		});
 	};

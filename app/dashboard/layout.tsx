@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Ubuntu_Sans, Source_Code_Pro, Raleway } from 'next/font/google';
 import '@/app/globals.css';
+import localFont from 'next/font/local';
 
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/ui/app-sidebar';
@@ -34,6 +35,12 @@ const raleway = Raleway({
 	display: 'swap',
 });
 
+const JetBrainsMonoNerdFont = localFont({
+	src: '../../public/fonts/JetBrainsMonoNerdFont-Regular.ttf',
+	display: 'swap',
+	variable: '--font-jetbrains-mono-nerd-font',
+});
+
 export default async function RootLayout({
 	children,
 }: {
@@ -42,7 +49,7 @@ export default async function RootLayout({
 	return (
 		<html>
 			<body
-				className={`antialiased ${ubuntu.className} ${sourceCodePro.className} ${raleway.className}`}
+				className={`antialiased ${ubuntu.className} ${sourceCodePro.className} ${raleway.className} ${JetBrainsMonoNerdFont.variable}`}
 			>
 				<ClientThemeWrapper>
 					<ThemeProvider
