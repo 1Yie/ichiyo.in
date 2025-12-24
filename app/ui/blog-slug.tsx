@@ -332,7 +332,7 @@ function PostContent({
 			</div>
 
 			<div className="border-b">
-				<section className="section-base flex flex-col items-start gap-2 px-4 py-10 sm:px-8 md:px-12 lg:flex-row lg:px-[60px]">
+				<section className="section-base flex flex-col items-start gap-2 px-4 py-10 sm:px-8 md:px-12 lg:flex-row lg:gap-10 lg:px-[60px]">
 					{hasHeadings && (
 						<aside className="w-full shrink-0 lg:sticky lg:top-24 lg:block lg:w-[200px]">
 							<BlogTOC />
