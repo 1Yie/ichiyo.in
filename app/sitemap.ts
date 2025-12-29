@@ -7,7 +7,6 @@ export const dynamic = 'force-dynamic';
 
 /**
  * 格式化版本号为标准 ISO Date
- * 将 20251222T054030547Z 转换为 2025-12-22T05:40:30.547Z
  */
 function parseVersionDate(versionStr: string): Date {
 	try {
@@ -36,21 +35,36 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 		buildDate = new Date();
 	}
 
-	const posts = await prisma.post.findMany({
-		select: {
-			slug: true,
-			updatedAt: true,
-		},
-		where: {
-			published: true,
-		},
-		orderBy: { updatedAt: 'desc' },
-	});
+	const [posts, tags] = await Promise.all([
+		prisma.post.findMany({
+			select: {
+				slug: true,
+				updatedAt: true,
+			},
+			where: { published: true },
+			orderBy: { updatedAt: 'desc' },
+		}),
+		prisma.tag.findMany({
+			select: {
+				name: true,
+				posts: {
+					select: { updatedAt: true },
+					orderBy: { updatedAt: 'desc' },
+					take: 1,
+				},
+			},
+			where: {
+				posts: { some: { published: true } },
+			},
+		}),
+	]);
+
+	const latestPostUpdate = posts[0]?.updatedAt ?? buildDate;
 
 	const staticRoutes: MetadataRoute.Sitemap = [
 		{
 			url: baseUrl,
-			lastModified: buildDate,
+			lastModified: latestPostUpdate,
 			changeFrequency: 'daily',
 			priority: 1,
 		},
@@ -62,24 +76,43 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 		},
 		{
 			url: `${baseUrl}/blog`,
-			lastModified: posts[0]?.updatedAt ?? buildDate,
+			lastModified: latestPostUpdate,
+			changeFrequency: 'daily',
+			priority: 0.9,
+		},
+		{
+			url: `${baseUrl}/archive`,
+			lastModified: latestPostUpdate,
 			changeFrequency: 'weekly',
 			priority: 0.8,
 		},
 		{
-			url: `${baseUrl}/link`,
-			lastModified: buildDate,
+			url: `${baseUrl}/tags`,
+			lastModified: latestPostUpdate,
 			changeFrequency: 'weekly',
 			priority: 0.7,
 		},
+		{
+			url: `${baseUrl}/link`,
+			lastModified: buildDate,
+			changeFrequency: 'monthly',
+			priority: 0.6,
+		},
 	];
 
-	const dynamicRoutes: MetadataRoute.Sitemap = posts.map((post) => ({
-		url: `${baseUrl}/blog/${post.slug}`,
+	const postRoutes: MetadataRoute.Sitemap = posts.map((post) => ({
+		url: `${baseUrl}/blog/${encodeURIComponent(post.slug)}`,
 		lastModified: post.updatedAt,
 		changeFrequency: 'weekly',
-		priority: 0.7,
+		priority: 0.8,
 	}));
 
-	return [...staticRoutes, ...dynamicRoutes];
+	const tagRoutes: MetadataRoute.Sitemap = tags.map((tag) => ({
+		url: `${baseUrl}/tags/${encodeURIComponent(tag.name)}`,
+		lastModified: tag.posts[0]?.updatedAt ?? buildDate,
+		changeFrequency: 'weekly',
+		priority: 0.6,
+	}));
+
+	return [...staticRoutes, ...postRoutes, ...tagRoutes];
 }
