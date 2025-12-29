@@ -24,7 +24,7 @@ interface Post {
 	authors: { user: { uid: number; id: string; email: string } }[];
 }
 
-const postsPerPage = 2;
+const postsPerPage = 6;
 const getPosts = request<Post[]>('/api/post/public?summary=true');
 
 export default function PostsList({
