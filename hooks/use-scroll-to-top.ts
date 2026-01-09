@@ -8,7 +8,7 @@ export function useScrollToTop() {
 	const searchParams = useSearchParams();
 
 	useEffect(() => {
-		// 1. 核心修复：检查 URL 中是否有 hash (锚点)
+		// 检查 URL 中是否有 hash
 		// 如果存在 hash (例如 #section1)，则不强制滚动到顶部
 		if (window.location.hash) {
 			return;

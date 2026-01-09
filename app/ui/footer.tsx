@@ -1,4 +1,7 @@
+'use client';
+
 import Link from 'next/link';
+import { useState } from 'react';
 import {
 	NavigationMenu,
 	NavigationMenuItem,
@@ -43,6 +46,8 @@ const ICP = {
 };
 
 export default function Footer() {
+	const [currentYear] = useState(() => new Date().getFullYear());
+
 	return (
 		<div className="relative">
 			<section className="section-base">
@@ -55,7 +60,7 @@ export default function Footer() {
 						{/* 移动端 版权和 ICP */}
 						<div className="flex flex-col items-start md:hidden">
 							<p className="font-['Source_Code_Pro',monospace] text-xs text-gray-500 dark:text-gray-300">
-								Copyright © {new Date().getFullYear()} ichiyo
+								Copyright © {currentYear} ichiyo
 							</p>
 							{ICP.name && ICP.url && (
 								<div className="flex flex-row items-center justify-center gap-1">
@@ -86,7 +91,7 @@ export default function Footer() {
 
 					<div className="absolute left-1/2 flex -translate-x-1/2 transform flex-col items-center space-y-0 max-md:hidden">
 						<p className="font-['Source_Code_Pro',monospace] text-sm whitespace-nowrap text-gray-500 dark:text-gray-300">
-							Copyright © {new Date().getFullYear()} ichiyo
+							Copyright © {currentYear} ichiyo
 						</p>
 						{ICP.name && ICP.url && (
 							<div className="flex flex-row items-center justify-center gap-1">
